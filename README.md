@@ -1,0 +1,1 @@
+Serverless api for no-spoilers.net
