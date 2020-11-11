@@ -21,9 +21,9 @@ SeriesFunctions:
           method: PATCH
           path: /series/{id}
 
-  # deleteSeries:
-  #   handler: src/handlers/deleteSeries.handler
-  #   events:
-  #     - http:
-  #         method: DELETE
-  #         path: /series/:id
+  deleteSeries:
+    handler: src/handlers/deleteSeries.handler
+    events:
+      - http:
+          method: DELETE
+          path: /series/{id}

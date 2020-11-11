@@ -5,8 +5,6 @@ import commonMiddleware from '../lib/commonMiddleware';
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function patchSeries(event) {
-  console.log(event.pathParameters);
-  console.log(event.body);
   const { id } = event.pathParameters;
   const { name } = event.body;
   const now = new Date();
@@ -38,7 +36,7 @@ async function patchSeries(event) {
 
   return {
     statusCode: 200,
-    body: JSON.stringify( updatedSeries ),
+    body: JSON.stringify({ message: 'item successfully updated', updatedSeries }),
   };
 }
 

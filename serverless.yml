@@ -24,7 +24,7 @@ functions:
   getSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeries}
   postSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.postSeries}
   patchSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.patchSeries}
-  # deleteSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.deleteSeries}
+  deleteSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.deleteSeries}
 
 custom:
   SeriesTable:

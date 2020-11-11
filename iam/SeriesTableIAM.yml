@@ -6,5 +6,6 @@ SeriesTableIAM:
     - dynamodb:GetItem
     - dynamodb:UpdateItem
     - dynamodb:Query
+    - dynamodb:DeleteItem 
   Resource: 
     - ${self:custom.SeriesTable.arn}
