@@ -4,8 +4,8 @@ SeriesTable:
     TableName: SeriesTable-${self:provider.stage}
     BillingMode: PAY_PER_REQUEST
     AttributeDefinitions:
-      - AttributeName: name
+      - AttributeName: id
         AttributeType: S
     KeySchema:
-      - AttributeName: name
+      - AttributeName: id
         KeyType: HASH

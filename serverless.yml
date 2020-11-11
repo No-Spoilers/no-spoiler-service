@@ -21,20 +21,10 @@ resources:
     SeriesTable: ${file(resources/SeriesTable.yml):SeriesTable}
 
 functions:
-  getSeries:
-    handler: src/handlers/getSeries.handler
-    events:
-      - http:
-          method: GET
-          path: /series
-
-  postSeries:
-    handler: src/handlers/postSeries.handler
-    events:
-      - http:
-          method: POST
-          path: /series
-
+  getSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeries}
+  postSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.postSeries}
+  patchSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.patchSeries}
+  # deleteSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.deleteSeries}
 
 custom:
   SeriesTable:
