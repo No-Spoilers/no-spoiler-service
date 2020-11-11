@@ -1,0 +1,11 @@
+SeriesTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: SeriesTable-${self:provider.stage}
+    BillingMode: PAY_PER_REQUEST
+    AttributeDefinitions:
+      - AttributeName: name
+        AttributeType: S
+    KeySchema:
+      - AttributeName: name
+        KeyType: HASH

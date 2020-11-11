@@ -1,0 +1,15 @@
+SeriesFunctions:
+
+  getSeries:
+    handler: functions/handlers/getSeries.handler
+    events:
+      - http:
+          method: GET
+          path: /series
+
+  postSeries:
+    handler: functions/handlers/postSeries.handler
+    events:
+      - http:
+          method: POST
+          path: /series

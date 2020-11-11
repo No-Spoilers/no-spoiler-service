@@ -11,11 +11,33 @@ provider:
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-  
+  environment:
+    SERIES_TABLE_NAME: ${self:custom.SeriesTable.name}
+  iamRoleStatements:
+    - ${file(iam/SeriesTableIAM.yml):SeriesTableIAM}
+
+resources:
+  Resources:
+    SeriesTable: ${file(resources/SeriesTable.yml):SeriesTable}
+
 functions:
-  getData:
-    handler: src/handlers/getData.handler
+  getSeries:
+    handler: src/handlers/getSeries.handler
     events:
       - http:
           method: GET
-          path: /data
+          path: /series
+
+  postSeries:
+    handler: src/handlers/postSeries.handler
+    events:
+      - http:
+          method: POST
+          path: /series
+
+
+custom:
+  SeriesTable:
+    name: !Ref SeriesTable
+    arn: !GetAtt SeriesTable.Arn
+    
