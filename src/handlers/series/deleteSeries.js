@@ -5,11 +5,11 @@ import commonMiddleware from '../../lib/commonMiddleware';
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function deleteSeries(event) {
-  const { id } = event.pathParameters;
+  const { seriesId } = event.pathParameters;
 
   const params = {
     TableName: process.env.SERIES_TABLE_NAME,
-    Key: { id },
+    Key: { id: seriesId },
     ReturnValues: 'ALL_OLD'
   };
 

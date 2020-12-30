@@ -5,13 +5,13 @@ import commonMiddleware from '../../lib/commonMiddleware';
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function patchSeries(event) {
-  const { id } = event.pathParameters;
+  const { seriesId } = event.pathParameters;
   const { name } = event.body;
   const now = new Date();
 
   const params = {
     TableName: process.env.SERIES_TABLE_NAME,
-    Key: { id },
+    Key: { id: seriesId },
     UpdateExpression: 'set #name = :name, updatedAt = :updatedAt',
     ExpressionAttributeValues: {
       ':name': name,
