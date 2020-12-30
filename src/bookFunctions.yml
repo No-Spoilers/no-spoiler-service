@@ -1,0 +1,8 @@
+BookFunctions:
+
+  postBook:
+    handler: src/handlers/book/postBook.handler
+    events:
+      - http:
+          method: POST
+          path: /book
