@@ -1,29 +1,29 @@
 SeriesFunctions:
 
   getSeries:
-    handler: src/handlers/getSeries.handler
+    handler: src/handlers/series/getSeries.handler
     events:
       - http:
           method: GET
           path: /series
 
   postSeries:
-    handler: src/handlers/postSeries.handler
+    handler: src/handlers/series/postSeries.handler
     events:
       - http:
           method: POST
           path: /series
 
   patchSeries:
-    handler: src/handlers/patchSeries.handler
+    handler: src/handlers/series/patchSeries.handler
     events:
       - http:
           method: PATCH
-          path: /series/{id}
+          path: /series/{seriesId}
 
   deleteSeries:
-    handler: src/handlers/deleteSeries.handler
+    handler: src/handlers/series/deleteSeries.handler
     events:
       - http:
           method: DELETE
-          path: /series/{id}
+          path: /series/{seriesId}
