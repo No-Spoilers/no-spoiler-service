@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import AWS from 'aws-sdk';
 import createError from 'http-errors';
-import commonMiddleware from '../lib/commonMiddleware';
+import commonMiddleware from '../../lib/commonMiddleware';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
