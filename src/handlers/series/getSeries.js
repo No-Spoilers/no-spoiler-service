@@ -3,7 +3,7 @@ import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-async function getData() {
+async function getSeries() {
   let seriesList;
 
   const params = {
@@ -25,4 +25,4 @@ async function getData() {
   };
 }
 
-export const handler = getData;
+export const handler = getSeries;
