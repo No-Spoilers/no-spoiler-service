@@ -7,6 +7,13 @@ SeriesFunctions:
           method: GET
           path: /series
 
+  getSeriesById:
+    handler: src/handlers/series/getSeriesById.handler
+    events:
+      - http:
+          method: GET
+          path: /series/{seriesId}
+
   postSeries:
     handler: src/handlers/series/postSeries.handler
     events:

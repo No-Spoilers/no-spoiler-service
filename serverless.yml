@@ -22,6 +22,7 @@ resources:
 
 functions:
   getSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeries}
+  getSeriesById: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeriesById}
   postSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.postSeries}
   patchSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.patchSeries}
   deleteSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.deleteSeries}
