@@ -1,36 +1,18 @@
-import AWS from 'aws-sdk';
 import commonMiddleware from '../../lib/commonMiddleware';
-import createError from 'http-errors';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-
-export async function dbQuerySeriesById(seriesId) {
-    let series;
-
-    try {
-        const result = await dynamodb.get({
-            TableName: process.env.SERIES_TABLE_NAME,
-            Key: { id: seriesId }
-        }).promise();
-
-        series = result.Item;
-    } catch (error) {
-        console.error(error);
-        throw new createError.InternalServerError(error);
-    }
-
-    if (!series) {
-        throw new createError.NotFound(`Series with ID "${seriesId}" not found.`);
-    }
-
-    return series;
-}
+import dbQuerySeriesById from '../../lib/dbQuerySeriesById';
 
 async function getSeriesById(event) {
     const { seriesId } = event.pathParameters;
     console.log('seriesId', seriesId);
 
     const series = await dbQuerySeriesById(seriesId);
+
+    if (!series) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: `Series with ID "${seriesId}" not found.` }),
+        };
+    }
 
     return {
         statusCode: 200,
