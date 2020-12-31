@@ -29,7 +29,7 @@ async function postSeries(event) {
   }
 
   return {
-    statusCode: 200,
+    statusCode: 201,
     body: JSON.stringify({ message: 'new item successfully added', series }),
   };
 }
