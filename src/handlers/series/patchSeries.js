@@ -12,6 +12,7 @@ async function patchSeries(event) {
   const params = {
     TableName: process.env.SERIES_TABLE_NAME,
     Key: { id: seriesId },
+    ConditionExpression: 'attribute_exists(id)',
     UpdateExpression: 'set #name = :name, updatedAt = :updatedAt',
     ExpressionAttributeValues: {
       ':name': name,
@@ -30,6 +31,12 @@ async function patchSeries(event) {
 
     updatedSeries = result.Attributes;
   } catch (error) {
+    if(error && error.code && error.code === 'ConditionalCheckFailedException') {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'bad series id' }),
+      }
+    }
     console.log(error);
     throw new createError.InternalServerError(error);
   }
