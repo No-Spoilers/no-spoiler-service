@@ -1,32 +1,22 @@
-import AWS from 'aws-sdk';
-import createError from 'http-errors';
 import commonMiddleware from '../../lib/commonMiddleware';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import dbDeleteSeries from '../../lib/dbDeleteSeries';
 
 async function deleteSeries(event) {
   const { seriesId } = event.pathParameters;
 
-  const params = {
-    TableName: process.env.SERIES_TABLE_NAME,
-    Key: { id: seriesId },
-    ReturnValues: 'ALL_OLD'
-  };
+  const removedSeries = await dbDeleteSeries(seriesId);
 
-  let deletedSeries;
-
-  try {
-    const result = await dynamodb.delete(params).promise();
-
-    deletedSeries = result.Attributes;
-  } catch (error) {
-    console.log(error);
-    throw new createError.InternalServerError(error);
+  if (!removedSeries) {
+    console.log('fail path');
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: `Series with ID "${seriesId}" not found.` }),
+    };
   }
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'item successfully deleted', deletedSeries }),
+    body: JSON.stringify({ message: 'item successfully deleted', deletedSeries: removedSeries }),
   };
 }
 
