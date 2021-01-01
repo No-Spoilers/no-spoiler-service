@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import AWS from 'aws-sdk';
 import createError from 'http-errors';
 import commonMiddleware from '../../lib/commonMiddleware';
-import { dbQuerySeriesById } from '../series/getSeriesById';
+import dbQuerySeriesById from '../../lib/dbQuerySeriesById';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
@@ -21,7 +21,12 @@ async function postBook(event) {
 
   const series = await dbQuerySeriesById(seriesId);
 
-  console.log('series', series);
+  if(!series) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: `Series with ID "${seriesId}" not found.` }),
+    }
+  }
 
   const { books = [] } = series;
 
@@ -33,6 +38,7 @@ async function postBook(event) {
   const params = {
     TableName: process.env.SERIES_TABLE_NAME,
     Key: { id: seriesId },
+    ConditionExpression: 'attribute_exists(id)',
     UpdateExpression: 'set #books = :books, updatedAt = :updatedAt',
     ExpressionAttributeValues: {
       ':books': books,
@@ -56,7 +62,7 @@ async function postBook(event) {
   }
 
   return {
-    statusCode: 200,
+    statusCode: 201,
     body: JSON.stringify( updatedSeries ),
   };
 }
