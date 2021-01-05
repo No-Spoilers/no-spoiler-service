@@ -1,0 +1,426 @@
+{
+	"info": {
+		"_postman_id": "16358ccf-d057-4c3d-85b0-46bea88f4b1b",
+		"name": "No-Spoilers Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Series",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomSuffix = Math.floor(Math.random() * 10000);\r",
+							"pm.environment.set('testSeriesName', `Test Series ${randomSuffix}`);\r",
+							"pm.environment.set('testPass', '0');\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('POST /series should succeed', () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"})\r",
+							"\r",
+							"pm.test('POST /series should return created series', () => {\r",
+							"    const { series: { name, id } } = pm.response.json();\r",
+							"    pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"    pm.expect(id).to.be.a('string');\r",
+							"    pm.environment.set('testSeriesID', id);\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{testSeriesName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/series",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"series"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Series",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('GET /series should succeed', () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"pm.test('GET /series should include test item', () => {\r",
+							"    const seriesList = pm.response.json();\r",
+							"    const filteredList = seriesList.filter(series => series.id === pm.environment.get('testSeriesID'));\r",
+							"    pm.expect(filteredList.length).to.equal(1);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/series",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"series"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Series By ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"const { series: { name } = {} } = pm.response.json();\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"\r",
+							"    pm.test('GET /series/:id should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('GET /series/:id should include name', () => {\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('GET /series/:id should fail with bad ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/series/:seriesId",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"series",
+						":seriesId"
+					],
+					"variable": [
+						{
+							"key": "seriesId",
+							"value": "{{testSeriesID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Series",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"const { updatedSeries: { name, id } = {} } = pm.response.json();\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"\r",
+							"    pm.test('PATCH /series/:id should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        pm.expect(id).to.equal(pm.environment.get('testSeriesID'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"    })\r",
+							"\r",
+							"    pm.test('PATCH /series/:id should return expected data', () => {\r",
+							"        pm.expect(id).to.equal(pm.environment.get('testSeriesID'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('PATCH /series/:id should fail with bad ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomSuffix = Math.floor(Math.random() * 10000);\r",
+							"\r",
+							"pm.environment.set('testSeriesName', `New Name ${randomSuffix}`);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{testSeriesName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/series/:id",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"series",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{testSeriesID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Book to Series",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomSuffix = Math.floor(Math.random() * 10000);\r",
+							"\r",
+							"pm.environment.set('testBookName', `Test Book Name ${randomSuffix}`);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    pm.test('POST /book should succeed', () => {\r",
+							"        pm.response.to.have.status(201);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('POST /book should return updated info', () => {\r",
+							"        const { name, id } = pm.response.json();\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
+							"        pm.environment.set('testBookID', id);\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('POST /book should still pass with bad Series ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"seriesId\": \"{{testSeriesID}}\", \r\n    \"name\": \"{{testBookName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/book",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    const { deletedBook: { name, id } } = pm.response.json();\r",
+							"\r",
+							"    pm.test('DELETE /book/:id should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('DELETE /book/:id should return deleted item', () => {\r",
+							"        pm.expect(id).to.equal(pm.environment.get('testBookID'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('DELETE /book/:id should fail with bad ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/book/:id",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"book",
+						":id"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "",
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{testBookID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Series",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    const { deletedSeries: { name, id } } = pm.response.json();\r",
+							"\r",
+							"    pm.test('DELETE /series/:id should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('DELETE /series/:id should return deleted item', () => {\r",
+							"        pm.expect(id).to.equal(pm.environment.get('testSeriesID'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"    })\r",
+							"\r",
+							"    // End of first pass\r",
+							"    pm.environment.set('testPass', '1');\r",
+							"    postman.setNextRequest('Get Series By ID');\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('DELETE /series/:id should fail with bad ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"    // End of final pass\r",
+							"    pm.environment.set('testPass', '0');\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/series/:id",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"series",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{testSeriesID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
