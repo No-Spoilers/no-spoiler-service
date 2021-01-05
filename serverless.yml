@@ -13,12 +13,21 @@ provider:
   region: ${opt:region, 'us-east-1'}
   environment:
     SERIES_TABLE_NAME: ${self:custom.SeriesTable.name}
+    BOOK_TABLE_NAME: ${self:custom.BookTable.name}
+    ENTRY_TABLE_NAME: ${self:custom.EntryTable.name}
+    USER_TABLE_NAME: ${self:custom.UserTable.name}
   iamRoleStatements:
     - ${file(iam/SeriesTableIAM.yml):SeriesTableIAM}
+    - ${file(iam/BookTableIAM.yml):BookTableIAM}
+    - ${file(iam/EntryTableIAM.yml):EntryTableIAM}
+    - ${file(iam/UserTableIAM.yml):UserTableIAM}
 
 resources:
   Resources:
     SeriesTable: ${file(resources/SeriesTable.yml):SeriesTable}
+    BookTable: ${file(resources/BookTable.yml):BookTable}
+    EntryTable: ${file(resources/EntryTable.yml):EntryTable}
+    UserTable: ${file(resources/UserTable.yml):UserTable}
 
 functions:
   getSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeries}
@@ -33,4 +42,13 @@ custom:
   SeriesTable:
     name: !Ref SeriesTable
     arn: !GetAtt SeriesTable.Arn
+  BookTable:
+    name: !Ref BookTable
+    arn: !GetAtt BookTable.Arn
+  EntryTable:
+    name: !Ref EntryTable
+    arn: !GetAtt EntryTable.Arn
+  UserTable:
+    name: !Ref UserTable
+    arn: !GetAtt UserTable.Arn
     
