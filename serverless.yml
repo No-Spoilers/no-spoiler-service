@@ -37,6 +37,7 @@ functions:
   deleteSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.deleteSeries}
   
   postBook: ${file(src/bookFunctions.yml):BookFunctions.postBook}
+  deleteBook: ${file(src/bookFunctions.yml):BookFunctions.deleteBook}
 
 custom:
   SeriesTable:

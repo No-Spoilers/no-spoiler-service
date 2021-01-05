@@ -6,3 +6,10 @@ BookFunctions:
       - http:
           method: POST
           path: /book
+
+  deleteBook:
+    handler: src/handlers/book/deleteBook.handler
+    events:
+      - http:
+          method: DELETE
+          path: /book/{bookId}
