@@ -29,10 +29,11 @@ functions:
   
   postBook: ${file(src/bookFunctions.yml):BookFunctions.postBook}
   deleteBook: ${file(src/bookFunctions.yml):BookFunctions.deleteBook}
+  
+  postEntry: ${file(src/entryFunctions.yml):EntryFunctions.postEntry}
+  deleteEntry: ${file(src/entryFunctions.yml):EntryFunctions.deleteEntry}
 
 custom:
   NoSpoilersTable:
     name: !Ref NoSpoilersTable
     arn: !GetAtt NoSpoilersTable.Arn
-
-    
