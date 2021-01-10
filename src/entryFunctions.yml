@@ -1,0 +1,8 @@
+EntryFunctions:
+
+  postEntry:
+    handler: src/handlers/entry/postEntry.handler
+    events:
+      - http:
+          method: POST
+          path: /entry
