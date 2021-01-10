@@ -1,10 +1,10 @@
 import commonMiddleware from '../../lib/commonMiddleware';
-import dbDeleteBook from '../../lib/dbDeleteBook';
+import dbDeleteItem from '../../lib/dbDeleteItem';
 
 async function deleteBook(event) {
   const { bookId, seriesId } = event.pathParameters;
 
-  const removedBook = await dbDeleteBook(bookId, seriesId);
+  const removedBook = await dbDeleteItem(seriesId, bookId);
 
   if (!removedBook) {
     return {
