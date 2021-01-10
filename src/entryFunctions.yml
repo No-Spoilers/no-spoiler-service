@@ -6,3 +6,10 @@ EntryFunctions:
       - http:
           method: POST
           path: /entry
+
+  deleteEntry:
+    handler: src/handlers/entry/deleteEntry.handler
+    events:
+      - http:
+          method: DELETE
+          path: /entry/{entryId}/book/{bookId}
