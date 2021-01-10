@@ -1,4 +1,4 @@
-UserTableIAM:
+NoSpoilersTableIAM:
   Effect: Allow
   Action:
     - dynamodb:PutItem
@@ -8,4 +8,4 @@ UserTableIAM:
     - dynamodb:Query
     - dynamodb:DeleteItem 
   Resource: 
-    - ${self:custom.UserTable.arn}
+    - ${self:custom.NoSpoilersTable.arn}

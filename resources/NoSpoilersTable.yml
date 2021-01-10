@@ -1,0 +1,15 @@
+NoSpoilersTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: NoSpoilersTable-${self:provider.stage}
+    BillingMode: PAY_PER_REQUEST
+    AttributeDefinitions:
+      - AttributeName: primary_key
+        AttributeType: S
+      - AttributeName: sort_key
+        AttributeType: S
+    KeySchema:
+      - AttributeName: primary_key
+        KeyType: HASH
+      - AttributeName: sort_key
+        KeyType: RANGE

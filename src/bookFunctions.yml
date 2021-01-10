@@ -12,4 +12,4 @@ BookFunctions:
     events:
       - http:
           method: DELETE
-          path: /book/{bookId}
+          path: /book/{bookId}/series/{seriesId}

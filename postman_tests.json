@@ -29,10 +29,11 @@
 							"})\r",
 							"\r",
 							"pm.test('POST /series should return created series', () => {\r",
-							"    const { series: { name, id } } = pm.response.json();\r",
+							"    const { series: { name, primary_key, sort_key } } = pm.response.json();\r",
 							"    pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
-							"    pm.expect(id).to.be.a('string');\r",
-							"    pm.environment.set('testSeriesID', id);\r",
+							"    pm.expect(primary_key).to.equal('TOP~');\r",
+							"    pm.expect(sort_key).to.be.a('string');\r",
+							"    pm.environment.set('testSeriesID', sort_key);\r",
 							"})\r",
 							""
 						],
@@ -77,7 +78,7 @@
 							"\r",
 							"pm.test('GET /series should include test item', () => {\r",
 							"    const seriesList = pm.response.json();\r",
-							"    const filteredList = seriesList.filter(series => series.id === pm.environment.get('testSeriesID'));\r",
+							"    const filteredList = seriesList.filter(series => series.sort_key === pm.environment.get('testSeriesID'));\r",
 							"    pm.expect(filteredList.length).to.equal(1);\r",
 							"})"
 						],
@@ -162,18 +163,16 @@
 					"script": {
 						"exec": [
 							"const testPass = parseInt(pm.environment.get('testPass'));\r",
-							"const { updatedSeries: { name, id } = {} } = pm.response.json();\r",
+							"const { updatedSeries: { name, sort_key } = {} } = pm.response.json();\r",
 							"\r",
 							"if (testPass === 0) {\r",
 							"\r",
 							"    pm.test('PATCH /series/:id should succeed', () => {\r",
 							"        pm.response.to.have.status(200);\r",
-							"        pm.expect(id).to.equal(pm.environment.get('testSeriesID'));\r",
-							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
 							"    })\r",
 							"\r",
 							"    pm.test('PATCH /series/:id should return expected data', () => {\r",
-							"        pm.expect(id).to.equal(pm.environment.get('testSeriesID'));\r",
+							"        pm.expect(sort_key).to.equal(pm.environment.get('testSeriesID'));\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
 							"    })\r",
 							"\r",
@@ -257,9 +256,9 @@
 							"    })\r",
 							"\r",
 							"    pm.test('POST /book should return updated info', () => {\r",
-							"        const { name, id } = pm.response.json();\r",
+							"        const { name, sort_key } = pm.response.json();\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
-							"        pm.environment.set('testBookID', id);\r",
+							"        pm.environment.set('testBookID', sort_key);\r",
 							"    })\r",
 							"\r",
 							"} else {\r",
@@ -308,14 +307,13 @@
 							"const testPass = parseInt(pm.environment.get('testPass'));\r",
 							"\r",
 							"if (testPass === 0) {\r",
-							"    const { deletedBook: { name, id } } = pm.response.json();\r",
-							"\r",
 							"    pm.test('DELETE /book/:id should succeed', () => {\r",
 							"        pm.response.to.have.status(200);\r",
 							"    })\r",
 							"\r",
 							"    pm.test('DELETE /book/:id should return deleted item', () => {\r",
-							"        pm.expect(id).to.equal(pm.environment.get('testBookID'));\r",
+							"        const { deletedBook: { name, sort_key } } = pm.response.json();\r",
+							"        pm.expect(sort_key).to.equal(pm.environment.get('testBookID'));\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
 							"    })\r",
 							"\r",
@@ -335,13 +333,15 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{SPOILERS_HOST}}/book/:id",
+					"raw": "{{SPOILERS_HOST}}/book/:bookId/series/:seriesId",
 					"host": [
 						"{{SPOILERS_HOST}}"
 					],
 					"path": [
 						"book",
-						":id"
+						":bookId",
+						"series",
+						":seriesId"
 					],
 					"query": [
 						{
@@ -352,8 +352,12 @@
 					],
 					"variable": [
 						{
-							"key": "id",
+							"key": "bookId",
 							"value": "{{testBookID}}"
+						},
+						{
+							"key": "seriesId",
+							"value": "{{testSeriesID}}"
 						}
 					]
 				}
@@ -370,14 +374,13 @@
 							"const testPass = parseInt(pm.environment.get('testPass'));\r",
 							"\r",
 							"if (testPass === 0) {\r",
-							"    const { deletedSeries: { name, id } } = pm.response.json();\r",
-							"\r",
 							"    pm.test('DELETE /series/:id should succeed', () => {\r",
 							"        pm.response.to.have.status(200);\r",
 							"    })\r",
 							"\r",
 							"    pm.test('DELETE /series/:id should return deleted item', () => {\r",
-							"        pm.expect(id).to.equal(pm.environment.get('testSeriesID'));\r",
+							"        const { deletedSeries: { name, sort_key } } = pm.response.json();\r",
+							"        pm.expect(sort_key).to.equal(pm.environment.get('testSeriesID'));\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
 							"    })\r",
 							"\r",

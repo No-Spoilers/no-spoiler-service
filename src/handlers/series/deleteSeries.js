@@ -7,7 +7,6 @@ async function deleteSeries(event) {
   const removedSeries = await dbDeleteSeries(seriesId);
 
   if (!removedSeries) {
-    console.log('fail path');
     return {
       statusCode: 400,
       body: JSON.stringify({ error: `Series with ID "${seriesId}" not found.` }),

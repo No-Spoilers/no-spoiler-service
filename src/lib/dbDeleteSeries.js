@@ -6,9 +6,12 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 export default async function dbDeleteSeries(seriesId) {
   try {
     const params = {
-      TableName: process.env.SERIES_TABLE_NAME,
-      Key: { id: seriesId },
-      ConditionExpression: 'attribute_exists(id)',
+      TableName: process.env.NO_SPOILERS_TABLE_NAME,
+      Key: {
+        primary_key: 'TOP~',
+        sort_key: seriesId
+      },
+      ConditionExpression: 'attribute_exists(sort_key)',
       ReturnValues: 'ALL_OLD'
     };
 

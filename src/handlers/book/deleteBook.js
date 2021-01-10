@@ -2,15 +2,14 @@ import commonMiddleware from '../../lib/commonMiddleware';
 import dbDeleteBook from '../../lib/dbDeleteBook';
 
 async function deleteBook(event) {
-  const { bookId } = event.pathParameters;
-  console.log('bookId:', bookId);
-  const removedBook = await dbDeleteBook(bookId);
+  const { bookId, seriesId } = event.pathParameters;
+
+  const removedBook = await dbDeleteBook(bookId, seriesId);
 
   if (!removedBook) {
-    console.log('fail path');
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `Book with ID "${bookId}" not found.` }),
+      body: JSON.stringify({ error: `"${bookId}" from "${seriesId}" not found.` }),
     };
   }
 

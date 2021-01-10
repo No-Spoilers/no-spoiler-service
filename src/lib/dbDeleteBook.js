@@ -3,12 +3,15 @@ import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbDeleteBook(bookId) {
+export default async function dbDeleteBook(bookId, seriesId) {
   try {
     const params = {
-      TableName: process.env.BOOK_TABLE_NAME,
-      Key: { id: bookId },
-      ConditionExpression: 'attribute_exists(id)',
+      TableName: process.env.NO_SPOILERS_TABLE_NAME,
+      Key: {
+        primary_key: seriesId,
+        sort_key: bookId
+      },
+      ConditionExpression: 'attribute_exists(sort_key)',
       ReturnValues: 'ALL_OLD'
     };
 
