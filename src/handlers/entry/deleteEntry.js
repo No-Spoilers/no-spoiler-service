@@ -15,7 +15,7 @@ async function deleteEntry(event) {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'item successfully deleted', deleteEntry: removedEntry }),
+    body: JSON.stringify({ message: 'item successfully deleted', deletedEntry: removedEntry }),
   };
 }
 

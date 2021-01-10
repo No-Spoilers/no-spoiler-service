@@ -12,4 +12,4 @@ EntryFunctions:
     events:
       - http:
           method: DELETE
-          path: /entry/{entryId}/book/{bookId}
+          path: /entry/{entryId}/series/{seriesId}
