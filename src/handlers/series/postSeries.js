@@ -1,4 +1,6 @@
 import createError from 'http-errors';
+import validator from '@middy/validator';
+import postSeriesSchema from '../../schemas/postSeriesSchema';
 import commonMiddleware from '../../lib/commonMiddleware';
 import dbCreateSeries from '../../lib/dbCreateSeries';
 
@@ -18,4 +20,5 @@ async function postSeries(event) {
   }
 }
 
-export const handler = commonMiddleware(postSeries);
+export const handler = commonMiddleware(postSeries)
+  .use(validator({inputSchema: postSeriesSchema, useDefaults: true}));

@@ -1,3 +1,5 @@
+import validator from '@middy/validator';
+import postEntrySchema from '../../schemas/postEntrySchema';
 import createError from 'http-errors';
 import dbCreateEntry from '../../lib/dbCreateEntry';
 import commonMiddleware from '../../lib/commonMiddleware';
@@ -6,12 +8,6 @@ import dbQuerySeriesById from '../../lib/dbQuerySeriesById';
 async function postEntry(event) {
   const { text, seriesId } = event.body;
 
-  if (!text || text === '' || !seriesId || seriesId === '') {
-    return {
-      statusCode: 400,
-      body: JSON.stringify( {error: 'Malformed entry. Missing data.'} ),
-    };
-  }
 
   try {
     const series = await dbQuerySeriesById(seriesId);
@@ -36,4 +32,5 @@ async function postEntry(event) {
 
 }
 
-export const handler = commonMiddleware(postEntry);
+export const handler = commonMiddleware(postEntry)
+  .use(validator({inputSchema: postEntrySchema, useDefaults: true}));
