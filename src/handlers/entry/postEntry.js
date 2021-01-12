@@ -1,9 +1,9 @@
 import validator from '@middy/validator';
 import postEntrySchema from '../../schemas/postEntrySchema';
 import createError from 'http-errors';
-import dbCreateEntry from '../../lib/dbCreateEntry';
+import dbCreateEntry from '../../db/dbCreateEntry';
 import commonMiddleware from '../../lib/commonMiddleware';
-import dbQuerySeriesById from '../../lib/dbQuerySeriesById';
+import dbQuerySeriesById from '../../db/dbQuerySeriesById';
 
 async function postEntry(event) {
   const { text, seriesId } = event.body;

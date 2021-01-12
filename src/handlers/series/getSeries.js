@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import dbQuerySeries from '../../lib/dbQuerySeries';
+import dbQuerySeries from '../../db/dbQuerySeries';
 
 async function getSeries() {
   try {

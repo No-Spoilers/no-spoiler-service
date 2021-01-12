@@ -1,5 +1,5 @@
 import commonMiddleware from '../../lib/commonMiddleware';
-import dbUpdateSeries from '../../lib/dbUpdateSeries';
+import dbUpdateSeries from '../../db/dbUpdateSeries';
 
 async function patchSeries(event) {
   const { seriesId } = event.pathParameters;

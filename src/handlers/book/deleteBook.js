@@ -1,5 +1,5 @@
 import commonMiddleware from '../../lib/commonMiddleware';
-import dbDeleteItem from '../../lib/dbDeleteItem';
+import dbDeleteItem from '../../db/dbDeleteItem';
 
 async function deleteBook(event) {
   const { bookId, seriesId } = event.pathParameters;

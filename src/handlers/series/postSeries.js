@@ -2,7 +2,7 @@ import createError from 'http-errors';
 import validator from '@middy/validator';
 import postSeriesSchema from '../../schemas/postSeriesSchema';
 import commonMiddleware from '../../lib/commonMiddleware';
-import dbCreateSeries from '../../lib/dbCreateSeries';
+import dbCreateSeries from '../../db/dbCreateSeries';
 
 async function postSeries(event) {
   const { name } = event.body;

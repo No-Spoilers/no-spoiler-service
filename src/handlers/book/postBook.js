@@ -1,8 +1,9 @@
 import validator from '@middy/validator';
+import postBookSchema from '../../schemas/postBookSchema';
 import createError from 'http-errors';
-import dbCreateBook from '../../lib/dbCreateBook';
+import dbCreateBook from '../../db/dbCreateBook';
 import commonMiddleware from '../../lib/commonMiddleware';
-import dbQuerySeriesById from '../../lib/dbQuerySeriesById';
+import dbQuerySeriesById from '../../db/dbQuerySeriesById';
 
 async function postBook(event) {
   const { name, seriesId } = event.body;
