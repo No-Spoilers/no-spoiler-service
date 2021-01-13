@@ -6,8 +6,9 @@ import commonMiddleware from '../../lib/commonMiddleware';
 import dbQuerySeriesById from '../../db/dbQuerySeriesById';
 
 async function postBook(event) {
-  const { name, seriesId } = event.body;
+  const { name, seriesId, pubDate } = event.body;
 
+  const formattedDate = new Date(pubDate).toISOString();
 
   try {
     const series = await dbQuerySeriesById(seriesId);
@@ -18,7 +19,7 @@ async function postBook(event) {
       };
     }
 
-    const newBook = await dbCreateBook(name, seriesId);
+    const newBook = await dbCreateBook(seriesId, name, formattedDate);
 
     return {
       statusCode: 201,

@@ -3,22 +3,21 @@ import postEntrySchema from '../../schemas/postEntrySchema';
 import createError from 'http-errors';
 import dbCreateEntry from '../../db/dbCreateEntry';
 import commonMiddleware from '../../lib/commonMiddleware';
-import dbQuerySeriesById from '../../db/dbQuerySeriesById';
+import dbQueryBookById from '../../db/dbQueryBookById';
 
 async function postEntry(event) {
-  const { text, seriesId } = event.body;
-
+  const { seriesId, bookId, name, text } = event.body;
 
   try {
-    const series = await dbQuerySeriesById(seriesId);
-    if (!series) {
+    const book = await dbQueryBookById(seriesId, bookId);
+    if (!book) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: `Series with ID "${seriesId}" not found.` }),
+        body: JSON.stringify({ error: `Book with ID "${bookId}" in "${seriesId}" not found.` }),
       };
     }
 
-    const newEntry = await dbCreateEntry(text, seriesId);
+    const newEntry = await dbCreateEntry(seriesId, bookId, name, text);
 
     return {
       statusCode: 201,
