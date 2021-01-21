@@ -8,7 +8,7 @@ export default async function dbCreateSeries(name) {
 
   const series = {
     primary_key: 'TOP~',
-    sort_key: `SERIES~${generateId(10)}`,
+    sort_key: `s${generateId(10)}`,
     name,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString()

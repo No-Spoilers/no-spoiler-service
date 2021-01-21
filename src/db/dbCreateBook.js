@@ -8,7 +8,7 @@ export default async function dbCreateBook(seriesId, name, pubDate) {
 
   const book = {
     primary_key: seriesId,
-    sort_key: `BOOK~${generateId(10)}`,
+    sort_key: `b${generateId(10)}`,
     name,
     pubDate,
     createdAt: now.toISOString(),

@@ -8,7 +8,7 @@ export default async function dbCreateEntry(seriesId, bookId, name, text) {
 
   const entry = {
     primary_key: seriesId,
-    sort_key: `ENTRY~${generateId(10)}`,
+    sort_key: `e${generateId(10)}`,
     bookId,
     name,
     text,
