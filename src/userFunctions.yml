@@ -7,3 +7,9 @@ UserFunctions:
           method: POST
           path: /user
 
+  deleteUser:
+    handler: src/handlers/user/deleteUser.handler
+    events:
+      - http:
+          method: DELETE
+          path: /user/{userId}
