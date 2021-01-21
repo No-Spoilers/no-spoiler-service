@@ -1,18 +1,26 @@
 import AWS from 'aws-sdk';
 import generateId from '../lib/base64id';
 import bcrypt from 'bcryptjs';
+import dbQueryUserByEmail from './dbQueryUserByEmail';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbCreateUser(name) {
+export default async function dbCreateUser(name, email, password) {
+  email = email.toLowerCase();
   const now = new Date();
 
-  const temporaryPassword = `${generateId(20)}`;
-  const passwordHash = await bcrypt.hash(temporaryPassword, 10);
+  const result = await dbQueryUserByEmail(email);
+  if (result) {
+    result.existing = true;
+    return result;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
 
   const user = {
     primary_key: 'user',
-    sort_key: `u${generateId(10)}`,
+    sort_key: email,
+    userId:`u${generateId(10)}`,
     name,
     passwordHash,
     createdAt: now.toISOString(),
@@ -25,8 +33,6 @@ export default async function dbCreateUser(name) {
   };
 
   await dynamodb.put(params).promise();
-
-  user.temporaryPassword = temporaryPassword;
 
   return user;
 }

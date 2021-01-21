@@ -5,10 +5,24 @@ import dbCreateUser from '../../db/dbCreateUser';
 import commonMiddleware from '../../lib/commonMiddleware';
 
 async function postUser(event) {
-  const { name } = event.body;
+  const { name, email, password } = event.body;
 
   try {
-    const newUser = await dbCreateUser(name);
+    const result = await dbCreateUser(name, email, password);
+
+    if (result && result.existing) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify( `User with email:${email} already exists.` ),
+      };
+    }
+
+    const newUser = {
+      email: result.sort_key,
+      name: result.name,
+      userId: result.userId,
+      createdAt: result.createdAt
+    }
 
     return {
       statusCode: 201,
