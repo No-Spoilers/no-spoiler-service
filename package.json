@@ -17,6 +17,7 @@
     "aws-sdk": "^2.761.0",
     "bcryptjs": "^2.4.3",
     "http-errors": "^1.8.0",
+    "jsonwebtoken": "^8.5.1",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
@@ -26,6 +27,7 @@
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.6.0",
     "serverless-bundle": "^3.1.0",
+    "serverless-dotenv-plugin": "^3.1.0",
     "serverless-pseudo-parameters": "^2.5.0",
     "webpack": "^4.44.2"
   }

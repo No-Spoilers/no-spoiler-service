@@ -13,3 +13,10 @@ UserFunctions:
       - http:
           method: DELETE
           path: /user/{userId}
+
+  postLogin:
+    handler: src/handlers/user/postLogin.handler
+    events:
+      - http:
+          method: POST
+          path: /login

@@ -4,6 +4,7 @@ service:
 plugins:
   - serverless-bundle
   - serverless-pseudo-parameters
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
@@ -32,9 +33,11 @@ functions:
   
   postEntry: ${file(src/entryFunctions.yml):EntryFunctions.postEntry}
   deleteEntry: ${file(src/entryFunctions.yml):EntryFunctions.deleteEntry}
-
+  
   postUser: ${file(src/userFunctions.yml):UserFunctions.postUser}
   deleteUser: ${file(src/userFunctions.yml):UserFunctions.deleteUser}
+  postLogin: ${file(src/userFunctions.yml):UserFunctions.postLogin}
+
 custom:
   NoSpoilersTable:
     name: !Ref NoSpoilersTable
