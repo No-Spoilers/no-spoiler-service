@@ -33,6 +33,7 @@ functions:
   postEntry: ${file(src/entryFunctions.yml):EntryFunctions.postEntry}
   deleteEntry: ${file(src/entryFunctions.yml):EntryFunctions.deleteEntry}
 
+  postUser: ${file(src/userFunctions.yml):UserFunctions.postUser}
 custom:
   NoSpoilersTable:
     name: !Ref NoSpoilersTable

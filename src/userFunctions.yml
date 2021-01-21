@@ -1,0 +1,9 @@
+UserFunctions:
+
+  postUser:
+    handler: src/handlers/user/postUser.handler
+    events:
+      - http:
+          method: POST
+          path: /user
+
