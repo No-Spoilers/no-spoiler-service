@@ -12,10 +12,19 @@ export function createNewToken(user) {
   const jwtId = generateId(20);
 
   const token = jwt.sign(payload, TOKEN_SECRET, {
-    expiresIn: '1h',
+    expiresIn: '100d',
     jwtid: jwtId,
     subject: user.sort_key
   })
 
   return token;
+}
+
+export function verifyToken(token) {
+  try {
+    return jwt.verify(token, TOKEN_SECRET);
+  } catch (err) {
+    console.log('err:', err);
+    return false;
+  }
 }
