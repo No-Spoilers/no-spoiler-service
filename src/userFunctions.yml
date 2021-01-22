@@ -12,7 +12,7 @@ UserFunctions:
     events:
       - http:
           method: DELETE
-          path: /user/{userId}
+          path: /user
 
   postLogin:
     handler: src/handlers/user/postLogin.handler

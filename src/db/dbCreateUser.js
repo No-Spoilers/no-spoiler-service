@@ -5,8 +5,8 @@ import dbQueryUserByEmail from './dbQueryUserByEmail';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbCreateUser(name, email, password) {
-  email = email.toLowerCase();
+export default async function dbCreateUser(name, preservedCaseEmail, password) {
+  const email = preservedCaseEmail.toLowerCase();
   const now = new Date();
 
   const result = await dbQueryUserByEmail(email);
@@ -22,6 +22,7 @@ export default async function dbCreateUser(name, email, password) {
     sort_key: email,
     userId:`u${generateId(10)}`,
     name,
+    preservedCaseEmail,
     passwordHash,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString()

@@ -2,15 +2,23 @@ import commonMiddleware from '../../lib/commonMiddleware';
 import dbDeleteItem from '../../db/dbDeleteItem';
 
 async function deleteUser(event) {
-  const { userId } = event.pathParameters;
+  let { email } = event.body;
 
-  const deletedUser = await dbDeleteItem('user', userId);
+  email = email.toLowerCase();
 
-  if (!deletedUser) {
+  const result = await dbDeleteItem('user', email);
+
+  if (!result) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `"${userId}" not found.` }),
+      body: JSON.stringify({ error: `user:${email} not found.` }),
     };
+  }
+
+  const deletedUser = {
+    name: result.name,
+    userId: result.userId,
+    email: result.preservedCaseEmail
   }
 
   return {
