@@ -10,10 +10,9 @@ const validateJwt = () => {
       if (handler.event.headers.Authorization) {
         const [type, token] = handler.event.headers.Authorization.split(' ');
         if (type === 'Bearer' && typeof token !== 'undefined') {
-          const payload = verifyToken(token);
-          if (payload) {
-            handler.event.validToken = true;
-            handler.event.user = payload;
+          const tokenData = verifyToken(token);
+          if (tokenData) {
+            handler.event.token = tokenData;
           }
         }
       }

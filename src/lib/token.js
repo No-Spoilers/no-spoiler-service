@@ -4,17 +4,14 @@ import generateId from './base64id';
 const { TOKEN_SECRET } = process.env;
 
 export function createNewToken(user) {
-  const payload = {
-    userId: user.sort_key,
-    name: user.name
-  };
+  const payload = {}; // to be determined
 
   const jwtId = generateId(20);
 
   const token = jwt.sign(payload, TOKEN_SECRET, {
     expiresIn: '100d',
     jwtid: jwtId,
-    subject: user.sort_key
+    subject: user.userId
   })
 
   return token;
