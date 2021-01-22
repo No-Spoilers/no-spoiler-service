@@ -6,9 +6,17 @@ import dbCreateSeries from '../../db/dbCreateSeries';
 
 async function postSeries(event) {
   const { name } = event.body;
+  const { token } = event;
+
+  if (!token) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: 'invalid token' }),
+    };
+  }
 
   try {
-    const series = await dbCreateSeries(name);
+    const series = await dbCreateSeries(name, token);
 
     return {
       statusCode: 201,
