@@ -18,7 +18,7 @@ async function postUser(event) {
     }
 
     const newUser = {
-      email: result.sort_key,
+      email: result.preservedCaseEmail,
       name: result.name,
       userId: result.userId,
       createdAt: result.createdAt
