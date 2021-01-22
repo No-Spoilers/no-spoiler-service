@@ -6,20 +6,26 @@ import commonMiddleware from '../../lib/commonMiddleware';
 import dbQuerySeriesById from '../../db/dbQuerySeriesById';
 
 async function postBook(event) {
-  const { name, seriesId, pubDate } = event.body;
+  const bookData = event.body;
+  const { token } = event;
 
-  const formattedDate = new Date(pubDate).toISOString();
+  if (!token) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: 'invalid token' }),
+    };
+  }
 
   try {
-    const series = await dbQuerySeriesById(seriesId);
+    const series = await dbQuerySeriesById(bookData.seriesId);
     if (!series) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: `Series with ID "${seriesId}" not found.` }),
+        body: JSON.stringify({ error: `Series with ID "${bookData.seriesId}" not found.` }),
       };
     }
 
-    const newBook = await dbCreateBook(seriesId, name, formattedDate);
+    const newBook = await dbCreateBook(bookData, token);
 
     return {
       statusCode: 201,
