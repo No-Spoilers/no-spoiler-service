@@ -3,10 +3,10 @@ const schema = {
     body: {
       type: 'object',
       properties: {
-        userId: { type: 'string' },
+        email: { type: 'string' },
         password: { type: 'string' }
       },
-      required: [ 'userId', 'password' ]
+      required: [ 'email', 'password' ]
     }
   },
   required: [ 'body' ]

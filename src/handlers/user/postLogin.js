@@ -2,29 +2,29 @@ import bcrypt from 'bcryptjs';
 import createError from 'http-errors';
 import validator from '@middy/validator';
 import { createNewToken } from '../../lib/token';
-import dbQueryUserById from '../../db/dbQueryUserById';
+import dbQueryUserByEmail from '../../db/dbQueryUserByEmail';
 import commonMiddleware from '../../lib/commonMiddleware';
 import postLoginSchema from '../../schemas/postLoginSchema';
 
 async function postLogin(event) {
-  const { userId, password } = event.body;
+  const { email, password } = event.body;
 
   try {
-    const user = await dbQueryUserById(userId);
+    const user = await dbQueryUserByEmail(email);
 
     const verified = await bcrypt.compare(password, user.passwordHash);
     if (!verified) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: `Problem with user:${userId} or password.` }),
+        body: JSON.stringify({ error: `Problem with email:${email} or password.` }),
       };
     }
 
-    const token = await createNewToken(user);
+    const token = createNewToken(user);
 
     return {
-      statusCode: 201,
-      body: JSON.stringify( token ),
+      statusCode: 200,
+      body: JSON.stringify({ token })
     };
 
   } catch (error) {
