@@ -28,7 +28,13 @@ export default async function dbUpdateSeries(seriesId, name) {
   try {
     const result = await dynamodb.update(params).promise();
 
-    return result.Attributes;
+    const series = result.Attributes;
+
+    series.seriesId = series.sort_key;
+    delete series.primary_key;
+    delete series.sort_key;
+
+    return series;
 
   } catch (error) {
     if(error && error.code && error.code === 'ConditionalCheckFailedException') {

@@ -18,6 +18,12 @@ export default async function dbQuerySeries() {
   try {
     const result = await dynamodb.query(params).promise();
 
+    result.Items.forEach(series => {
+      series.seriesId = series.sort_key,
+      delete series.primary_key,
+      delete series.sort_key
+    })
+
     return result.Items;
 
   } catch (error) {

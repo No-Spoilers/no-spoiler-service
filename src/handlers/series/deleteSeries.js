@@ -13,6 +13,10 @@ async function deleteSeries(event) {
     };
   }
 
+  removedSeries.seriesId = removedSeries.sort_key,
+  delete removedSeries.primary_key,
+  delete removedSeries.sort_key
+
   return {
     statusCode: 200,
     body: JSON.stringify({ message: 'item successfully deleted', deletedSeries: removedSeries }),

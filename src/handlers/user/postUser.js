@@ -8,25 +8,18 @@ async function postUser(event) {
   const { name, email, password } = event.body;
 
   try {
-    const result = await dbCreateUser(name, email, password);
+    const user = await dbCreateUser(name, email, password);
 
-    if (result && result.existing) {
+    if (user && user.existing) {
       return {
         statusCode: 400,
         body: JSON.stringify( `User with email:${email} already exists.` ),
       };
     }
 
-    const newUser = {
-      email: result.preservedCaseEmail,
-      name: result.name,
-      userId: result.userId,
-      createdAt: result.createdAt
-    }
-
     return {
       statusCode: 201,
-      body: JSON.stringify( newUser ),
+      body: JSON.stringify( user ),
     };
 
   } catch (error) {

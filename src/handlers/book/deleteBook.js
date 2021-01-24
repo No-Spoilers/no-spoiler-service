@@ -13,6 +13,11 @@ async function deleteBook(event) {
     };
   }
 
+  removedBook.seriesId = removedBook.primary_key,
+  removedBook.bookId = removedBook.sort_key,
+  delete removedBook.primary_key,
+  delete removedBook.sort_key
+
   return {
     statusCode: 200,
     body: JSON.stringify({ message: 'item successfully deleted', deletedBook: removedBook }),

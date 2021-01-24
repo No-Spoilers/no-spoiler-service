@@ -10,7 +10,7 @@ async function patchSeries(event) {
   if(!updatedSeries) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `${seriesId} not found` }),
+      body: JSON.stringify({ error: `series:${seriesId} not found` }),
     }
   }
 

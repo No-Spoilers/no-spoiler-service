@@ -24,5 +24,10 @@ export default async function dbCreateBook({pubDate, seriesId, name}, token) {
 
   await dynamodb.put(params).promise();
 
+  book.seriesId = book.primary_key;
+  book.bookId = book.sort_key;
+  delete book.primary_key;
+  delete book.sort_key;
+
   return book;
 }

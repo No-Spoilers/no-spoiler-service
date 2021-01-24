@@ -24,5 +24,10 @@ export default async function dbCreateEntry({seriesId, bookId, name, text}, toke
 
   await dynamodb.put(params).promise();
 
+  entry.seriesId = entry.primary_key;
+  entry.entryId = entry.sort_key;
+  delete entry.primary_key;
+  delete entry.sort_key;
+
   return entry;
 }

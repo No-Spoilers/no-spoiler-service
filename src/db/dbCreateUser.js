@@ -35,5 +35,11 @@ export default async function dbCreateUser(name, preservedCaseEmail, password) {
 
   await dynamodb.put(params).promise();
 
+  user.email = user.preservedCaseEmail;
+  delete user.primary_key;
+  delete user.sort_key;
+  delete user.preservedCaseEmail;
+  delete user.passwordHash;
+
   return user;
 }

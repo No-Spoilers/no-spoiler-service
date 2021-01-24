@@ -4,8 +4,6 @@ import createError from 'http-errors';
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 export default async function dbQueryBookById(seriesId, bookId) {
-  let series;
-
   try {
     const result = await dynamodb.get({
       TableName: process.env.NO_SPOILERS_TABLE_NAME,
@@ -15,11 +13,19 @@ export default async function dbQueryBookById(seriesId, bookId) {
       }
     }).promise();
 
-    series = result.Item;
+    const book = result.Item;
+
+    if (!book) return null;
+
+    book.seriesId = book.primary_key,
+    book.bookId = book.sort_key,
+    delete book.primary_key,
+    delete book.sort_key
+
+    return book;
+
   } catch (error) {
       console.error(error);
       throw new createError.InternalServerError(error);
   }
-
-  return series;
 }

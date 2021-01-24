@@ -22,5 +22,9 @@ export default async function dbCreateSeries(name, token) {
 
   await dynamodb.put(entry).promise();
 
+  series.seriesId = series.sort_key;
+  delete series.primary_key;
+  delete series.sort_key;
+
   return series;
 }
