@@ -1,5 +1,6 @@
 import createError from 'http-errors';
 import dbQuerySeries from '../../db/dbQuerySeries';
+import commonMiddleware from '../../lib/commonMiddleware';
 
 async function getSeries() {
   try {
@@ -15,4 +16,4 @@ async function getSeries() {
   }
 }
 
-export const handler = getSeries;
+export const handler = commonMiddleware(getSeries);
