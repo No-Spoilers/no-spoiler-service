@@ -10,8 +10,8 @@ export default async function dbUpdateSeries(seriesId, name) {
   const params = {
     TableName: process.env.NO_SPOILERS_TABLE_NAME,
     Key: {
-      primary_key: 'TOP~',
-      sort_key: seriesId
+      primary_key: seriesId,
+      sort_key: 'TOP~'
     },
     ConditionExpression: 'attribute_exists(sort_key)',
     UpdateExpression: 'set #name = :name, updatedAt = :updatedAt',
@@ -30,7 +30,7 @@ export default async function dbUpdateSeries(seriesId, name) {
 
     const series = result.Attributes;
 
-    series.seriesId = series.sort_key;
+    series.seriesId = series.primary_key;
     delete series.primary_key;
     delete series.sort_key;
 

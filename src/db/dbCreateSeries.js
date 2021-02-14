@@ -7,8 +7,8 @@ export default async function dbCreateSeries(name, token) {
   const now = new Date();
 
   const series = {
-    primary_key: 'TOP~',
-    sort_key: `s${generateId(10)}`,
+    primary_key: `s${generateId(10)}`,
+    sort_key: 'TOP~',
     name,
     createdBy: token.sub,
     createdAt: now.toISOString(),
@@ -22,7 +22,7 @@ export default async function dbCreateSeries(name, token) {
 
   await dynamodb.put(entry).promise();
 
-  series.seriesId = series.sort_key;
+  series.seriesId = series.primary_key;
   delete series.primary_key;
   delete series.sort_key;
 

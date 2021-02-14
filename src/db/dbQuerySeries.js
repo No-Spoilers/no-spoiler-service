@@ -6,9 +6,10 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 export default async function dbQuerySeries() {
   const params = {
     TableName: process.env.NO_SPOILERS_TABLE_NAME,
-    KeyConditionExpression: '#pk = :top',
+    IndexName: 'ReverseLookup',
+    KeyConditionExpression: '#sk = :top',
     ExpressionAttributeNames:{
-        '#pk': 'primary_key'
+        '#sk': 'sort_key'
     },
     ExpressionAttributeValues: {
         ':top': 'TOP~'
@@ -19,7 +20,7 @@ export default async function dbQuerySeries() {
     const result = await dynamodb.query(params).promise();
 
     result.Items.forEach(series => {
-      series.seriesId = series.sort_key,
+      series.seriesId = series.primary_key,
       delete series.primary_key,
       delete series.sort_key
     })
