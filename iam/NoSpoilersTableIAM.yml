@@ -9,3 +9,4 @@ NoSpoilersTableIAM:
     - dynamodb:DeleteItem 
   Resource: 
     - ${self:custom.NoSpoilersTable.arn}
+    - ${self:custom.NoSpoilersTable.indexes}
