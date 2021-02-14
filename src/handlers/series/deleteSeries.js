@@ -4,22 +4,22 @@ import dbDeleteItem from '../../db/dbDeleteItem';
 async function deleteSeries(event) {
   const { seriesId } = event.pathParameters;
 
-  const removedSeries = await dbDeleteItem('TOP~', seriesId);
+  const deletedSeries = await dbDeleteItem(seriesId, 'TOP~');
 
-  if (!removedSeries) {
+  if (!deletedSeries) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: `Series with ID "${seriesId}" not found.` }),
     };
   }
 
-  removedSeries.seriesId = removedSeries.sort_key,
-  delete removedSeries.primary_key,
-  delete removedSeries.sort_key
+  deletedSeries.seriesId = deletedSeries.primary_key,
+  delete deletedSeries.primary_key,
+  delete deletedSeries.sort_key
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'item successfully deleted', deletedSeries: removedSeries }),
+    body: JSON.stringify({ message: 'item successfully deleted', deletedSeries }),
   };
 }
 

@@ -6,6 +6,122 @@
 	},
 	"item": [
 		{
+			"name": "Create User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomName = pm.variables.replaceIn('{{$randomFullName}}');\r",
+							"const randomEmail = pm.variables.replaceIn('{{$randomEmail}}');\r",
+							"const randomPassword = pm.variables.replaceIn('{{$randomPassword}}');\r",
+							"\r",
+							"pm.environment.set('testUserName', `Test-${randomName}`);\r",
+							"pm.environment.set('testUserEmail', randomEmail);\r",
+							"pm.environment.set('testUserPassword', randomPassword);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('POST /user should succeed', () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"})\r",
+							"\r",
+							"pm.test('POST /user should return created user', () => {\r",
+							"    const { name, userId, email, createdAt } = pm.response.json();\r",
+							"    pm.expect(name).to.equal(pm.environment.get('testUserName'));\r",
+							"    pm.expect(email).to.equal(pm.environment.get('testUserEmail'));\r",
+							"    pm.expect(createdAt).to.be.a('string');\r",
+							"    pm.expect(userId).to.be.a('string');\r",
+							"    pm.environment.set('testUserId', userId);\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{testUserName}}\",\r\n    \"email\": \"{{testUserEmail}}\",\r\n    \"password\": \"{{testUserPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/user",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('POST /login should succeed', () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"pm.test('POST /login should return token', () => {\r",
+							"    const { token } = pm.response.json();\r",
+							"    pm.expect(token).to.be.a('string');\r",
+							"    pm.environment.set('testUserToken', token);\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{testUserEmail}}\",\r\n    \"password\": \"{{testUserPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/login",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create Series",
 			"event": [
 				{
@@ -29,11 +145,10 @@
 							"})\r",
 							"\r",
 							"pm.test('POST /series should return created series', () => {\r",
-							"    const { series: { name, primary_key, sort_key } } = pm.response.json();\r",
+							"    const { series: { name, seriesId } } = pm.response.json();\r",
 							"    pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
-							"    pm.expect(primary_key).to.equal('TOP~');\r",
-							"    pm.expect(sort_key).to.be.a('string');\r",
-							"    pm.environment.set('testSeriesID', sort_key);\r",
+							"    pm.expect(seriesId).to.be.a('string');\r",
+							"    pm.environment.set('testSeriesId', seriesId);\r",
 							"})\r",
 							""
 						],
@@ -42,6 +157,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -78,7 +203,7 @@
 							"\r",
 							"pm.test('GET /series should include test item', () => {\r",
 							"    const seriesList = pm.response.json();\r",
-							"    const filteredList = seriesList.filter(series => series.sort_key === pm.environment.get('testSeriesID'));\r",
+							"    const filteredList = seriesList.filter(series => series.seriesId === pm.environment.get('testSeriesId'));\r",
 							"    pm.expect(filteredList.length).to.equal(1);\r",
 							"})"
 						],
@@ -109,7 +234,6 @@
 					"script": {
 						"exec": [
 							"const testPass = parseInt(pm.environment.get('testPass'));\r",
-							"const { series: { name } = {} } = pm.response.json();\r",
 							"\r",
 							"if (testPass === 0) {\r",
 							"\r",
@@ -118,7 +242,9 @@
 							"    })\r",
 							"\r",
 							"    pm.test('GET /series/:id should include name', () => {\r",
-							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"        const allEntries = pm.response.json();\r",
+							"        pm.expect(allEntries.length).to.equal(1);\r",
+							"        pm.expect(allEntries[0].name).to.equal(pm.environment.get('testSeriesName'));\r",
 							"    })\r",
 							"\r",
 							"} else {\r",
@@ -148,7 +274,8 @@
 					"variable": [
 						{
 							"key": "seriesId",
-							"value": "{{testSeriesID}}"
+							"value": "{{testSeriesId}}",
+							"type": "string"
 						}
 					]
 				}
@@ -163,7 +290,6 @@
 					"script": {
 						"exec": [
 							"const testPass = parseInt(pm.environment.get('testPass'));\r",
-							"const { updatedSeries: { name, sort_key } = {} } = pm.response.json();\r",
 							"\r",
 							"if (testPass === 0) {\r",
 							"\r",
@@ -172,7 +298,8 @@
 							"    })\r",
 							"\r",
 							"    pm.test('PATCH /series/:id should return expected data', () => {\r",
-							"        pm.expect(sort_key).to.equal(pm.environment.get('testSeriesID'));\r",
+							"        const { updatedSeries: { name, seriesId } } = pm.response.json();\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
 							"    })\r",
 							"\r",
@@ -200,6 +327,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PATCH",
 				"header": [],
 				"body": {
@@ -212,18 +349,19 @@
 					}
 				},
 				"url": {
-					"raw": "{{SPOILERS_HOST}}/series/:id",
+					"raw": "{{SPOILERS_HOST}}/series/:seriesId",
 					"host": [
 						"{{SPOILERS_HOST}}"
 					],
 					"path": [
 						"series",
-						":id"
+						":seriesId"
 					],
 					"variable": [
 						{
-							"key": "id",
-							"value": "{{testSeriesID}}"
+							"key": "seriesId",
+							"value": "{{testSeriesId}}",
+							"type": "string"
 						}
 					]
 				}
@@ -239,7 +377,8 @@
 						"exec": [
 							"const randomSuffix = Math.floor(Math.random() * 10000);\r",
 							"\r",
-							"pm.environment.set('testBookName', `Test Book Name ${randomSuffix}`);"
+							"pm.environment.set('testBookName', `Test Book Name ${randomSuffix}`);\r",
+							"pm.environment.set('testBookDate', pm.variables.replaceIn('{{$randomDatePast}}'));"
 						],
 						"type": "text/javascript"
 					}
@@ -256,14 +395,14 @@
 							"    })\r",
 							"\r",
 							"    pm.test('POST /book should return updated info', () => {\r",
-							"        const { name, sort_key } = pm.response.json();\r",
+							"        const { name, bookId } = pm.response.json();\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
-							"        pm.environment.set('testBookID', sort_key);\r",
+							"        pm.environment.set('testBookId', bookId);\r",
 							"    })\r",
 							"\r",
 							"} else {\r",
 							"\r",
-							"    pm.test('POST /book should still pass with bad Series ID', () => {\r",
+							"    pm.test('POST /book should not pass with bad Series ID', () => {\r",
 							"        pm.response.to.have.status(400);\r",
 							"    })\r",
 							"\r",
@@ -274,11 +413,21 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"seriesId\": \"{{testSeriesID}}\", \r\n    \"name\": \"{{testBookName}}\"\r\n}",
+					"raw": "{\r\n    \"seriesId\": \"{{testSeriesId}}\", \r\n    \"name\": \"{{testBookName}}\",\r\n    \"pubDate\": \"{{testBookDate}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -292,6 +441,158 @@
 					],
 					"path": [
 						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Entry",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set('testEntryText', pm.variables.replaceIn('{{$randomLoremParagraph}}'));\r",
+							"pm.environment.set('testEntryName', pm.variables.replaceIn('{{$randomFullName}}')); // Every entry will be about a person, place, item, group, or concept"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    pm.test('POST /entry should succeed', () => {\r",
+							"        pm.response.to.have.status(201);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('POST /entry should return updated info', () => {\r",
+							"        const { seriesId, entryId, name, text, bookId } = pm.response.json();\r",
+							"        pm.expect(text).to.equal(pm.environment.get('testEntryText'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testEntryName'));\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
+							"        pm.expect(bookId).to.equal(pm.environment.get('testBookId'));\r",
+							"        pm.environment.set('testEntryId', entryId);\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('POST /entry should not pass with bad Series ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"seriesId\": \"{{testSeriesId}}\",\r\n    \"bookId\": \"{{testBookId}}\",\r\n    \"name\": \"{{testEntryName}}\",\r\n    \"text\": \"{{testEntryText}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/entry",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"entry"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Entry",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    pm.test('DELETE /entry/:entryId/series/:seriesId should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('DELETE /entry/:entryId/series/:seriesId should return deleted item', () => {\r",
+							"        const { deletedEntry: { text, seriesId, entryId } } = pm.response.json();\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
+							"        pm.expect(entryId).to.equal(pm.environment.get('testEntryId'));\r",
+							"        pm.expect(text).to.equal(pm.environment.get('testEntryText'));\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('DELETE /entry/:entryId/series/:seriesId should fail with bad ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/entry/:entryId/series/:seriesId",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"entry",
+						":entryId",
+						"series",
+						":seriesId"
+					],
+					"variable": [
+						{
+							"key": "entryId",
+							"value": "{{testEntryId}}",
+							"type": "string"
+						},
+						{
+							"key": "seriesId",
+							"value": "{{testSeriesId}}",
+							"type": "string"
+						}
 					]
 				}
 			},
@@ -312,8 +613,9 @@
 							"    })\r",
 							"\r",
 							"    pm.test('DELETE /book/:id should return deleted item', () => {\r",
-							"        const { deletedBook: { name, sort_key } } = pm.response.json();\r",
-							"        pm.expect(sort_key).to.equal(pm.environment.get('testBookID'));\r",
+							"        const { deletedBook: { name, bookId, seriesId } } = pm.response.json();\r",
+							"        pm.expect(bookId).to.equal(pm.environment.get('testBookId'));\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
 							"    })\r",
 							"\r",
@@ -330,6 +632,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"url": {
@@ -353,11 +665,13 @@
 					"variable": [
 						{
 							"key": "bookId",
-							"value": "{{testBookID}}"
+							"value": "{{testBookId}}",
+							"type": "string"
 						},
 						{
 							"key": "seriesId",
-							"value": "{{testSeriesID}}"
+							"value": "{{testSeriesId}}",
+							"type": "string"
 						}
 					]
 				}
@@ -379,8 +693,8 @@
 							"    })\r",
 							"\r",
 							"    pm.test('DELETE /series/:id should return deleted item', () => {\r",
-							"        const { deletedSeries: { name, sort_key } } = pm.response.json();\r",
-							"        pm.expect(sort_key).to.equal(pm.environment.get('testSeriesID'));\r",
+							"        const { deletedSeries: { name, seriesId } } = pm.response.json();\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
 							"    })\r",
 							"\r",
@@ -394,7 +708,7 @@
 							"        pm.response.to.have.status(400);\r",
 							"    })\r",
 							"\r",
-							"    // End of final pass\r",
+							"    // End of looping tests\r",
 							"    pm.environment.set('testPass', '0');\r",
 							"\r",
 							"}"
@@ -404,22 +718,91 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{SPOILERS_HOST}}/series/:id",
+					"raw": "{{SPOILERS_HOST}}/series/:seriesId",
 					"host": [
 						"{{SPOILERS_HOST}}"
 					],
 					"path": [
 						"series",
-						":id"
+						":seriesId"
 					],
 					"variable": [
 						{
-							"key": "id",
-							"value": "{{testSeriesID}}"
+							"key": "seriesId",
+							"value": "{{testSeriesId}}",
+							"type": "string"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test('DELETE /user/:userId should succeed', () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"pm.test('DELETE /series/:userId should return deleted item', () => {\r",
+							"    const { deletedUser: { name, userId, email } } = pm.response.json();\r",
+							"    pm.expect(name).to.equal(pm.environment.get('testUserName'));\r",
+							"    pm.expect(userId).to.equal(pm.environment.get('testUserId'));\r",
+							"    pm.expect(email).to.equal(pm.environment.get('testUserEmail'));\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{testUserEmail}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/user",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"user"
 					]
 				}
 			},
