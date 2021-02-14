@@ -15,7 +15,7 @@ async function getSeriesById(event) {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ series }),
+    body: JSON.stringify(series),
   };
 }
 
