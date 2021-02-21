@@ -6,6 +6,7 @@ EntryFunctions:
       - http:
           method: POST
           path: /entry
+          cors: true
 
   deleteEntry:
     handler: src/handlers/entry/deleteEntry.handler
@@ -13,3 +14,4 @@ EntryFunctions:
       - http:
           method: DELETE
           path: /entry/{entryId}/series/{seriesId}
+          cors: true

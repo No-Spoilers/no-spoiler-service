@@ -6,6 +6,7 @@ SeriesFunctions:
       - http:
           method: GET
           path: /series
+          cors: true
 
   getSeriesById:
     handler: src/handlers/series/getSeriesById.handler
@@ -13,6 +14,7 @@ SeriesFunctions:
       - http:
           method: GET
           path: /series/{seriesId}
+          cors: true
 
   postSeries:
     handler: src/handlers/series/postSeries.handler
@@ -20,6 +22,7 @@ SeriesFunctions:
       - http:
           method: POST
           path: /series
+          cors: true
 
   patchSeries:
     handler: src/handlers/series/patchSeries.handler
@@ -27,6 +30,7 @@ SeriesFunctions:
       - http:
           method: PATCH
           path: /series/{seriesId}
+          cors: true
 
   deleteSeries:
     handler: src/handlers/series/deleteSeries.handler
@@ -34,3 +38,4 @@ SeriesFunctions:
       - http:
           method: DELETE
           path: /series/{seriesId}
+          cors: true

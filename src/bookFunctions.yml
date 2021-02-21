@@ -6,6 +6,7 @@ BookFunctions:
       - http:
           method: POST
           path: /book
+          cors: true
 
   deleteBook:
     handler: src/handlers/book/deleteBook.handler
@@ -13,3 +14,4 @@ BookFunctions:
       - http:
           method: DELETE
           path: /book/{bookId}/series/{seriesId}
+          cors: true

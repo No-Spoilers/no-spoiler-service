@@ -6,6 +6,7 @@ UserFunctions:
       - http:
           method: POST
           path: /user
+          cors: true
 
   deleteUser:
     handler: src/handlers/user/deleteUser.handler
@@ -13,6 +14,7 @@ UserFunctions:
       - http:
           method: DELETE
           path: /user
+          cors: true
 
   postLogin:
     handler: src/handlers/user/postLogin.handler
@@ -20,3 +22,4 @@ UserFunctions:
       - http:
           method: POST
           path: /login
+          cors: true
