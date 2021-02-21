@@ -3,6 +3,7 @@ import postUserSchema from '../../schemas/postUserSchema';
 import createError from 'http-errors';
 import dbCreateUser from '../../db/dbCreateUser';
 import commonMiddleware from '../../lib/commonMiddleware';
+import { createNewToken } from '../../lib/token';
 
 async function postUser(event) {
   const { name, email, password } = event.body;
@@ -17,9 +18,17 @@ async function postUser(event) {
       };
     }
 
+    const token = createNewToken(user);
+
+    const returnObject = {
+      name: user.name,
+      email: user.preservedCaseEmail,
+      token
+    }
+
     return {
       statusCode: 201,
-      body: JSON.stringify( user ),
+      body: JSON.stringify( returnObject ),
     };
 
   } catch (error) {

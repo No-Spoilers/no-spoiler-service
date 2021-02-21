@@ -11,20 +11,32 @@ async function postLogin(event) {
 
   try {
     const user = await dbQueryUserByEmail(email);
+    if (!user || !user.passwordHash) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ error: `Problem with email:${email} or password.` })
+      };
+    }
 
     const verified = await bcrypt.compare(password, user.passwordHash);
     if (!verified) {
       return {
-        statusCode: 400,
+        statusCode: 401,
         body: JSON.stringify({ error: `Problem with email:${email} or password.` }),
       };
     }
 
     const token = createNewToken(user);
 
+    const returnObject = {
+      name: user.name,
+      email: user.preservedCaseEmail,
+      token
+    }
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ token })
+      body: JSON.stringify(returnObject)
     };
 
   } catch (error) {
