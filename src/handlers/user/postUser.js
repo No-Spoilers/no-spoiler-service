@@ -22,7 +22,7 @@ async function postUser(event) {
 
     const returnObject = {
       name: user.name,
-      email: user.preservedCaseEmail,
+      email: user.email,
       token
     }
 
