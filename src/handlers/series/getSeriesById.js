@@ -2,14 +2,14 @@ import commonMiddleware from '../../lib/commonMiddleware';
 import dbQuerySeriesById from '../../db/dbQuerySeriesById';
 
 async function getSeriesById(event) {
-  const { seriesId } = event.pathParameters;
+  const { contentId } = event.pathParameters;
 
-  const series = await dbQuerySeriesById(seriesId);
+  const series = await dbQuerySeriesById(contentId);
 
   if (!series) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `Series with ID "${seriesId}" not found.` }),
+      body: JSON.stringify({ error: `Series for ID "${contentId}" not found.` }),
     };
   }
 

@@ -2,15 +2,15 @@ import commonMiddleware from '../../lib/commonMiddleware';
 import dbUpdateSeries from '../../db/dbUpdateSeries';
 
 async function patchSeries(event) {
-  const { seriesId } = event.pathParameters;
+  const { contentId } = event.pathParameters;
   const { name } = event.body;
 
-  const updatedSeries = await dbUpdateSeries(seriesId, name);
+  const updatedSeries = await dbUpdateSeries(contentId, name);
 
   if(!updatedSeries) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `series:${seriesId} not found` }),
+      body: JSON.stringify({ error: `series:${contentId} not found` }),
     }
   }
 

@@ -13,7 +13,7 @@ SeriesFunctions:
     events:
       - http:
           method: GET
-          path: /series/{seriesId}
+          path: /series/{contentId}
           cors: true
 
   postSeries:
@@ -29,7 +29,7 @@ SeriesFunctions:
     events:
       - http:
           method: PATCH
-          path: /series/{seriesId}
+          path: /series/{contentId}
           cors: true
 
   deleteSeries:
@@ -37,5 +37,5 @@ SeriesFunctions:
     events:
       - http:
           method: DELETE
-          path: /series/{seriesId}
+          path: /series/{contentId}
           cors: true
