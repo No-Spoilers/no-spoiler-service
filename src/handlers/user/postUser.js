@@ -23,6 +23,7 @@ async function postUser(event) {
     const returnObject = {
       name: user.name,
       email: user.email,
+      createdAt: user.createdAt,
       token
     }
 

@@ -17,7 +17,6 @@ async function deleteUser(event) {
 
   const deletedUser = {
     name: result.name,
-    userId: result.userId,
     email: result.preservedCaseEmail
   }
 
