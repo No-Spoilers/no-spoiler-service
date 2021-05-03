@@ -3,7 +3,7 @@ import postEntrySchema from '../../schemas/postEntrySchema';
 import createError from 'http-errors';
 import dbCreateEntry from '../../db/dbCreateEntry';
 import commonMiddleware from '../../lib/commonMiddleware';
-import dbQueryBookById from '../../db/dbQueryBookById';
+import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId';
 
 async function postEntry(event) {
   const entryData = event.body;
@@ -17,7 +17,7 @@ async function postEntry(event) {
   }
 
   try {
-    const book = await dbQueryBookById(entryData.seriesId, entryData.bookId);
+    const book = await dbGetBookBySeriesIdAndBookId(entryData.seriesId, entryData.bookId);
     if (!book) {
       return {
         statusCode: 400,

@@ -3,7 +3,7 @@ import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbQueryBookById(seriesId, bookId) {
+export default async function dbGetBookBySeriesIdAndBookId(seriesId, bookId) {
   try {
     const result = await dynamodb.get({
       TableName: process.env.NO_SPOILERS_TABLE_NAME,
