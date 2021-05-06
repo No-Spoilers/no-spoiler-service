@@ -29,7 +29,7 @@ functions:
   deleteSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.deleteSeries}
   
   postBook: ${file(src/bookFunctions.yml):BookFunctions.postBook}
-  putBook: ${file(src/bookFunctions.yml):BookFunctions.putBook}
+  patchBook: ${file(src/bookFunctions.yml):BookFunctions.patchBook}
   deleteBook: ${file(src/bookFunctions.yml):BookFunctions.deleteBook}
   
   postEntry: ${file(src/entryFunctions.yml):EntryFunctions.postEntry}

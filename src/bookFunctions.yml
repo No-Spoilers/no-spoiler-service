@@ -8,11 +8,11 @@ BookFunctions:
           path: /book
           cors: true
 
-  putBook:
-    handler: src/handlers/book/putBook.handler
+  patchBook:
+    handler: src/handlers/book/patchBook.handler
     events:
       - http:
-          method: PUT
+          method: PATCH
           path: /book
           cors: true
 
