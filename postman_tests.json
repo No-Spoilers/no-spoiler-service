@@ -86,6 +86,9 @@
 							"    const { token } = pm.response.json();\r",
 							"    pm.expect(token).to.be.a('string');\r",
 							"    pm.environment.set('testUserToken', token);\r",
+							"    const tokenParts = token.split('.');\r",
+							"    const payload = JSON.parse(atob(tokenParts[1]));\r",
+							"    pm.environment.set('testUserId', payload.sub);\r",
 							"})\r",
 							""
 						],
@@ -129,6 +132,7 @@
 						"exec": [
 							"const randomSuffix = Math.floor(Math.random() * 10000);\r",
 							"pm.environment.set('testSeriesName', `Test Series ${randomSuffix}`);\r",
+							"pm.environment.set('testSeriesText', pm.variables.replaceIn('{{$randomLoremSentences}}'));\r",
 							"pm.environment.set('testPass', '0');\r",
 							""
 						],
@@ -144,8 +148,9 @@
 							"})\r",
 							"\r",
 							"pm.test('POST /series should return created series', () => {\r",
-							"    const { series: { name, seriesId } } = pm.response.json();\r",
+							"    const { series: { name, seriesId, text } } = pm.response.json();\r",
 							"    pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"    pm.expect(text).to.equal(pm.environment.get('testSeriesText'));\r",
 							"    pm.expect(seriesId).to.be.a('string');\r",
 							"    pm.environment.set('testSeriesId', seriesId);\r",
 							"})\r",
@@ -170,7 +175,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"{{testSeriesName}}\"\r\n}",
+					"raw": "{\r\n    \"name\": \"{{testSeriesName}}\",\r\n    \"text\": \"{{testSeriesText}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -204,6 +209,11 @@
 							"    const seriesList = pm.response.json();\r",
 							"    const filteredList = seriesList.filter(series => series.seriesId === pm.environment.get('testSeriesId'));\r",
 							"    pm.expect(filteredList.length).to.equal(1);\r",
+							"    const { seriesId, name, text, createdBy } = filteredList[0];\r",
+							"    pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
+							"    pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"    pm.expect(text).to.equal(pm.environment.get('testSeriesText'));\r",
+							"    pm.expect(createdBy).to.equal(pm.environment.get('testUserId'));\r",
 							"})"
 						],
 						"type": "text/javascript"
@@ -240,10 +250,14 @@
 							"        pm.response.to.have.status(200);\r",
 							"    })\r",
 							"\r",
-							"    pm.test('GET /series/:id should include name', () => {\r",
+							"    pm.test('GET /series/:id should include expected data', () => {\r",
 							"        const allEntries = pm.response.json();\r",
 							"        pm.expect(allEntries.length).to.equal(1);\r",
-							"        pm.expect(allEntries[0].name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"        const { seriesId, name, text, createdBy } = allEntries[0];\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"        pm.expect(text).to.equal(pm.environment.get('testSeriesText'));\r",
+							"        pm.expect(createdBy).to.equal(pm.environment.get('testUserId'));\r",
 							"    })\r",
 							"\r",
 							"} else {\r",
@@ -297,9 +311,10 @@
 							"    })\r",
 							"\r",
 							"    pm.test('PATCH /series/:id should return expected data', () => {\r",
-							"        const { updatedSeries: { name, seriesId } } = pm.response.json();\r",
+							"        const { updatedSeries: { name, seriesId, text } } = pm.response.json();\r",
 							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
 							"        pm.expect(name).to.equal(pm.environment.get('testSeriesName'));\r",
+							"        pm.expect(text).to.equal(pm.environment.get('testSeriesText'));\r",
 							"    })\r",
 							"\r",
 							"} else {\r",
@@ -319,7 +334,8 @@
 						"exec": [
 							"const randomSuffix = Math.floor(Math.random() * 10000);\r",
 							"\r",
-							"pm.environment.set('testSeriesName', `New Name ${randomSuffix}`);"
+							"pm.environment.set('testSeriesName', `New Name ${randomSuffix}`);\r",
+							"pm.environment.set('testSeriesText', pm.variables.replaceIn('{{$randomLoremSentences}}'));"
 						],
 						"type": "text/javascript"
 					}
@@ -340,7 +356,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"{{testSeriesName}}\"\r\n}",
+					"raw": "{\r\n    \"name\": \"{{testSeriesName}}\",\r\n    \"text\": \"{{testSeriesText}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -377,7 +393,8 @@
 							"const randomSuffix = Math.floor(Math.random() * 10000);\r",
 							"\r",
 							"pm.environment.set('testBookName', `Test Book Name ${randomSuffix}`);\r",
-							"pm.environment.set('testBookDate', pm.variables.replaceIn('{{$randomDatePast}}'));"
+							"pm.environment.set('testBookDate', pm.variables.replaceIn('{{$randomDatePast}}'));\r",
+							"pm.environment.set('testBookText', pm.variables.replaceIn('{{$randomLoremSentences}}'));"
 						],
 						"type": "text/javascript"
 					}
@@ -394,9 +411,11 @@
 							"    })\r",
 							"\r",
 							"    pm.test('POST /book should return updated info', () => {\r",
-							"        const { name, bookId } = pm.response.json();\r",
-							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
+							"        const { name, bookId, text, createdBy } = pm.response.json();\r",
 							"        pm.environment.set('testBookId', bookId);\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
+							"        pm.expect(text).to.equal(pm.environment.get('testBookText'));\r",
+							"        pm.expect(createdBy).to.equal(pm.environment.get('testUserId'));\r",
 							"    })\r",
 							"\r",
 							"} else {\r",
@@ -426,7 +445,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"seriesId\": \"{{testSeriesId}}\", \r\n    \"name\": \"{{testBookName}}\",\r\n    \"pubDate\": \"{{testBookDate}}\"\r\n}",
+					"raw": "{\r\n    \"seriesId\": \"{{testSeriesId}}\", \r\n    \"name\": \"{{testBookName}}\",\r\n    \"pubDate\": \"{{testBookDate}}\",\r\n    \"text\": \"{{testBookText}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -440,6 +459,97 @@
 					],
 					"path": [
 						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Book",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomSuffix = Math.floor(Math.random() * 10000);\r",
+							"\r",
+							"pm.environment.set('testBookName', `New Name ${randomSuffix}`);\r",
+							"pm.environment.set('testBookText', `New Text ${randomSuffix} ${pm.variables.replaceIn('{{$randomLoremSentences}}')}`);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    pm.test('PATCH /book/:bookId/series/:seriesId should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('PATCH /book/:bookId/series/:seriesId should return updated info', () => {\r",
+							"        const { name, text } = pm.response.json();\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testBookName'));\r",
+							"        pm.expect(text).to.equal(pm.environment.get('testBookText'));\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('PATCH /book/:bookId/series/:seriesId should not pass with bad Book ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{testBookName}}\",\r\n    \"text\": \"{{testBookText}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/book/:bookId/series/:seriesId",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"book",
+						":bookId",
+						"series",
+						":seriesId"
+					],
+					"variable": [
+						{
+							"key": "bookId",
+							"value": "{{testBookId}}"
+						},
+						{
+							"key": "seriesId",
+							"value": "{{testSeriesId}}"
+						}
 					]
 				}
 			},
