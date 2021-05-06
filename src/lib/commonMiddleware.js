@@ -23,6 +23,15 @@ const validateJwt = () => {
   }
 }
 
+const log = () => {
+  return {
+    before: (handler, next) => {
+      console.log(handler.event);
+      return next();
+    }
+  }
+}
+
 export default handler => middy(handler)
   .use([
     httpJsonBodyParser(),
@@ -35,5 +44,6 @@ export default handler => middy(handler)
       //   ]
       // }
     ),
-    validateJwt()
+    validateJwt(),
+    log()
   ]);

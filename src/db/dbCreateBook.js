@@ -3,7 +3,7 @@ import generateId from '../lib/base64id';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbCreateBook({pubDate, seriesId, name}, token) {
+export default async function dbCreateBook({pubDate, seriesId, name, text}, token) {
   const now = new Date();
   const formattedDate = new Date(pubDate).toISOString();
 
@@ -11,6 +11,7 @@ export default async function dbCreateBook({pubDate, seriesId, name}, token) {
     primary_key: seriesId,
     sort_key: `b${generateId(10)}`,
     name,
+    text,
     pubDate: formattedDate,
     createdBy: token.sub,
     createdAt: now.toISOString(),

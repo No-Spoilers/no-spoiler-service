@@ -8,6 +8,14 @@ BookFunctions:
           path: /book
           cors: true
 
+  putBook:
+    handler: src/handlers/book/putBook.handler
+    events:
+      - http:
+          method: PUT
+          path: /book
+          cors: true
+
   deleteBook:
     handler: src/handlers/book/deleteBook.handler
     events:
