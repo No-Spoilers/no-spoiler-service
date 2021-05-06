@@ -2,20 +2,31 @@ import AWS from 'aws-sdk';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbCreateBook({pubDate, seriesId, bookId, name, text}, token) {
+export default async function dbUpdateBook(bookData, token) {
+  const { seriesId, bookId } = bookData;
   const now = new Date();
-  const formattedDate = new Date(pubDate).toISOString();
-
-  const book = {
-    primary_key: seriesId,
-    sort_key: bookId,
-    name,
-    text,
-    pubDate: formattedDate,
-    createdBy: token.sub,
-    createdAt: now.toISOString(),
-    updatedAt: now.toISOString()
+  if (bookData.pubDate) {
+    bookData.pubDate = new Date(bookData.pubDate).toISOString();
   }
+
+  let updateExpression = 'set updatedAt = :updatedAt, updatedBy=:updatedBy';
+
+  const expressionAttributeValues = {
+    ':updatedAt': now.toISOString(),
+    ':updatedBy': token.sub
+  }
+
+  const expressionAttributeNames = {};
+
+  const validFields = ['name', 'text', 'pubDate'];
+
+  validFields.forEach(field => {
+    if (bookData[field]) {
+      updateExpression += `, #${field} = :${field}`;
+      expressionAttributeNames[`#${field}`] = `${field}`;
+      expressionAttributeValues[`:${field}`] = bookData[field];
+    }
+  })
 
   const params = {
     TableName: process.env.NO_SPOILERS_TABLE_NAME,
@@ -23,29 +34,18 @@ export default async function dbCreateBook({pubDate, seriesId, bookId, name, tex
       primary_key: seriesId,
       sort_key: bookId,
     },
-    UpdateExpression: 'set #n=:name, #t=:text, pubDate=:pubDate, updatedAt=:updatedAt, updatedBy=:updatedBy',
-    ExpressionAttributeNames: {
-      '#n': 'name',
-      '#t': 'text'
-    },
-    ExpressionAttributeValues:{
-        ':name': name,
-        ':text': text,
-        ':pubDate': formattedDate,
-        ':updatedAt': now.toISOString(),
-        ':updatedBy': token.sub
-    },
-    ReturnValues:'UPDATED_NEW'
-};
+    UpdateExpression: updateExpression,
+    ExpressionAttributeNames: expressionAttributeNames,
+    ExpressionAttributeValues: expressionAttributeValues,
+    ReturnValues: 'ALL_NEW'
+  };
 
-  const result = await dynamodb.update(params).promise();
+  const { Attributes: result } = await dynamodb.update(params).promise();
 
-  console.log('result:', result);
+  result.seriesId = result.primary_key;
+  result.bookId = result.sort_key;
+  delete result.primary_key;
+  delete result.sort_key;
 
-  book.seriesId = book.primary_key;
-  book.bookId = book.sort_key;
-  delete book.primary_key;
-  delete book.sort_key;
-
-  return book;
+  return result;
 }

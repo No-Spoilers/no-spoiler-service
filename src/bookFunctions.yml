@@ -13,7 +13,7 @@ BookFunctions:
     events:
       - http:
           method: PATCH
-          path: /book
+          path: /book/{bookId}/series/{seriesId}
           cors: true
 
   deleteBook:
