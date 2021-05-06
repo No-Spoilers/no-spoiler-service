@@ -5,7 +5,7 @@ import commonMiddleware from '../../lib/commonMiddleware';
 import dbCreateSeries from '../../db/dbCreateSeries';
 
 async function postSeries(event) {
-  const { name } = event.body;
+  const seriesData = event.body;
   const { token } = event;
 
   if (!token) {
@@ -16,7 +16,7 @@ async function postSeries(event) {
   }
 
   try {
-    const series = await dbCreateSeries(name, token);
+    const series = await dbCreateSeries(seriesData, token);
 
     return {
       statusCode: 201,

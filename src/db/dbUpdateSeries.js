@@ -3,9 +3,28 @@ import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-// Currently only works for updating 'name' but might need to be broadened
-export default async function dbUpdateSeries(seriesId, name) {
+export default async function dbUpdateSeries(seriesId, seriesData) {
   const now = new Date();
+
+  let updateExpression = 'set updatedAt = :updatedAt';
+
+  const expressionAttributeValues = {
+    ':updatedAt': now.toISOString()
+  }
+
+  const expressionAttributeNames = {};
+
+  if (seriesData.name) {
+    updateExpression += ', #name = :name';
+    expressionAttributeValues[':name'] = seriesData.name;
+    expressionAttributeNames['#name'] = 'name';
+  }
+
+  if (seriesData.text) {
+    updateExpression += ', #text = :text';
+    expressionAttributeValues[':text'] = seriesData.text;
+    expressionAttributeNames['#text'] = 'text';
+  }
 
   const params = {
     TableName: process.env.NO_SPOILERS_TABLE_NAME,
@@ -14,14 +33,9 @@ export default async function dbUpdateSeries(seriesId, name) {
       sort_key: 'TOP~'
     },
     ConditionExpression: 'attribute_exists(sort_key)',
-    UpdateExpression: 'set #name = :name, updatedAt = :updatedAt',
-    ExpressionAttributeValues: {
-      ':name': name,
-      ':updatedAt': now.toISOString()
-    },
-    ExpressionAttributeNames: {
-      '#name': 'name'
-    },
+    UpdateExpression: updateExpression,
+    ExpressionAttributeValues: expressionAttributeValues,
+    ExpressionAttributeNames: expressionAttributeNames,
     ReturnValues: 'ALL_NEW'
   };
 

@@ -3,13 +3,14 @@ import generateId from '../lib/base64id';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbCreateSeries(name, token) {
+export default async function dbCreateSeries(seriesData, token) {
   const now = new Date();
 
   const series = {
     primary_key: `s${generateId(10)}`,
     sort_key: 'TOP~',
-    name,
+    name: seriesData.name,
+    text: seriesData.text,
     createdBy: token.sub,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString()

@@ -3,9 +3,9 @@ import dbUpdateSeries from '../../db/dbUpdateSeries';
 
 async function patchSeries(event) {
   const { contentId } = event.pathParameters;
-  const { name } = event.body;
+  const seriesData = event.body;
 
-  const updatedSeries = await dbUpdateSeries(contentId, name);
+  const updatedSeries = await dbUpdateSeries(contentId, seriesData);
 
   if(!updatedSeries) {
     return {
