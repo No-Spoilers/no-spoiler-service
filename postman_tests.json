@@ -556,6 +556,74 @@
 			"response": []
 		},
 		{
+			"name": "Set Spoiler Level",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    pm.test('PATCH /user should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('PATCH /user should return updated info', () => {\r",
+							"        const { userId, seriesId, bookId } = pm.response.json();\r",
+							"        pm.expect(userId).to.equal(pm.environment.get('testUserId'));\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
+							"        pm.expect(bookId).to.equal(pm.environment.get('testBookId'));\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('PATCH /user should not pass with bad Book ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"seriesId\": \"{{testSeriesId}}\",\r\n    \"bookId\": \"{{testBookId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/level",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"level"
+					]
+				},
+				"description": "Spoiler level is determined by the most recent book a user has marked as read."
+			},
+			"response": []
+		},
+		{
 			"name": "Create Entry",
 			"event": [
 				{
@@ -701,6 +769,70 @@
 							"key": "seriesId",
 							"value": "{{testSeriesId}}",
 							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Spoiler Level",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    pm.test('DELETE /level/:seriesId should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('DELETE /level/:seriesId should return deleted item', () => {\r",
+							"        const { deletedLevel: { userId, seriesId } } = pm.response.json();\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
+							"        pm.expect(userId).to.equal(pm.environment.get('testUserId'));\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('DELETE /level/:seriesId should fail with bad ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/level/:seriesId",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"level",
+						":seriesId"
+					],
+					"variable": [
+						{
+							"key": "seriesId",
+							"value": "{{testSeriesId}}"
 						}
 					]
 				}

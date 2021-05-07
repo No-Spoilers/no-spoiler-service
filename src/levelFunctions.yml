@@ -1,0 +1,17 @@
+LevelFunctions:
+
+  postLevel:
+    handler: src/handlers/level/postLevel.handler
+    events:
+      - http:
+          method: POST
+          path: /level
+          cors: true
+
+  deleteLevel:
+    handler: src/handlers/level/deleteLevel.handler
+    events:
+      - http:
+          method: DELETE
+          path: /level/{seriesId}
+          cors: true
