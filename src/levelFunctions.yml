@@ -1,5 +1,13 @@
 LevelFunctions:
 
+  getLevels:
+    handler: src/handlers/level/getLevels.handler
+    events:
+      - http:
+          method: GET
+          path: /level
+          cors: true
+
   postLevel:
     handler: src/handlers/level/postLevel.handler
     events:

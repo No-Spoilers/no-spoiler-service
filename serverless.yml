@@ -39,8 +39,10 @@ functions:
   deleteUser: ${file(src/userFunctions.yml):UserFunctions.deleteUser}
   postLogin: ${file(src/userFunctions.yml):UserFunctions.postLogin}
 
+  getLevels: ${file(src/levelFunctions.yml):LevelFunctions.getLevels}
   postLevel: ${file(src/levelFunctions.yml):LevelFunctions.postLevel}
   deleteLevel: ${file(src/levelFunctions.yml):LevelFunctions.deleteLevel}
+  
 custom:
   NoSpoilersTable:
     name: !Ref NoSpoilersTable

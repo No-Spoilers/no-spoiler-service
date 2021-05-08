@@ -624,6 +624,68 @@
 			"response": []
 		},
 		{
+			"name": "Get Spoiler Levels",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"\r",
+							"    pm.test('GET /level should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('GET /level should include expected data', () => {\r",
+							"        const response = pm.response.json();\r",
+							"        const seriesId = pm.environment.get('testSeriesId');\r",
+							"        const bookId = pm.environment.get('testBookId');\r",
+							"        const expectedResult = { [`${seriesId}`]: bookId };\r",
+							"        pm.expect(response).to.deep.equal(expectedResult);\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('GET /level should return no data for a bad ID', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"        const response = pm.response.json();\r",
+							"        pm.expect(response).to.deep.equal({});\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/level",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"level"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create Entry",
 			"event": [
 				{
