@@ -1,10 +1,20 @@
 import commonMiddleware from '../../lib/commonMiddleware';
 import dbDeleteItem from '../../db/dbDeleteItem';
+import dbQueryUserByEmail from '../../db/dbQueryUserByEmail';
 
 async function deleteUser(event) {
+  const { token } = event;
   let { email } = event.body;
 
   email = email.toLowerCase();
+
+  const user = await dbQueryUserByEmail(email);
+
+  if (user.userId !== token.sub) {
+    return {
+      statusCode: 401
+    };
+  }
 
   const result = await dbDeleteItem('user', email);
 
