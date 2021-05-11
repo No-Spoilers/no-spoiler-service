@@ -8,6 +8,14 @@ EntryFunctions:
           path: /entry
           cors: true
 
+  patchEntryList:
+    handler: src/handlers/entry/patchEntryList.handler
+    events:
+      - http:
+          method: PATCH
+          path: /entry/list
+          cors: true
+
   deleteEntry:
     handler: src/handlers/entry/deleteEntry.handler
     events:

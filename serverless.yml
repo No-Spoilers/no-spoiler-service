@@ -33,6 +33,7 @@ functions:
   deleteBook: ${file(src/bookFunctions.yml):BookFunctions.deleteBook}
   
   postEntry: ${file(src/entryFunctions.yml):EntryFunctions.postEntry}
+  patchEntryList: ${file(src/entryFunctions.yml):EntryFunctions.patchEntryList}
   deleteEntry: ${file(src/entryFunctions.yml):EntryFunctions.deleteEntry}
   
   postUser: ${file(src/userFunctions.yml):UserFunctions.postUser}

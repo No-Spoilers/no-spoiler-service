@@ -25,7 +25,7 @@ async function postEntry(event) {
       };
     }
 
-    const newEntry = await dbCreateEntry(entryData, token);
+    const newEntry = await dbCreateEntry(entryData, token.sub);
 
     return {
       statusCode: 201,
