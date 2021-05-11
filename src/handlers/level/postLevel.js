@@ -1,6 +1,6 @@
 import createError from 'http-errors';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId';
-import dbUpsertUserSeriesBook from '../../db/dbUpsertUserSeriesBook';
+import dbUpdateUserLevel from '../../db/dbUpdateUserLevel';
 import commonMiddleware from '../../lib/commonMiddleware';
 
 async function postLevel(event) {
@@ -21,7 +21,7 @@ async function postLevel(event) {
       };
     }
 
-    const spoilerState = await dbUpsertUserSeriesBook(token, seriesId, bookId);
+    const spoilerState = await dbUpdateUserLevel(token, seriesId, bookId);
 
     return {
       statusCode: 200,

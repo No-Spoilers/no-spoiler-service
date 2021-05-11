@@ -16,7 +16,7 @@ export default async function dbQueryUserLevels(userId) {
     const { Items: levelArray } = await dynamodb.query(params).promise();
 
     const levelsBySeries = levelArray.reduce((acc, entry) => {
-      acc[entry.sort_key] = entry.bookId;
+      acc[entry.sort_key] = entry.level;
       return acc;
     }, {})
 

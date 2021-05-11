@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbUpsertUserSeriesBook(token, seriesId, bookId) {
+export default async function dbUpdateUserLevel(token, seriesId, bookId) {
   const userId = token.sub;
   const now = new Date();
 
@@ -12,11 +12,14 @@ export default async function dbUpsertUserSeriesBook(token, seriesId, bookId) {
       primary_key: userId,
       sort_key: seriesId,
     },
-    UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, bookId=:bookId',
+    UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, #level=:level',
+    ExpressionAttributeNames: {
+      '#level': 'level'
+    },
     ExpressionAttributeValues: {
       ':updatedAt': now.toISOString(),
       ':updatedBy': token.sub,
-      ':bookId': bookId
+      ':level': bookId
     },
     ReturnValues: 'ALL_NEW'
   };
