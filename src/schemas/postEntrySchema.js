@@ -8,7 +8,7 @@ const schema = {
         name: { type: 'string' },
         text: { type: 'string' }
       },
-      required: [ 'seriesId', 'bookId', 'name', 'text' ]
+      required: [ 'seriesId', 'bookId', 'name' ]
     }
   },
   required: [ 'body' ]
