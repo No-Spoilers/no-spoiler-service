@@ -8,12 +8,12 @@ EntryFunctions:
           path: /entry
           cors: true
 
-  patchEntryList:
-    handler: src/handlers/entry/patchEntryList.handler
+  patchEntry:
+    handler: src/handlers/entry/patchEntry.handler
     events:
       - http:
           method: PATCH
-          path: /entry/list
+          path: /entry
           cors: true
 
   deleteEntry:
