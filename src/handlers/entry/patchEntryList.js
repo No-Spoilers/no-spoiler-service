@@ -4,7 +4,7 @@ import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId'
 import dbCreateEntry from '../../db/dbCreateEntry';
 import dbUpdateEntry from '../../db/dbUpdateEntry';
 
-async function postEntryList(event) {
+async function patchEntryList(event) {
   const {seriesId, bookId, mentions} = event.body;
   const { token } = event;
 
@@ -51,4 +51,4 @@ async function postEntryList(event) {
 
 }
 
-export const handler = commonMiddleware(postEntryList);
+export const handler = commonMiddleware(patchEntryList);
