@@ -3,9 +3,14 @@ import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbUpdateEntry(entry, userId) {
+export default async function dbUpdateEntry(entry, newEntry, userId) {
   try {
     const now = new Date();
+
+    const newText = {
+      ...entry.text,
+      [`${newEntry.bookId}`]: newEntry.text
+    };
 
     const params = {
       TableName: process.env.NO_SPOILERS_TABLE_NAME,
@@ -13,15 +18,15 @@ export default async function dbUpdateEntry(entry, userId) {
         primary_key: entry.seriesId,
         sort_key: entry.entryId
       },
-      UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, bookId=:bookId, #name=:name',
+      UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, bookId=:bookId, #text=:text',
       ExpressionAttributeNames: {
-        '#name': 'name'
+        '#text': 'text'
       },
       ExpressionAttributeValues: {
         ':updatedAt': now.toISOString(),
         ':updatedBy': userId,
         ':bookId': entry.bookId,
-        ':name': entry.name
+        ':text': newText
       },
       ReturnValues: 'ALL_NEW'
     };
