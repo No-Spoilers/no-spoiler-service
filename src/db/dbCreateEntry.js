@@ -8,12 +8,15 @@ export default async function dbCreateEntry(entry, userId) {
 
   const newSortKey = `e${generateId(9)}`;
 
+  const text = {
+    [`${entry.bookId}`]: entry.text
+  };
+
   const item = {
     primary_key: entry.seriesId,
     sort_key: newSortKey,
-    bookId: entry.bookId,
     name: entry.name,
-    text: entry.text,
+    text,
     createdBy: userId,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString()
