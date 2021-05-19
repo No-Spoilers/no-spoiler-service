@@ -12,13 +12,15 @@ async function postLevel(event) {
   const { seriesId, bookId } = event.body;
 
   try {
-    const book = await dbGetBookBySeriesIdAndBookId(seriesId, bookId);
+    if (bookId !== '') {
+      const book = await dbGetBookBySeriesIdAndBookId(seriesId, bookId);
 
-    if (!book) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Series or Book not found.' }),
-      };
+      if (!book) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ error: 'Series or Book not found.' }),
+        };
+      }
     }
 
     const spoilerState = await dbUpdateUserLevel(token, seriesId, bookId);
