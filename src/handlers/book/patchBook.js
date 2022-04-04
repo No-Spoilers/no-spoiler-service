@@ -1,7 +1,7 @@
 import createError from 'http-errors';
-import dbUpdateBook from '../../db/dbUpdateBook';
-import commonMiddleware from '../../lib/commonMiddleware';
-import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId';
+import dbUpdateBook from '../../db/dbUpdateBook.js';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
 async function patchBook(event) {
   const { token } = event;
@@ -36,7 +36,7 @@ async function patchBook(event) {
     };
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new createError.InternalServerError(error);
   }
 

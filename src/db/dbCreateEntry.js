@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk';
-import generateId from '../lib/base64id';
+import generateId from '../lib/base64id.js';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 

@@ -1,7 +1,9 @@
 import createError from 'http-errors';
-import commonMiddleware from '../../lib/commonMiddleware';
-import dbGetEntryBySeriesIdAndEntryId from '../../db/dbGetEntryBySeriesIdAndEntryId';
-import dbUpdateEntry from '../../db/dbUpdateEntry';
+import patchEntrySchema from '../../schemas/patchEntrySchema.js';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+import dbGetEntryBySeriesIdAndEntryId from '../../db/dbGetEntryBySeriesIdAndEntryId.js';
+import dbUpdateEntry from '../../db/dbUpdateEntry.js';
+import validator from '@middy/validator';
 
 async function patchEntry(event) {
   const newEntry = event.body;
@@ -31,9 +33,10 @@ async function patchEntry(event) {
     };
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new createError.InternalServerError(error);
   }
 }
 
-export const handler = commonMiddleware(patchEntry);
+export const handler = commonMiddleware(patchEntry)
+  .use(validator({ inputSchema: patchEntrySchema, useDefaults: true }));

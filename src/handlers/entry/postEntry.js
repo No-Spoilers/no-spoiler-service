@@ -1,9 +1,9 @@
 import validator from '@middy/validator';
-import postEntrySchema from '../../schemas/postEntrySchema';
+import postEntrySchema from '../../schemas/postEntrySchema.js';
 import createError from 'http-errors';
-import dbCreateEntry from '../../db/dbCreateEntry';
-import commonMiddleware from '../../lib/commonMiddleware';
-import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId';
+import dbCreateEntry from '../../db/dbCreateEntry.js';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
 async function postEntry(event) {
   const entryData = event.body;
@@ -33,11 +33,11 @@ async function postEntry(event) {
     };
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new createError.InternalServerError(error);
   }
 
 }
 
 export const handler = commonMiddleware(postEntry)
-  .use(validator({inputSchema: postEntrySchema, useDefaults: true}));
+  .use(validator({ inputSchema: postEntrySchema, useDefaults: true }));

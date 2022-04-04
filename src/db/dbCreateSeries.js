@@ -1,9 +1,8 @@
 import AWS from 'aws-sdk';
-import generateId from '../lib/base64id';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import generateId from '../lib/base64id.js';
 
 export default async function dbCreateSeries(seriesData, token) {
+  const dynamodb = new AWS.DynamoDB.DocumentClient();
   const now = new Date();
 
   const series = {

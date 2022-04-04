@@ -1,0 +1,9 @@
+HealthFunctions:
+
+  getHealth:
+    handler: src/handlers/health/getHealth.handler
+    events:
+      - http:
+          method: GET
+          path: /health
+          cors: true

@@ -1,5 +1,5 @@
-import commonMiddleware from '../../lib/commonMiddleware';
-import dbQuerySeriesById from '../../db/dbQuerySeriesById';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+import dbQuerySeriesById from '../../db/dbQuerySeriesById.js';
 
 async function getSeriesById(event) {
   const { contentId } = event.pathParameters;

@@ -1,5 +1,5 @@
-import commonMiddleware from '../../lib/commonMiddleware';
-import dbDeleteItem from '../../db/dbDeleteItem';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+import dbDeleteItem from '../../db/dbDeleteItem.js';
 
 async function deleteSeries(event) {
   const { contentId } = event.pathParameters;

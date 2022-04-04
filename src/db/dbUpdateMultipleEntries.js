@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import createError from 'http-errors';
-import generateId from '../lib/base64id';
+import generateId from '../lib/base64id.js';
 
 const dynamodb = new AWS.DynamoDB();
 
@@ -34,7 +34,7 @@ export default async function dbUpdateMultipleEntries(entryList, userId) {
       }
     });
 
-    var params = {
+    const params = {
       TransactItems
     };
 

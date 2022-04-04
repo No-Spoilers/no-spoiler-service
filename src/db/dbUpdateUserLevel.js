@@ -26,8 +26,6 @@ export default async function dbUpdateUserLevel(token, seriesId, bookId) {
 
   const { Attributes: result } = await dynamodb.update(params).promise();
 
-  console.log('result:', result);
-
   result.userId = result.primary_key;
   result.seriesId = result.sort_key;
   delete result.primary_key;

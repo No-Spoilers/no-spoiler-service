@@ -1,9 +1,9 @@
 import AWS from 'aws-sdk';
-import generateId from '../lib/base64id';
+import generateId from '../lib/base64id.js';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-export default async function dbCreateBook({pubDate, seriesId, name, text}, token) {
+export default async function dbCreateBook({ pubDate, seriesId, name, text }, token) {
   const now = new Date();
   const formattedDate = new Date(pubDate).toISOString();
 

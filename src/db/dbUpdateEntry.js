@@ -18,14 +18,13 @@ export default async function dbUpdateEntry(entry, newEntry, userId) {
         primary_key: entry.seriesId,
         sort_key: entry.entryId
       },
-      UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, bookId=:bookId, #text=:text',
+      UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, #text=:text',
       ExpressionAttributeNames: {
         '#text': 'text'
       },
       ExpressionAttributeValues: {
         ':updatedAt': now.toISOString(),
         ':updatedBy': userId,
-        ':bookId': entry.bookId,
         ':text': newText
       },
       ReturnValues: 'ALL_NEW'

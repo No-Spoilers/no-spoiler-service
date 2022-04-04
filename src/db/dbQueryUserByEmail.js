@@ -1,9 +1,8 @@
 import AWS from 'aws-sdk';
 import createError from 'http-errors';
 
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-
 export default async function dbQueryUserByEmail(email) {
+  const dynamodb = new AWS.DynamoDB.DocumentClient();
   try {
     const normalizedEmail = email.toLowerCase();
 
@@ -18,7 +17,7 @@ export default async function dbQueryUserByEmail(email) {
     return result.Item;
 
   } catch (error) {
-      console.error(error);
-      throw new createError.InternalServerError(error);
+    console.error(error);
+    throw new createError.InternalServerError(error);
   }
 }

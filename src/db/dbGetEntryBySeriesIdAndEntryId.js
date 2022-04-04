@@ -25,7 +25,7 @@ export default async function dbGetEntryBySeriesIdAndEntryId(seriesId, entryId) 
     return book;
 
   } catch (error) {
-      console.error(error);
-      throw new createError.InternalServerError(error);
+    console.error(error);
+    throw new createError.InternalServerError(error);
   }
 }

@@ -1,6 +1,6 @@
-import commonMiddleware from '../../lib/commonMiddleware';
-import dbDeleteItem from '../../db/dbDeleteItem';
-import dbQueryUserByEmail from '../../db/dbQueryUserByEmail';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+import dbDeleteItem from '../../db/dbDeleteItem.js';
+import dbQueryUserByEmail from '../../db/dbQueryUserByEmail.js';
 
 async function deleteUser(event) {
   const { token } = event;
