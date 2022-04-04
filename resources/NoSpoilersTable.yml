@@ -15,8 +15,8 @@ NoSpoilersTable:
       - AttributeName: sort_key
         KeyType: RANGE
     ProvisionedThroughput:
-      ReadCapacityUnits: '5'
-      WriteCapacityUnits: '5'
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
     GlobalSecondaryIndexes:
       - IndexName: ReverseLookup
         KeySchema:
@@ -27,8 +27,8 @@ NoSpoilersTable:
         Projection:
           ProjectionType: ALL
         ProvisionedThroughput:
-          ReadCapacityUnits: '5'
-          WriteCapacityUnits: '5'
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
       - IndexName: UserContributionLookup
         KeySchema:
         - AttributeName: createdBy
@@ -42,5 +42,5 @@ NoSpoilersTable:
           - name
           - createdAt
         ProvisionedThroughput:
-          ReadCapacityUnits: '5'
-          WriteCapacityUnits: '5'
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

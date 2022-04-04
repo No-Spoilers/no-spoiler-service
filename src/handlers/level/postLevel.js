@@ -1,7 +1,7 @@
 import createError from 'http-errors';
-import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId';
-import dbUpdateUserLevel from '../../db/dbUpdateUserLevel';
-import commonMiddleware from '../../lib/commonMiddleware';
+import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
+import dbUpdateUserLevel from '../../db/dbUpdateUserLevel.js';
+import commonMiddleware from '../../lib/commonMiddleware.js';
 
 async function postLevel(event) {
   // Currently only for saving a user's spoiler level in a given series.
@@ -31,7 +31,7 @@ async function postLevel(event) {
     };
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new createError.InternalServerError(error);
   }
 

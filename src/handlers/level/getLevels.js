@@ -1,6 +1,6 @@
 import createError from 'http-errors';
-import dbQueryUserLevels from '../../db/dbQueryUserLevels';
-import commonMiddleware from '../../lib/commonMiddleware';
+import dbQueryUserLevels from '../../db/dbQueryUserLevels.js';
+import commonMiddleware from '../../lib/commonMiddleware.js';
 
 async function getLevels(event) {
   try {

@@ -23,7 +23,7 @@ export default async function dbQueryUserLevels(userId) {
     return levelsBySeries;
 
   } catch (error) {
-      console.error(error);
-      throw new createError.InternalServerError(error);
+    console.error(error);
+    throw new createError.InternalServerError(error);
   }
 }

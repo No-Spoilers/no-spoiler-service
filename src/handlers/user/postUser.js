@@ -1,9 +1,9 @@
 import validator from '@middy/validator';
-import postUserSchema from '../../schemas/postUserSchema';
+import postUserSchema from '../../schemas/postUserSchema.js';
 import createError from 'http-errors';
-import dbCreateUser from '../../db/dbCreateUser';
-import commonMiddleware from '../../lib/commonMiddleware';
-import { createNewToken } from '../../lib/token';
+import dbCreateUser from '../../db/dbCreateUser.js';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+import { createNewToken } from '../../lib/token.js';
 
 async function postUser(event) {
   const { name, email, password } = event.body;
@@ -33,11 +33,11 @@ async function postUser(event) {
     };
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new createError.InternalServerError(error);
   }
 
 }
 
 export const handler = commonMiddleware(postUser)
-  .use(validator({inputSchema: postUserSchema, useDefaults: true}));
+  .use(validator({ inputSchema: postUserSchema, useDefaults: true }));

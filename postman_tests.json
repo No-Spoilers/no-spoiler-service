@@ -6,6 +6,23 @@
 	},
 	"item": [
 		{
+			"name": "Get health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/health",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create User",
 			"event": [
 				{
@@ -570,10 +587,10 @@
 							"    })\r",
 							"\r",
 							"    pm.test('PATCH /user should return updated info', () => {\r",
-							"        const { userId, seriesId, bookId } = pm.response.json();\r",
+							"        const { userId, seriesId, level } = pm.response.json();\r",
 							"        pm.expect(userId).to.equal(pm.environment.get('testUserId'));\r",
 							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
-							"        pm.expect(bookId).to.equal(pm.environment.get('testBookId'));\r",
+							"        pm.expect(level).to.equal(pm.environment.get('testBookId'));\r",
 							"    })\r",
 							"\r",
 							"} else {\r",
@@ -709,13 +726,16 @@
 							"        pm.response.to.have.status(201);\r",
 							"    })\r",
 							"\r",
-							"    pm.test('POST /entry should return updated info', () => {\r",
+							"    pm.test('POST /entry should return data for created entry', () => {\r",
 							"        const { seriesId, entryId, name, text, bookId } = pm.response.json();\r",
-							"        pm.expect(text).to.equal(pm.environment.get('testEntryText'));\r",
-							"        pm.expect(name).to.equal(pm.environment.get('testEntryName'));\r",
-							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
-							"        pm.expect(bookId).to.equal(pm.environment.get('testBookId'));\r",
 							"        pm.environment.set('testEntryId', entryId);\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testEntryName'));\r",
+							"        \r",
+							"        const entryKeys = Object.keys(text);\r",
+							"        pm.expect(entryKeys.length).to.equal(1);\r",
+							"        pm.expect(entryKeys[0]).to.equal(pm.environment.get('testBookId'));\r",
+							"        pm.expect(text[entryKeys[0]]).to.equal(pm.environment.get('testEntryText'));\r",
 							"    })\r",
 							"\r",
 							"} else {\r",
@@ -765,6 +785,89 @@
 			"response": []
 		},
 		{
+			"name": "Update Entry",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set('testEntryText', pm.variables.replaceIn('{{$randomLoremParagraph}}'));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const testPass = parseInt(pm.environment.get('testPass'));\r",
+							"\r",
+							"if (testPass === 0) {\r",
+							"    pm.test('PATCH /entry should succeed', () => {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    })\r",
+							"\r",
+							"    pm.test('PATCH /entry should return updated data', () => {\r",
+							"        const { seriesId, entryId, name, text } = pm.response.json();\r",
+							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
+							"        pm.expect(entryId).to.equal(pm.environment.get('testEntryId'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testEntryName'));\r",
+							"\r",
+							"        const keyArray = Object.keys(text);\r",
+							"        pm.expect(keyArray.length).to.equal(1);\r",
+							"        pm.expect(keyArray[0]).to.equal(pm.environment.get('testBookId'));\r",
+							"        pm.expect(text[keyArray[0]]).to.equal(pm.environment.get('testEntryText'));\r",
+							"        pm.environment.set('testEntryId', entryId);\r",
+							"    })\r",
+							"\r",
+							"} else {\r",
+							"\r",
+							"    pm.test('PATCH /entry should not pass with bad Series ID', () => {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    })\r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{testUserToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"seriesId\": \"{{testSeriesId}}\",\r\n    \"bookId\": \"{{testBookId}}\",\r\n    \"entryId\": \"{{testEntryId}}\",\r\n    \"text\": \"{{testEntryText}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SPOILERS_HOST}}/entry",
+					"host": [
+						"{{SPOILERS_HOST}}"
+					],
+					"path": [
+						"entry"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Delete Entry",
 			"event": [
 				{
@@ -779,10 +882,14 @@
 							"    })\r",
 							"\r",
 							"    pm.test('DELETE /entry/:entryId/series/:seriesId should return deleted item', () => {\r",
-							"        const { deletedEntry: { text, seriesId, entryId } } = pm.response.json();\r",
+							"        const { deletedEntry: { text, seriesId, entryId, name } } = pm.response.json();\r",
 							"        pm.expect(seriesId).to.equal(pm.environment.get('testSeriesId'));\r",
 							"        pm.expect(entryId).to.equal(pm.environment.get('testEntryId'));\r",
-							"        pm.expect(text).to.equal(pm.environment.get('testEntryText'));\r",
+							"        pm.expect(name).to.equal(pm.environment.get('testEntryName'));\r",
+							"\r",
+							"        const entryKeys = Object.keys(text);\r",
+							"        pm.expect(entryKeys.length).to.equal(1);\r",
+							"        pm.expect(text[entryKeys[0]]).to.equal(pm.environment.get('testEntryText'));\r",
 							"    })\r",
 							"\r",
 							"} else {\r",

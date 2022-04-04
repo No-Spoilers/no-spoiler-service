@@ -9,10 +9,10 @@ export default async function dbQuerySeries() {
     IndexName: 'ReverseLookup',
     KeyConditionExpression: '#sk = :top',
     ExpressionAttributeNames:{
-        '#sk': 'sort_key'
+      '#sk': 'sort_key'
     },
     ExpressionAttributeValues: {
-        ':top': 'TOP~'
+      ':top': 'TOP~'
     }
   };
 
@@ -28,7 +28,7 @@ export default async function dbQuerySeries() {
     return result.Items;
 
   } catch (error) {
-      console.error(error);
-      throw new createError.InternalServerError(error);
+    console.error(error);
+    throw new createError.InternalServerError(error);
   }
 }

@@ -3,12 +3,12 @@ import cors from '@middy/http-cors';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpErrorHandler from '@middy/http-error-handler';
 import httpEventNormalizer from '@middy/http-event-normalizer';
-import { verifyToken } from './token';
+import { verifyToken } from './token.js';
 
 const validateJwt = () => {
   return {
     before: (handler, next) => {
-      if (handler.event.headers.Authorization) {
+      if (handler.event.headers?.Authorization) {
         const [type, token] = handler.event.headers.Authorization.split(' ');
         if (type === 'Bearer' && typeof token !== 'undefined') {
           const tokenData = verifyToken(token);
@@ -26,7 +26,9 @@ const validateJwt = () => {
 const log = () => {
   return {
     before: (handler, next) => {
-      console.log(handler.event);
+      if (process.env.NODE_ENV !== 'test') {
+        console.log(handler.event);
+      }
       return next();
     }
   }

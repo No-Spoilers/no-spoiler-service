@@ -1,6 +1,6 @@
 import createError from 'http-errors';
-import dbQuerySeries from '../../db/dbQuerySeries';
-import commonMiddleware from '../../lib/commonMiddleware';
+import dbQuerySeries from '../../db/dbQuerySeries.js';
+import commonMiddleware from '../../lib/commonMiddleware.js';
 
 async function getSeries() {
   try {

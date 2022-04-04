@@ -1,10 +1,10 @@
 import bcrypt from 'bcryptjs';
 import createError from 'http-errors';
 import validator from '@middy/validator';
-import { createNewToken } from '../../lib/token';
-import dbQueryUserByEmail from '../../db/dbQueryUserByEmail';
-import commonMiddleware from '../../lib/commonMiddleware';
-import postLoginSchema from '../../schemas/postLoginSchema';
+import { createNewToken } from '../../lib/token.js';
+import dbQueryUserByEmail from '../../db/dbQueryUserByEmail.js';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+import postLoginSchema from '../../schemas/postLoginSchema.js';
 
 async function postLogin(event) {
   const { email, password } = event.body;
@@ -40,11 +40,11 @@ async function postLogin(event) {
     };
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new createError.InternalServerError(error);
   }
 
 }
 
 export const handler = commonMiddleware(postLogin)
-  .use(validator({inputSchema: postLoginSchema, useDefaults: true}));
+  .use(validator({ inputSchema: postLoginSchema, useDefaults: true }));

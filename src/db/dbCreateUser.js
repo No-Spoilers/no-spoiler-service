@@ -1,11 +1,10 @@
 import AWS from 'aws-sdk';
-import generateId from '../lib/base64id';
+import generateId from '../lib/base64id.js';
 import bcrypt from 'bcryptjs';
-import dbQueryUserByEmail from './dbQueryUserByEmail';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import dbQueryUserByEmail from './dbQueryUserByEmail.js';
 
 export default async function dbCreateUser(name, preservedCaseEmail, password) {
+  const dynamodb = new AWS.DynamoDB.DocumentClient();
   const email = preservedCaseEmail.toLowerCase();
   const now = new Date();
 

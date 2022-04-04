@@ -55,7 +55,7 @@ export default async function dbQuerySeriesById(contentId) {
     return queryResult;
 
   } catch (error) {
-      console.error(error);
-      throw new createError.InternalServerError(error);
+    console.error(error);
+    throw new createError.InternalServerError(error);
   }
 }

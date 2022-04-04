@@ -1,27 +1,32 @@
-service:
-  name: no-spoiler-service
-
-plugins:
-  - serverless-bundle
-  - serverless-pseudo-parameters
-  - serverless-dotenv-plugin
+org: geoffreyemerson
+app: no-spoiler-service
+service: no-spoiler-service
+frameworkVersion: '3'
+useDotenv: true
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: provided
+  layers:
+    - arn:aws:lambda:us-east-1:072686360478:layer:node-17_8_0:1
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
   environment:
     NO_SPOILERS_TABLE_NAME: ${self:custom.NoSpoilersTable.name}
-  iamRoleStatements:
-    - ${file(iam/NoSpoilersTableIAM.yml):NoSpoilersTableIAM}
+    TOKEN_SECRET: ${env:TOKEN_SECRET}
+  iam:
+    role:
+      statements:
+        - ${file(iam/NoSpoilersTableIAM.yml):NoSpoilersTableIAM}
 
 resources:
   Resources:
     NoSpoilersTable: ${file(resources/NoSpoilersTable.yml):NoSpoilersTable}
 
 functions:
+  getHealth: ${file(src/healthFunctions.yml):HealthFunctions.getHealth}
+
   getSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeries}
   getSeriesById: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeriesById}
   postSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.postSeries}
