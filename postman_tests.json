@@ -7,6 +7,20 @@
 	"item": [
 		{
 			"name": "Get health",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('GET /health should succeed', () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    console.log(pm.response.json());\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],

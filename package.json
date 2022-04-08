@@ -13,7 +13,8 @@
     "test": "NODE_ENV=test c8 -r text-summary npm run test:base",
     "test:coverage": "c8 --check-coverage npm run test:base",
     "test:base": "mocha tests/**/*.test.js -r dotenv/config",
-    "package": "sls package"
+    "test:e2e": "newman run postman_tests.json -e postman_environment.dev.json",
+    "deploy": "sls deploy"
   },
   "dependencies": {
     "@middy/core": "^1.4.0",
@@ -27,26 +28,19 @@
     "dotenv": "^16.0.0",
     "http-errors": "^1.8.0",
     "jsonwebtoken": "^8.5.1",
-    "newman": "^5.3.2",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",
     "aws-sdk-mock": "^5.6.2",
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.1.1",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-polyfill": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
     "c8": "^7.11.0",
     "chai": "^4.3.6",
     "eslint": "^8.12.0",
     "mocha": "^9.2.2",
-    "serverless": "^3.10.2",
-    "serverless-webpack": "^5.6.1",
-    "webpack": "^5.71.0"
+    "newman": "^5.3.2",
+    "serverless": "^3.10.2"
   },
   "volta": {
-    "node": "14.19.1"
+    "node": "17.9.0"
   }
 }
