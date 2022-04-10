@@ -1,7 +1,12 @@
+import { readFileSync } from 'fs';
+const packageJson = JSON.parse(readFileSync('./package.json'));
+
 async function getHealth() {
   try {
     const responseBody = {
-      node: process.version
+      nodeVersion: process.version,
+      packageVersion: packageJson.version,
+      test: true
     };
 
     return {
