@@ -13,6 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: volta-cli/action@v1
+      with:
+        node-version: 17.x
     - run: npm ci
     - name: serverless deploy
       uses: serverless/github-action@v3
