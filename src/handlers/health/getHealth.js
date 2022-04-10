@@ -4,11 +4,9 @@ async function getHealth() {
       node: process.version
     };
 
-    const body = JSON.stringify(responseBody);
-
     return {
       statusCode: 200,
-      body
+      body: JSON.stringify(responseBody)
     }
   } catch (error) {
     console.error(error);
