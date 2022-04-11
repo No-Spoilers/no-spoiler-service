@@ -1,0 +1,18 @@
+name: Test PRs
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: volta-cli/action@v1
+      with:
+        node-version: 17.x
+    - run: npm ci
+    - name: run test suite
+      run: npm test
+        TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
