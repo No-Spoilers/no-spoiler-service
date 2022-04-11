@@ -5,8 +5,7 @@ async function getHealth() {
   try {
     const responseBody = {
       nodeVersion: process.version,
-      packageVersion: packageJson.version,
-      test: '2'
+      packageVersion: packageJson.version
     };
 
     return {
