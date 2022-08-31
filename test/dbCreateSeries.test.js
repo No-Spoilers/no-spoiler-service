@@ -46,7 +46,7 @@ describe('dbCreateSeries', () => {
     expect(result.name).to.equal('test name');
     expect(result.text).to.equal('test text');
     expect(result.createdBy).to.equal('test_createdBy');
-    expect(result.seriesId).to.match(/^s/);
+    expect(result.seriesId).to.match(/^t/);
     expect(result.createdAt).to.match(/Z$/);
     expect(result.updatedAt).to.match(/Z$/);
   });

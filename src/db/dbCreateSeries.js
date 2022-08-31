@@ -6,7 +6,7 @@ export default async function dbCreateSeries(seriesData, token) {
   const now = new Date();
 
   const series = {
-    primary_key: `s${generateId(10)}`,
+    primary_key: `t${generateId(10)}`,
     sort_key: 'TOP~',
     name: seriesData.name,
     text: seriesData.text,
