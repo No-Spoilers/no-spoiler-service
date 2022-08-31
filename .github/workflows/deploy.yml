@@ -14,7 +14,7 @@ jobs:
     - uses: asdf-vm/actions/install@v1
     - run: npm install
     - name: serverless deploy
-      run: npm deploy
+      run: npm run deploy
       env:
         # SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
         # or if using AWS credentials directly
