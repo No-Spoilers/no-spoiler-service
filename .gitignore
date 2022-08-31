@@ -13,3 +13,4 @@ jspm_packages
 
 # Test code coverage
 coverage
+.nyc_output
