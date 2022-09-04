@@ -40,11 +40,11 @@ export default handler => middy(handler)
     httpEventNormalizer(),
     httpErrorHandler(),
     cors(
-      // {
-      //   origins: [
-      //     'https://no-spoilers.com'
-      //   ]
-      // }
+      {
+        origins: [
+          'https://no-spoilers.net'
+        ]
+      }
     ),
     validateJwt(),
     log()
