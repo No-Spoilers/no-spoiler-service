@@ -27,7 +27,19 @@ const log = () => {
   return {
     before: (handler, next) => {
       if (process.env.NODE_ENV !== 'test') {
-        console.log(handler.event);
+        console.log({
+          logType: "incoming request",
+          ...handler.event
+        });
+      }
+      return next();
+    },
+    after: (handler, next) => {
+      if (process.env.NODE_ENV !== 'test') {
+        console.log({
+          logType: "request result",
+          ...handler.event
+        });
       }
       return next();
     }
