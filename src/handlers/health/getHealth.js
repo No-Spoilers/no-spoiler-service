@@ -1,4 +1,6 @@
 import { readFileSync } from 'fs';
+import commonMiddleware from '../../lib/commonMiddleware.js';
+
 const packageJson = JSON.parse(readFileSync('./package.json'));
 
 async function getHealth() {
@@ -17,4 +19,4 @@ async function getHealth() {
   }
 }
 
-export const handler = getHealth;
+export const handler = commonMiddleware(getHealth);

@@ -30,6 +30,7 @@ resources:
           Ref: 'ApiGatewayRestApi'
 
 functions:
+  getRoot: ${file(src/rootFunctions.yml):RootFunctions.getRoot}
   getHealth: ${file(src/healthFunctions.yml):HealthFunctions.getHealth}
 
   getSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeries}

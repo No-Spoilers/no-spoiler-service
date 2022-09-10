@@ -1,0 +1,9 @@
+RootFunctions:
+
+  getRoot:
+    handler: src/handlers/root/getRoot.handler
+    events:
+      - http:
+          method: GET
+          path: /
+          cors: true
