@@ -5,7 +5,7 @@ import httpErrorHandler from '@middy/http-error-handler';
 import httpEventNormalizer from '@middy/http-event-normalizer';
 import { verifyToken } from './token.js';
 
-const validateJwt = () => {
+function validateJwt() {
   return {
     before: (handler, next) => {
       if (handler.event.headers?.Authorization) {
@@ -23,7 +23,7 @@ const validateJwt = () => {
   }
 }
 
-const log = () => {
+function logEvents() {
   return {
     before: (handler, next) => {
       if (process.env.NODE_ENV !== 'test') {
@@ -46,18 +46,21 @@ const log = () => {
   }
 }
 
-export default handler => middy(handler)
-  .use([
-    httpJsonBodyParser(),
-    httpEventNormalizer(),
-    httpErrorHandler(),
-    cors(
-      {
-        origins: [
-          'https://no-spoilers.net'
-        ]
-      }
-    ),
-    validateJwt(),
-    log()
-  ]);
+function commonMiddleware(handler) {
+  return middy(handler)
+    .use([
+      httpJsonBodyParser(),
+      httpEventNormalizer(),
+      httpErrorHandler(),
+      cors(
+        {
+          origins: [
+            'https://*.no-spoilers.net'
+          ]
+        }
+      ),
+      validateJwt(),
+      logEvents()
+    ]);
+}
+export default commonMiddleware;
