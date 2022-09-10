@@ -55,7 +55,9 @@ function commonMiddleware(handler) {
       cors(
         {
           origins: [
-            'https://*.no-spoilers.net'
+            'https://no-spoilers.net',
+            'https://www.no-spoilers.net',
+            'https://api.no-spoilers.net'
           ]
         }
       ),
