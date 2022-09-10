@@ -19,6 +19,15 @@ provider:
 resources:
   Resources:
     NoSpoilersTable: ${file(resources/NoSpoilersTable.yml):NoSpoilersTable}
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'https://no-spoilers.net'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
 
 functions:
   getHealth: ${file(src/healthFunctions.yml):HealthFunctions.getHealth}
