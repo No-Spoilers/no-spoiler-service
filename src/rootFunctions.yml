@@ -4,6 +4,18 @@ RootFunctions:
     handler: src/handlers/root/getRoot.handler
     events:
       - http:
-          method: POST
+          method: GET
           path: /
-          cors: true
+          cors:
+            origin: 'https://no-spoilers.net'
+            headers:	
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            methods:
+              - OPTIONS
+              - GET
+              - POST
