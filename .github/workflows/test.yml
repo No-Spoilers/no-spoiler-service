@@ -10,8 +10,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: asdf-vm/actions/install@v1
-    - run: npm install
+    - run: pnpm install
     - name: run test suite
-      run: npm test
+      run: pnpm test
       env:
         TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
