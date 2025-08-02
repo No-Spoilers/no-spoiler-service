@@ -28,7 +28,7 @@ function logEvents() {
     before: (handler, next) => {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
-          logType: "incoming request",
+          logType: 'incoming request',
           ...handler.event
         });
       }
@@ -37,7 +37,7 @@ function logEvents() {
     after: (handler, next) => {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
-          logType: "request result",
+          logType: 'request result',
           ...handler.event
         });
       }
