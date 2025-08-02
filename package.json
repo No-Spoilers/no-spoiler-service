@@ -14,7 +14,8 @@
     "test:coverage": "c8 --check-coverage npm run test:base",
     "test:base": "mocha test/**/*.test.js -r dotenv/config",
     "test:e2e": "newman run postman_tests.json -e postman_environment.dev.json",
-    "sls:deploy": "sls deploy"
+    "sls:deploy": "sls deploy",
+    "sls:login": "sls login"
   },
   "dependencies": {
     "@middy/core": "^1.4.0",
