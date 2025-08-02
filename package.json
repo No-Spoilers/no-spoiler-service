@@ -1,6 +1,6 @@
 {
   "name": "no-spoiler-service",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "serverless api for no-spoilers.net",
   "author": "Geoffrey Emerson <geoffrey.emerson.git@gmail.com>",
   "license": "UNLICENSED",
