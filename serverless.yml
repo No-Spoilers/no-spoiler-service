@@ -2,7 +2,7 @@ service: no-spoiler-service
 frameworkVersion: '4'
 useDotenv: true
 
-licenseKey: ${arn:aws:secretsmanager:us-east-1:392417943421:secret:SERVERLESS_LICENSE_KEY-CqQONR}
+licenseKey: ${ssm:/aws/reference/secretsmanager/SERVERLESS_LICENSE_KEY}
 
 provider:
   name: aws
