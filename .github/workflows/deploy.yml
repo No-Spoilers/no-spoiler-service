@@ -20,7 +20,6 @@ jobs:
     - run: npm install
     - name: serverless deploy
       run: |
-        echo "Starting serverless deploy"
         if [ -v SERVERLESS_LICENSE_KEY ]; then
           echo "SERVERLESS_LICENSE_KEY is set."
         else

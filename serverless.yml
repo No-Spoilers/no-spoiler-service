@@ -2,8 +2,6 @@ service: no-spoiler-service
 frameworkVersion: '4'
 useDotenv: true
 
-licenseKey: ${ssm:/aws/reference/secretsmanager/SERVERLESS_LICENSE_KEY}
-
 provider:
   name: aws
   runtime: nodejs20.x
