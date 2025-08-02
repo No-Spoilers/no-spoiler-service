@@ -5,7 +5,7 @@ import { handler } from '../src/handlers/health/getHealth.js';
 describe('getHealth', () => {
 
   it('should return 200', async () => {
-    const result = await handler();
+    const result = await handler({});
 
     expect(result).to.have.all.keys(
       'statusCode',
