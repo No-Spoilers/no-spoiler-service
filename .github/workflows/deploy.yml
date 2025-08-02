@@ -10,8 +10,8 @@ jobs:
     name: deploy
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: asdf-vm/actions/install@v1
+    - uses: actions/checkout@v4
+    - uses: asdf-vm/actions/install@v4
     - run: npm install
     - name: serverless deploy
       run: npm run sls:deploy
