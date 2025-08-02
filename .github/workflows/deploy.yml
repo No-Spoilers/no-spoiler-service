@@ -8,15 +8,22 @@ on:
 jobs:
   deploy:
     name: deploy
+    env:
+      SERVERLESS_LICENSE_KEY: ${{ secrets.SERVERLESS_LICENSE_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: asdf-vm/actions/install@v4
     - run: npm install
     - name: serverless deploy
-      run: npm run sls:deploy
-      env:
-        SERVERLESS_LICENSE_KEY: ${{ secrets.SERVERLESS_LICENSE_KEY }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+      run: |
+        echo "Starting serverless deploy"
+        if [ -v SERVERLESS_LICENSE_KEY ]; then
+          echo "SERVERLESS_LICENSE_KEY is set."
+        else
+          echo "SERVERLESS_LICENSE_KEY is not set."
+        fi
+        npm run sls:deploy
