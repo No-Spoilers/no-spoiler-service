@@ -5,6 +5,7 @@ import {
   GetItemCommand,
   QueryCommand,
   UpdateItemCommand,
+  TransactWriteItemsCommand,
 } from '@aws-sdk/client-dynamodb';
 
 const TableName = process.env.NO_SPOILERS_TABLE_NAME;
@@ -97,6 +98,23 @@ export async function updateDbItem(item) {
   const { Attributes } = await client.send(command);
 
   return Attributes;
+}
+
+export async function updateMultipleDbItems(items) {
+  const input = {
+    TransactItems: items.map(item => {
+      return {
+        Update: {
+          TableName,
+          ...item,
+        }
+      };
+    })
+  };
+
+  const command = new TransactWriteItemsCommand(input);
+
+  return client.send(command);
 }
 
 export async function deleteDbItem(primary_key, sort_key) {
