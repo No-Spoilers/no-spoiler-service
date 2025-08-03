@@ -7,7 +7,7 @@ import { verifyToken } from './token.js';
 
 function validateJwt() {
   return {
-    before: (handler, next) => {
+    before: (handler) => {
       if (handler.event.headers?.Authorization) {
         const [type, token] = handler.event.headers.Authorization.split(' ');
         if (type === 'Bearer' && typeof token !== 'undefined') {
@@ -17,31 +17,41 @@ function validateJwt() {
           }
         }
       }
-
-      return next();
     }
   }
 }
 
 function logEvents() {
   return {
-    before: (handler, next) => {
+    before: (request) => {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
           logType: 'incoming request',
-          ...handler.event
+          ...request.event
         });
       }
-      return next();
     },
-    after: (handler, next) => {
+    after: (handler) => {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
           logType: 'request result',
           ...handler.event
         });
       }
-      return next();
+    }
+  }
+}
+
+function bodyNormalizer() {
+  return {
+    before: (handler) => {
+      if (!handler.event.headers) {
+        handler.event.headers = {};
+      }
+      if (!handler.event.headers['Content-Type']) {
+        handler.event.headers['Content-Type'] = 'application/json';
+        handler.event.body = handler.event.body || '{}';
+      }
     }
   }
 }
@@ -49,6 +59,7 @@ function logEvents() {
 function commonMiddleware(handler) {
   return middy(handler)
     .use([
+      bodyNormalizer(),
       httpJsonBodyParser(),
       httpEventNormalizer(),
       httpErrorHandler(),

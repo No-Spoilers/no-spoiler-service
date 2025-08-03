@@ -18,12 +18,12 @@
     "sls:deploy": "sls deploy"
   },
   "dependencies": {
-    "@middy/core": "^1.4.0",
-    "@middy/http-cors": "^1.5.2",
-    "@middy/http-error-handler": "^1.4.0",
-    "@middy/http-event-normalizer": "^1.4.0",
-    "@middy/http-json-body-parser": "^1.4.0",
-    "@middy/validator": "^1.5.0",
+    "@middy/core": "6.4.1",
+    "@middy/http-cors": "6.4.1",
+    "@middy/http-error-handler": "6.4.1",
+    "@middy/http-event-normalizer": "6.4.1",
+    "@middy/http-json-body-parser": "6.4.1",
+    "@middy/validator": "6.4.1",
     "aws-sdk": "^2.761.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.0",

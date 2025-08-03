@@ -6,7 +6,6 @@ const packageJson = JSON.parse(readFileSync('./package.json'));
 async function getHealth() {
   try {
     const responseBody = {
-      nodeVersion: process.version,
       packageVersion: packageJson.version
     };
 

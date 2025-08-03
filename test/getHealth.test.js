@@ -9,7 +9,8 @@ describe('getHealth', () => {
 
     expect(result).to.have.all.keys(
       'statusCode',
-      'body'
+      'body',
+      'headers'
     );
 
     const { statusCode, body } = result;
@@ -19,7 +20,6 @@ describe('getHealth', () => {
     const parsedBody = JSON.parse(body);
 
     expect(parsedBody).to.have.all.keys(
-      'nodeVersion',
       'packageVersion'
     );
   });

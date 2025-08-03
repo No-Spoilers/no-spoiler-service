@@ -1,4 +1,6 @@
 const schema = {
+  type: 'object',
+  required: [ 'body' ],
   properties: {
     body: {
       type: 'object',
@@ -8,8 +10,7 @@ const schema = {
       },
       required: [ 'email', 'password' ]
     }
-  },
-  required: [ 'body' ]
+  }
 };
 
 export default schema;

@@ -32,17 +32,19 @@ describe('postUser', () => {
 
   it('should create a new user', async () => {
     const event = {
-      body: {
+      body: JSON.stringify({
         name: 'Test User',
         email: 'Test.User@example.com',
         password: 'Test Password'
-      }
+      })
     }
 
     const result = await handler(event);
+    // const result = {};
 
     expect(result).to.have.all.keys(
       'statusCode',
+      'headers',
       'body'
     );
 

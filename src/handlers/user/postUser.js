@@ -4,6 +4,7 @@ import createError from 'http-errors';
 import dbCreateUser from '../../db/dbCreateUser.js';
 import commonMiddleware from '../../lib/commonMiddleware.js';
 import { createNewToken } from '../../lib/token.js';
+import { transpileSchema } from '@middy/validator/transpile';
 
 async function postUser(event) {
   const { name, email, password } = event.body;
@@ -14,7 +15,7 @@ async function postUser(event) {
     if (user && user.existing) {
       return {
         statusCode: 400,
-        body: JSON.stringify( `User with email:${email} already exists.` ),
+        body: { message: `User with email:${email} already exists.` },
       };
     }
 
@@ -25,7 +26,7 @@ async function postUser(event) {
       email: user.email,
       createdAt: user.createdAt,
       token
-    }
+    };
 
     return {
       statusCode: 201,
@@ -40,4 +41,4 @@ async function postUser(event) {
 }
 
 export const handler = commonMiddleware(postUser)
-  .use(validator({ inputSchema: postUserSchema, useDefaults: true }));
+  .use(validator({ eventSchema: transpileSchema(postUserSchema, { useDefaults: true }) }));
