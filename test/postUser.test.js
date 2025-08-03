@@ -63,7 +63,5 @@ describe('postUser', () => {
     expect(parsedBody.name).to.equal('Test User');
     expect(parsedBody.email).to.equal('Test.User@example.com');
     expect(parsedBody.createdAt).to.match(/Z$/);
-    // expect(parsedBody.token).to.
-
   });
 });
