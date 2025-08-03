@@ -1,24 +1,21 @@
-import AWS from 'aws-sdk';
 import createError from 'http-errors';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import { searchDbItems } from '../lib/dynamodb-client';
 
 export default async function dbQueryUserLevels(userId) {
   try {
     const params = {
-      TableName: process.env.NO_SPOILERS_TABLE_NAME,
       KeyConditionExpression: 'primary_key = :primary_key',
       ExpressionAttributeValues: {
         ':primary_key': userId
       }
     };
 
-    const { Items: levelArray } = await dynamodb.query(params).promise();
+    const queryResult = await searchDbItems(params);
 
-    const levelsBySeries = levelArray.reduce((acc, entry) => {
+    const levelsBySeries = queryResult.reduce((acc, entry) => {
       acc[entry.sort_key] = entry.level;
       return acc;
-    }, {})
+    }, {});
 
     return levelsBySeries;
 

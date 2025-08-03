@@ -3,6 +3,7 @@ import {
   PutItemCommand,
   DeleteItemCommand,
   GetItemCommand,
+  QueryCommand,
 } from '@aws-sdk/client-dynamodb';
 
 const TableName = process.env.NO_SPOILERS_TABLE_NAME;
@@ -24,6 +25,17 @@ export async function getDbItem(primary_key, sort_key) {
   const result = await client.send(command);
 
   return result.Item;
+}
+
+export async function searchDbItems(params) {
+  const command = new QueryCommand({
+    TableName,
+    ...params
+  });
+
+  const result = await client.send(command);
+
+  return result.Items;
 }
 
 export async function putDbItem(item) {

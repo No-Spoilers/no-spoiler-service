@@ -1,30 +1,24 @@
-import AWS from 'aws-sdk';
 import createError from 'http-errors';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import { searchDbItems } from '../lib/dynamodb-client';
 
 export default async function dbQuerySeriesById(contentId) {
-  const reverseLookup = contentId.split('')[0] === 's' ? false : true;
-
-  const params = {
-    TableName: process.env.NO_SPOILERS_TABLE_NAME,
-  };
-
-  if (reverseLookup) {
-    params.IndexName = 'ReverseLookup';
-    params.KeyConditionExpression = '#sk = :sk';
-    params.ExpressionAttributeNames = { '#sk': 'sort_key' };
-    params.ExpressionAttributeValues = { ':sk': contentId };
-  } else {
-    params.KeyConditionExpression = '#pk = :pk';
-    params.ExpressionAttributeNames = { '#pk': 'primary_key' };
-    params.ExpressionAttributeValues = { ':pk': contentId };
-  }
-
   try {
-    const { Items: queryResult } = await dynamodb.query(params).promise();
+    const reverseLookup = contentId.startsWith('s') ? false : true;
 
-    if (!queryResult || queryResult.length == 0) return null;
+    const params = reverseLookup ? {
+      IndexName: 'ReverseLookup',
+      KeyConditionExpression: '#sk = :sk',
+      ExpressionAttributeNames: { '#sk': 'sort_key' },
+      ExpressionAttributeValues: { ':sk': contentId }
+    } : {
+      KeyConditionExpression: '#pk = :pk',
+      ExpressionAttributeNames: { '#pk': 'primary_key' },
+      ExpressionAttributeValues: { ':pk': contentId }
+    };
+
+    const queryResult = await searchDbItems(params);
+
+    if (!Array.isArray(queryResult) || queryResult.length === 0) return null;
 
     if (reverseLookup) {
       // always return full series info, even if query was for a book or entry
