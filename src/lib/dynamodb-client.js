@@ -1,7 +1,8 @@
 import {
   DynamoDBClient,
   PutItemCommand,
-  DeleteItemCommand
+  DeleteItemCommand,
+  GetItemCommand,
 } from '@aws-sdk/client-dynamodb';
 
 const TableName = process.env.NO_SPOILERS_TABLE_NAME;
@@ -9,6 +10,21 @@ const ReturnValues = 'ALL_OLD';
 const dynamoClientConfig = {};
 
 const client = new DynamoDBClient(dynamoClientConfig);
+
+export async function getDbItem(primary_key, sort_key) {
+  const params = {
+    TableName,
+    Key: {
+      primary_key,
+      sort_key
+    }
+  };
+  const command = new GetItemCommand(params);
+
+  const result = await client.send(command);
+
+  return result.Item;
+}
 
 export async function putDbItem(item) {
   const Item = Object.entries(item).map(([key, value]) => {

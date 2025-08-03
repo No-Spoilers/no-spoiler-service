@@ -1,28 +1,18 @@
-import AWS from 'aws-sdk';
 import createError from 'http-errors';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import { getDbItem } from '../lib/dynamodb-client';
 
 export default async function dbGetEntryBySeriesIdAndEntryId(seriesId, entryId) {
   try {
-    const result = await dynamodb.get({
-      TableName: process.env.NO_SPOILERS_TABLE_NAME,
-      Key: {
-        primary_key: seriesId,
-        sort_key: entryId
-      }
-    }).promise();
+    const entry = await getDbItem(seriesId, entryId);
 
-    const book = result.Item;
+    if (!entry) return null;
 
-    if (!book) return null;
+    entry.seriesId = entry.primary_key,
+    entry.entryId = entry.sort_key,
+    delete entry.primary_key,
+    delete entry.sort_key
 
-    book.seriesId = book.primary_key,
-    book.entryId = book.sort_key,
-    delete book.primary_key,
-    delete book.sort_key
-
-    return book;
+    return entry;
 
   } catch (error) {
     console.error(error);
