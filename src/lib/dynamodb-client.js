@@ -4,6 +4,7 @@ import {
   DeleteItemCommand,
   GetItemCommand,
   QueryCommand,
+  UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 
 const TableName = process.env.NO_SPOILERS_TABLE_NAME;
@@ -82,6 +83,20 @@ export async function putDbItem(item) {
   };
   const command = new PutItemCommand(input);
   return client.send(command);
+}
+
+export async function updateDbItem(item) {
+  const input = {
+    TableName,
+    ReturnValues: 'ALL_NEW',
+    ...item
+  };
+
+  const command = new UpdateItemCommand(input);
+
+  const { Attributes } = await client.send(command);
+
+  return Attributes;
 }
 
 export async function deleteDbItem(primary_key, sort_key) {

@@ -1,35 +1,38 @@
-import AWS from 'aws-sdk';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import createError from 'http-errors';
+import { updateDbItem } from '../lib/dynamodb-client';
 
 export default async function dbUpdateUserLevel(token, seriesId, bookId) {
-  const userId = token.sub;
-  const now = new Date();
+  try {
+    const userId = token.sub;
+    const now = new Date();
 
-  const params = {
-    TableName: process.env.NO_SPOILERS_TABLE_NAME,
-    Key:{
-      primary_key: userId,
-      sort_key: seriesId,
-    },
-    UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, #level=:level',
-    ExpressionAttributeNames: {
-      '#level': 'level'
-    },
-    ExpressionAttributeValues: {
-      ':updatedAt': now.toISOString(),
-      ':updatedBy': token.sub,
-      ':level': bookId
-    },
-    ReturnValues: 'ALL_NEW'
-  };
+    const params = {
+      Key:{
+        primary_key: userId,
+        sort_key: seriesId,
+      },
+      UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, #level=:level',
+      ExpressionAttributeNames: {
+        '#level': 'level'
+      },
+      ExpressionAttributeValues: {
+        ':updatedAt': now.toISOString(),
+        ':updatedBy': token.sub,
+        ':level': bookId
+      },
+    };
 
-  const { Attributes: result } = await dynamodb.update(params).promise();
+    const user = await updateDbItem(params);
 
-  result.userId = result.primary_key;
-  result.seriesId = result.sort_key;
-  delete result.primary_key;
-  delete result.sort_key;
+    user.userId = user.primary_key;
+    user.seriesId = user.sort_key;
+    delete user.primary_key;
+    delete user.sort_key;
 
-  return result;
+    return user;
+
+  } catch (error) {
+    console.error(error);
+    throw new createError.InternalServerError(error);
+  }
 }

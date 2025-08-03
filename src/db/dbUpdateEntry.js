@@ -1,7 +1,5 @@
-import AWS from 'aws-sdk';
 import createError from 'http-errors';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import { updateDbItem } from '../lib/dynamodb-client';
 
 export default async function dbUpdateEntry(entry, newEntry, userId) {
   try {
@@ -13,7 +11,6 @@ export default async function dbUpdateEntry(entry, newEntry, userId) {
     };
 
     const params = {
-      TableName: process.env.NO_SPOILERS_TABLE_NAME,
       Key: {
         primary_key: entry.seriesId,
         sort_key: entry.entryId
@@ -27,17 +24,16 @@ export default async function dbUpdateEntry(entry, newEntry, userId) {
         ':updatedBy': userId,
         ':text': newText
       },
-      ReturnValues: 'ALL_NEW'
     };
 
-    const { Attributes: result } = await dynamodb.update(params).promise();
+    const entry = await updateDbItem(params);
 
-    result.seriesId = result.primary_key;
-    result.entryId = result.sort_key;
-    delete result.primary_key;
-    delete result.sort_key;
+    entry.seriesId = entry.primary_key;
+    entry.entryId = entry.sort_key;
+    delete entry.primary_key;
+    delete entry.sort_key;
 
-    return result;
+    return entry;
 
   } catch (error) {
     console.error(error);
