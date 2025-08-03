@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import { getDbItem } from '../lib/dynamodb-client';
+import { getDbItem } from '../lib/dynamodb-client.js';
 
 export default async function dbGetEntryBySeriesIdAndEntryId(seriesId, entryId) {
   try {

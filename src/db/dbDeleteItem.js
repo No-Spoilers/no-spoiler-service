@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import { deleteDbItem } from '../lib/dynamodb-client';
+import { deleteDbItem } from '../lib/dynamodb-client.js';
 
 export default async function dbDeleteItem(primary_key, sort_key) {
   try {

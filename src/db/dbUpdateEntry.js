@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import { updateDbItem } from '../lib/dynamodb-client';
+import { updateDbItem } from '../lib/dynamodb-client.js';
 
 export default async function dbUpdateEntry(entry, newEntry, userId) {
   try {

@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import { searchDbItems } from '../lib/dynamodb-client';
+import { searchDbItems } from '../lib/dynamodb-client.js';
 
 export default async function dbQuerySeriesById(contentId) {
   try {
