@@ -1,21 +1,9 @@
-import AWS from 'aws-sdk';
 import createError from 'http-errors';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import { deleteDbItem } from '../lib/dynamodb-client';
 
 export default async function dbDeleteItem(primary_key, sort_key) {
   try {
-    const params = {
-      TableName: process.env.NO_SPOILERS_TABLE_NAME,
-      Key: {
-        primary_key,
-        sort_key
-      },
-      ConditionExpression: 'attribute_exists(sort_key)',
-      ReturnValues: 'ALL_OLD'
-    };
-
-    const result = await dynamodb.delete(params).promise();
+    const result = await deleteDbItem(primary_key, sort_key);
 
     return result.Attributes;
 

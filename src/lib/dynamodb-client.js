@@ -1,5 +1,11 @@
-import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  PutItemCommand,
+  DeleteItemCommand
+} from '@aws-sdk/client-dynamodb';
 
+const TableName = process.env.NO_SPOILERS_TABLE_NAME;
+const ReturnValues = 'ALL_OLD';
 const dynamoClientConfig = {};
 
 const client = new DynamoDBClient(dynamoClientConfig);
@@ -42,9 +48,24 @@ export async function putDbItem(item) {
     return result;
   });
   const input = {
-    TableName: process.env.NO_SPOILERS_TABLE_NAME,
+    TableName,
     Item,
+    ReturnValues
   };
   const command = new PutItemCommand(input);
+  return client.send(command);
+}
+
+export async function deleteDbItem(primary_key, sort_key) {
+  const params = {
+    TableName,
+    Key: {
+      primary_key,
+      sort_key
+    },
+    ConditionExpression: 'attribute_exists(sort_key)',
+    ReturnValues: 'ALL_OLD'
+  };
+  const command = new DeleteItemCommand(params);
   return client.send(command);
 }
