@@ -1,31 +1,19 @@
-import AWS from 'aws-sdk';
 import generateId from '../lib/base64id.js';
-
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+import { putDbItem } from '../lib/dynamodb-client.js';
 
 export default async function dbCreateEntry(entry, userId) {
-  const now = new Date();
+  const now = new Date().toISOString();
 
-  const newSortKey = `e${generateId(9)}`;
-
-  const text = {
-    [`${entry.bookId}`]: entry.text
-  };
+  const newSortKey = `e${generateId(9)}`;;
 
   const item = {
     primary_key: entry.seriesId,
     sort_key: newSortKey,
     name: entry.name,
-    text,
+    text: { key: entry.bookId, value: entry.text },
     createdBy: userId,
-    createdAt: now.toISOString(),
-    updatedAt: now.toISOString()
-  }
-
-  const params = {
-    TableName: process.env.NO_SPOILERS_TABLE_NAME,
-    Item: item,
-    ReturnValues: 'ALL_OLD'
+    createdAt: now,
+    updatedAt: now
   };
 
   // TODO: Add check and retry for collisions:
@@ -36,7 +24,7 @@ export default async function dbCreateEntry(entry, userId) {
   //   ExpressionAttributeValues: {':primary_key': entry.primary_key, ':sort_key': entry.sort_key}
   // }
 
-  await dynamodb.put(params).promise();
+  await putDbItem(item);
 
   item.seriesId = item.primary_key;
   item.entryId = item.sort_key;

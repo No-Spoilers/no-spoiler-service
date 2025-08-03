@@ -1,12 +1,11 @@
-import AWS from 'aws-sdk';
-import generateId from '../lib/base64id.js';
 import bcrypt from 'bcryptjs';
+import generateId from '../lib/base64id.js';
+import { putDbItem } from '../lib/dynamodb-client.js';
 import dbQueryUserByEmail from './dbQueryUserByEmail.js';
 
 export default async function dbCreateUser(name, preservedCaseEmail, password) {
-  const dynamodb = new AWS.DynamoDB.DocumentClient();
   const email = preservedCaseEmail.toLowerCase();
-  const now = new Date();
+  const now = new Date().toISOString();
 
   const result = await dbQueryUserByEmail(email);
   if (result) {
@@ -23,16 +22,11 @@ export default async function dbCreateUser(name, preservedCaseEmail, password) {
     name,
     preservedCaseEmail,
     passwordHash,
-    createdAt: now.toISOString(),
-    updatedAt: now.toISOString()
+    createdAt: now,
+    updatedAt: now
   }
 
-  const params = {
-    TableName: process.env.NO_SPOILERS_TABLE_NAME,
-    Item: user
-  };
-
-  await dynamodb.put(params).promise();
+  await putDbItem(user);
 
   user.email = user.preservedCaseEmail;
   delete user.primary_key;

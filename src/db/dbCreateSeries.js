@@ -1,9 +1,8 @@
-import AWS from 'aws-sdk';
 import generateId from '../lib/base64id.js';
+import { putDbItem } from '../lib/dynamodb-client.js';
 
 export default async function dbCreateSeries(seriesData, token) {
-  const dynamodb = new AWS.DynamoDB.DocumentClient();
-  const now = new Date();
+  const now = new Date().toISOString();
 
   const series = {
     primary_key: `t${generateId(10)}`,
@@ -11,16 +10,12 @@ export default async function dbCreateSeries(seriesData, token) {
     name: seriesData.name,
     text: seriesData.text,
     createdBy: token.sub,
-    createdAt: now.toISOString(),
-    updatedAt: now.toISOString()
+    createdAt: now,
+    updatedAt: now
   };
 
-  const entry = {
-    TableName: process.env.NO_SPOILERS_TABLE_NAME,
-    Item: series
-  };
 
-  await dynamodb.put(entry).promise();
+  await putDbItem(series);
 
   series.seriesId = series.primary_key;
   delete series.primary_key;

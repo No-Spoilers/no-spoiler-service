@@ -1,10 +1,9 @@
-import AWS from 'aws-sdk';
 import generateId from '../lib/base64id.js';
+import { putDbItem } from '../lib/dynamodb-client.js';
 
-const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 export default async function dbCreateBook({ pubDate, seriesId, name, text }, token) {
-  const now = new Date();
+  const now = new Date().toISOString();
   const formattedDate = new Date(pubDate).toISOString();
 
   const book = {
@@ -14,16 +13,11 @@ export default async function dbCreateBook({ pubDate, seriesId, name, text }, to
     text,
     pubDate: formattedDate,
     createdBy: token.sub,
-    createdAt: now.toISOString(),
-    updatedAt: now.toISOString()
-  }
-
-  const params = {
-    TableName: process.env.NO_SPOILERS_TABLE_NAME,
-    Item: book
+    createdAt: now,
+    updatedAt: now
   };
 
-  await dynamodb.put(params).promise();
+  await putDbItem(book);
 
   book.seriesId = book.primary_key;
   book.bookId = book.sort_key;
