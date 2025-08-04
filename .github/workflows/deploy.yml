@@ -16,6 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: asdf-vm/actions/install@v4
-    - run: npm install
+    - name: install dependencies
+      run: npm install
+    - name: run tests
+      run: npm test
     - name: serverless deploy
       run: npm run sls:deploy
