@@ -14,7 +14,6 @@ export default async function dbCreateSeries(seriesData, token) {
     updatedAt: now
   };
 
-
   await putDbItem(series);
 
   series.seriesId = series.primary_key;

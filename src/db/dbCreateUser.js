@@ -7,15 +7,16 @@ export default async function dbCreateUser(name, preservedCaseEmail, password) {
   const email = preservedCaseEmail.toLowerCase();
   const now = new Date().toISOString();
 
-  const result = await dbQueryUserByEmail(email);
-  if (result) {
-    result.existing = true;
-    return result;
+  const user = await dbQueryUserByEmail(email);
+
+  if (user) {
+    user.existing = true;
+    return user;
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  const user = {
+  const newUser = {
     primary_key: 'user',
     sort_key: email,
     userId:`u${generateId(10)}`,
@@ -26,13 +27,13 @@ export default async function dbCreateUser(name, preservedCaseEmail, password) {
     updatedAt: now
   }
 
-  await putDbItem(user);
+  await putDbItem(newUser);
 
-  user.email = user.preservedCaseEmail;
-  delete user.primary_key;
-  delete user.sort_key;
-  delete user.preservedCaseEmail;
-  delete user.passwordHash;
+  newUser.email = newUser.preservedCaseEmail;
+  delete newUser.primary_key;
+  delete newUser.sort_key;
+  delete newUser.preservedCaseEmail;
+  delete newUser.passwordHash;
 
-  return user;
+  return newUser;
 }

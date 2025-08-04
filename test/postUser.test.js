@@ -1,46 +1,38 @@
 import { expect } from 'chai';
-import AWSMock from 'aws-sdk-mock';
-import AWS from 'aws-sdk';
+import { DynamoDBClient, QueryCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { mockClient } from 'aws-sdk-client-mock';
 
 import { handler } from '../src/handlers/user/postUser.js';
 
 describe('postUser', () => {
+  let dynamoDBMock;
 
-  before(() => {
-    // set up a mock call to DynamoDB
-    AWSMock.setSDKInstance(AWS);
-    AWSMock.mock('DynamoDB.DocumentClient', 'put', (params, callback) => {
-      const fakeData = {
-        Item: {
-          foo: 'bar'
-        }
-      };
-
-      return callback(null, fakeData);
-    });
-    AWSMock.mock('DynamoDB.DocumentClient', 'get', (params, callback) => {
-      const fakeData = { Item: null };
-
-      return callback(null, fakeData);
-    });
+  beforeEach(() => {
+    const dynamoDB = new DynamoDBClient({});
+    dynamoDBMock = mockClient(dynamoDB);
   });
 
-  after(() => {
-    // restore normal function
-    AWSMock.restore('DynamoDB.DocumentClient');
+  afterEach(() => {
+    dynamoDBMock.reset();
   });
 
-  it('should create a new user', async () => {
+  it('should call the database to create a new user', async () => {
+    dynamoDBMock
+      .on(QueryCommand)
+      .resolves({ Item: null });
+    dynamoDBMock
+      .on(PutItemCommand)
+      .resolves({ Item: { foo: 'bar' } });
+
     const event = {
       body: JSON.stringify({
         name: 'Test User',
-        email: 'Test.User@example.com',
+        email: 'Test.User2@example.com',
         password: 'Test Password'
       })
     }
 
     const result = await handler(event);
-    // const result = {};
 
     expect(result).to.have.all.keys(
       'statusCode',
@@ -61,7 +53,7 @@ describe('postUser', () => {
       'token'
     );
     expect(parsedBody.name).to.equal('Test User');
-    expect(parsedBody.email).to.equal('Test.User@example.com');
+    expect(parsedBody.email).to.equal('Test.User2@example.com');
     expect(parsedBody.createdAt).to.match(/Z$/);
   });
 });

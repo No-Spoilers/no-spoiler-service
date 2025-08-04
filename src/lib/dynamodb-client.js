@@ -8,7 +8,7 @@ import {
   TransactWriteItemsCommand,
 } from '@aws-sdk/client-dynamodb';
 
-const TableName = process.env.NO_SPOILERS_TABLE_NAME;
+const TableName = process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev';
 const ReturnValues = 'ALL_OLD';
 const dynamoClientConfig = {};
 
@@ -41,42 +41,38 @@ export async function searchDbItems(params) {
 }
 
 export async function putDbItem(item) {
-  const Item = Object.entries(item).map(([key, value]) => {
+  const Item = Object.entries(item).reduce((acc, [key, value]) => {
     if (typeof value === 'string') {
-      const result = {};
-      result[key] = { S: value };
-      return result;
+      acc[key] = { S: value };
+      return acc;
     }
     if (typeof value === 'number') {
-      const result = {};
-      result[key] = { N: value.toString() }; // DynamoDB expects numbers as strings
-      return result;
+      acc[key] = { N: value.toString() }; // DynamoDB expects numbers as strings
+      return acc;
     }
     if (typeof value === 'object') {
       if (Array.isArray(value)) {
-        const result = {};
-        result[key] = { L: value.map(v => ({ S: v })) };
-        return result;
+        acc[key] = { L: value.map(v => ({ S: v })) };
+        return acc;
       }
-      const result = {};
-      result[key] = { M: {} };
+      acc[key] = { M: {} };
       Object.entries(value).forEach(([subKey, subValue]) => {
         if (typeof subValue === 'string') {
-          result[key].M[subKey] = { S: subValue };
+          acc[key].M[subKey] = { S: subValue };
         } else if (typeof subValue === 'number') {
-          result[key].M[subKey] = { N: subValue.toString() };
+          acc[key].M[subKey] = { N: subValue.toString() };
         } else if (typeof subValue === 'object') {
-          result[key].M[subKey] = { M: subValue };
+          acc[key].M[subKey] = { M: subValue };
         } else {
-          result[key].M[subKey] = { S: String(subValue) }; // Fallback for other types
+          acc[key].M[subKey] = { S: String(subValue) }; // Fallback for other types
         }
       });
-      return result;
+      return acc;
     }
     const result = {};
     result[key] = { S: String(value) }; // Fallback for other types
     return result;
-  });
+  }, {});
   const input = {
     TableName,
     Item,

@@ -1,32 +1,26 @@
 import { expect } from 'chai';
-import AWSMock from 'aws-sdk-mock';
-import AWS from 'aws-sdk';
+import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { mockClient } from 'aws-sdk-client-mock';
 
 import dbCreateSeries from '../src/db/dbCreateSeries.js';
 
 describe('dbCreateSeries', () => {
+  let dynamoDBMock;
 
-  before(() => {
-    // set up a mock call to DynamoDB
-    AWSMock.setSDKInstance(AWS);
-    AWSMock.mock('DynamoDB.DocumentClient', 'put', (params, callback) => {
-      // return fake data
-      const fakeData = {
-        Item: {
-          foo: 'bar'
-        }
-      };
-
-      return callback(null, fakeData);
-    });
+  beforeEach(() => {
+    const dynamoDB = new DynamoDBClient({});
+    dynamoDBMock = mockClient(dynamoDB);
   });
 
-  after(() => {
-    // restore normal function
-    AWSMock.restore('DynamoDB.DocumentClient');
+  afterEach(() => {
+    dynamoDBMock.reset();
   });
 
   it('should create a new series', async () => {
+    dynamoDBMock
+      .on(PutItemCommand)
+      .resolves({ Item: { foo: 'bar' } });
+
     const seriesData = {
       name: 'test name',
       text: 'test text'

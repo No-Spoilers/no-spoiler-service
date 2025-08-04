@@ -6,13 +6,23 @@ export default async function dbQueryUserByEmail(email) {
     const normalizedEmail = email.toLowerCase();
 
     const params = {
-      Key: {
-        primary_key: 'user',
-        sort_key: normalizedEmail
+      KeyConditions: {
+        primary_key: {
+          AttributeValueList: [{ S: 'user' }],
+          ComparisonOperator: 'EQ'
+        },
+        sort_key: {
+          AttributeValueList: [{ S: normalizedEmail }],
+          ComparisonOperator: 'EQ'
+        }
       }
     };
 
-    return searchDbItems(params);
+    const queryResult = searchDbItems(params);
+
+    if (!Array.isArray(queryResult) || queryResult.length === 0) return null;
+
+    return queryResult[0];
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error);
