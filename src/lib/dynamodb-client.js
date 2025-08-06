@@ -10,7 +10,7 @@ import {
 
 const TableName = process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev';
 const ReturnValues = 'ALL_OLD';
-const dynamoClientConfig = {};
+const dynamoClientConfig = { region: 'us-east-1' };
 
 const client = new DynamoDBClient(dynamoClientConfig);
 
