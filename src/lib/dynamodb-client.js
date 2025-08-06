@@ -30,14 +30,19 @@ export async function getDbItem(primary_key, sort_key) {
 }
 
 export async function searchDbItems(params) {
-  const command = new QueryCommand({
-    TableName,
-    ...params
-  });
+  try {
+    const command = new QueryCommand({
+      TableName,
+      ...params
+    });
 
-  const result = await client.send(command);
+    const result = await client.send(command);
 
-  return result.Items;
+    return result.Items;
+  } catch (error) {
+    console.error('Error searching DB items:', error);
+    return error;
+  }
 }
 
 export async function putDbItem(item) {

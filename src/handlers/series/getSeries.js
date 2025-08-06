@@ -11,7 +11,7 @@ async function getSeries() {
       body: JSON.stringify(seriesList),
     }
   } catch (error) {
-    console.error(error);
+    console.error('GET Series Error: ' + error);
     throw new createError.InternalServerError(error);
   }
 }

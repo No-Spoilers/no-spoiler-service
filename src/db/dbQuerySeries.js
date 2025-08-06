@@ -16,13 +16,17 @@ export default async function dbQuerySeries() {
 
     const queryResult = await searchDbItems(params);
 
-    if (!Array.isArray(queryResult) || queryResult.length === 0) return null;
+    if (queryResult instanceof Error) {
+      return queryResult;
+    }
 
-    queryResult.forEach(series => {
-      series.seriesId = series.primary_key,
-      delete series.primary_key,
-      delete series.sort_key
-    })
+    if (Array.isArray(queryResult)) {
+      queryResult.forEach(series => {
+        series.seriesId = series.primary_key,
+        delete series.primary_key,
+        delete series.sort_key
+      })
+    }
 
     return queryResult;
 
