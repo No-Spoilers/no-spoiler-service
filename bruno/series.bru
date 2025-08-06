@@ -1,0 +1,15 @@
+meta {
+  name: /series
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://{{no_spoilers_url}}/series
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
