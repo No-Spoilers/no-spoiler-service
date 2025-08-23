@@ -1,0 +1,61 @@
+meta {
+  name: Add Book to Series
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{SPOILERS_HOST}}/book
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+body:json {
+  {
+      "seriesId": "{{testSeriesId}}", 
+      "name": "{{testBookName}}",
+      "pubDate": "{{testBookDate}}",
+      "text": "{{testBookText}}"
+  }
+}
+
+script:pre-request {
+  const randomSuffix = Math.floor(Math.random() * 10000);
+  
+  bru.setEnvVar('testBookName', `Test Book Name ${randomSuffix}`);
+  bru.setEnvVar('testBookDate', bru.interpolate('{{$randomDatePast}}'));
+  bru.setEnvVar('testBookText', bru.interpolate('{{$randomLoremSentences}}'));
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+      test('POST /book should succeed', () => {
+          expect(res.getStatus()).to.equal(201);
+      })
+  
+      test('POST /book should return updated info', () => {
+          const { name, bookId, text, createdBy } = res.getBody();
+          bru.setEnvVar('testBookId', bookId);
+          expect(name).to.equal(bru.getEnvVar('testBookName'));
+          expect(text).to.equal(bru.getEnvVar('testBookText'));
+          expect(createdBy).to.equal(bru.getEnvVar('testUserId'));
+      })
+  
+  } else {
+  
+      test('POST /book should not pass with bad Series ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,52 @@
+meta {
+  name: Delete Book
+  type: http
+  seq: 16
+}
+
+delete {
+  url: {{SPOILERS_HOST}}/book/:bookId/series/:seriesId
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~id: 
+}
+
+params:path {
+  bookId: {{testBookId}}
+  seriesId: {{testSeriesId}}
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+      test('DELETE /book/:id should succeed', () => {
+          expect(res.getStatus()).to.equal(200);
+      })
+  
+      test('DELETE /book/:id should return deleted item', () => {
+          const { deletedBook: { name, bookId, seriesId } } = res.getBody();
+          expect(bookId).to.equal(bru.getEnvVar('testBookId'));
+          expect(seriesId).to.equal(bru.getEnvVar('testSeriesId'));
+          expect(name).to.equal(bru.getEnvVar('testBookName'));
+      })
+  
+  } else {
+  
+      test('DELETE /book/:id should fail with bad ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

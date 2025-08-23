@@ -1,0 +1,63 @@
+meta {
+  name: Update Entry
+  type: http
+  seq: 13
+}
+
+patch {
+  url: {{SPOILERS_HOST}}/entry
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+body:json {
+  {
+      "seriesId": "{{testSeriesId}}",
+      "bookId": "{{testBookId}}",
+      "entryId": "{{testEntryId}}",
+      "text": "{{testEntryText}}"
+  }
+}
+
+script:pre-request {
+  bru.setEnvVar('testEntryText', bru.interpolate('{{$randomLoremParagraph}}'));
+  
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+      test('PATCH /entry should succeed', () => {
+          expect(res.getStatus()).to.equal(200);
+      })
+  
+      test('PATCH /entry should return updated data', () => {
+          const { seriesId, entryId, name, text } = res.getBody();
+          expect(seriesId).to.equal(bru.getEnvVar('testSeriesId'));
+          expect(entryId).to.equal(bru.getEnvVar('testEntryId'));
+          expect(name).to.equal(bru.getEnvVar('testEntryName'));
+  
+          const keyArray = Object.keys(text);
+          expect(keyArray.length).to.equal(1);
+          expect(keyArray[0]).to.equal(bru.getEnvVar('testBookId'));
+          expect(text[keyArray[0]]).to.equal(bru.getEnvVar('testEntryText'));
+          bru.setEnvVar('testEntryId', entryId);
+      })
+  
+  } else {
+  
+      test('PATCH /entry should not pass with bad Series ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

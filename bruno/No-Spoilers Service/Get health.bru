@@ -1,0 +1,22 @@
+meta {
+  name: Get health
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{SPOILERS_HOST}}/health
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test('GET /health should succeed', () => {
+      expect(res.getStatus()).to.equal(200);
+      console.log(res.getBody());
+  })
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,62 @@
+meta {
+  name: Update Series
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{SPOILERS_HOST}}/series/:seriesId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  seriesId: {{testSeriesId}}
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+body:json {
+  {
+      "name": "{{testSeriesName}}",
+      "text": "{{testSeriesText}}"
+  }
+}
+
+script:pre-request {
+  const randomSuffix = Math.floor(Math.random() * 10000);
+  
+  bru.setEnvVar('testSeriesName', `New Name ${randomSuffix}`);
+  bru.setEnvVar('testSeriesText', bru.interpolate('{{$randomLoremSentences}}'));
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+  
+      test('PATCH /series/:id should succeed', () => {
+          expect(res.getStatus()).to.equal(200);
+      })
+  
+      test('PATCH /series/:id should return expected data', () => {
+          const { updatedSeries: { name, seriesId, text } } = res.getBody();
+          expect(seriesId).to.equal(bru.getEnvVar('testSeriesId'));
+          expect(name).to.equal(bru.getEnvVar('testSeriesName'));
+          expect(text).to.equal(bru.getEnvVar('testSeriesText'));
+      })
+  
+  } else {
+  
+      test('PATCH /series/:id should fail with bad ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

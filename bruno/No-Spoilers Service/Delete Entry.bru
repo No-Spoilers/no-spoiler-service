@@ -1,0 +1,52 @@
+meta {
+  name: Delete Entry
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{SPOILERS_HOST}}/entry/:entryId/series/:seriesId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  entryId: {{testEntryId}}
+  seriesId: {{testSeriesId}}
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+      test('DELETE /entry/:entryId/series/:seriesId should succeed', () => {
+          expect(res.getStatus()).to.equal(200);
+      })
+  
+      test('DELETE /entry/:entryId/series/:seriesId should return deleted item', () => {
+          const { deletedEntry: { text, seriesId, entryId, name } } = res.getBody();
+          expect(seriesId).to.equal(bru.getEnvVar('testSeriesId'));
+          expect(entryId).to.equal(bru.getEnvVar('testEntryId'));
+          expect(name).to.equal(bru.getEnvVar('testEntryName'));
+  
+          const entryKeys = Object.keys(text);
+          expect(entryKeys.length).to.equal(1);
+          expect(text[entryKeys[0]]).to.equal(bru.getEnvVar('testEntryText'));
+      })
+  
+  } else {
+  
+      test('DELETE /entry/:entryId/series/:seriesId should fail with bad ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

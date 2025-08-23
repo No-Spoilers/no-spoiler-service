@@ -1,0 +1,54 @@
+meta {
+  name: Set Spoiler Level
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{SPOILERS_HOST}}/level
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+body:json {
+  {
+      "seriesId": "{{testSeriesId}}",
+      "bookId": "{{testBookId}}"
+  }
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+      test('PATCH /user should succeed', () => {
+          expect(res.getStatus()).to.equal(200);
+      })
+  
+      test('PATCH /user should return updated info', () => {
+          const { userId, seriesId, level } = res.getBody();
+          expect(userId).to.equal(bru.getEnvVar('testUserId'));
+          expect(seriesId).to.equal(bru.getEnvVar('testSeriesId'));
+          expect(level).to.equal(bru.getEnvVar('testBookId'));
+      })
+  
+  } else {
+  
+      test('PATCH /user should not pass with bad Book ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}
+
+docs {
+  Spoiler level is determined by the most recent book a user has marked as read.
+}

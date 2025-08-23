@@ -1,0 +1,49 @@
+meta {
+  name: Create Series
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{SPOILERS_HOST}}/series
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+body:json {
+  {
+      "name": "{{testSeriesName}}",
+      "text": "{{testSeriesText}}"
+  }
+}
+
+script:pre-request {
+  const randomSuffix = Math.floor(Math.random() * 10000);
+  bru.setEnvVar('testSeriesName', `Test Series ${randomSuffix}`);
+  bru.setEnvVar('testSeriesText', bru.interpolate('{{$randomLoremSentences}}'));
+  bru.setEnvVar('testPass', '0');
+  
+}
+
+script:post-response {
+  test('POST /series should succeed', () => {
+      expect(res.getStatus()).to.equal(201);
+  })
+  
+  test('POST /series should return created series', () => {
+      const { series: { name, seriesId, text } } = res.getBody();
+      expect(name).to.equal(bru.getEnvVar('testSeriesName'));
+      expect(text).to.equal(bru.getEnvVar('testSeriesText'));
+      expect(seriesId).to.be.a('string');
+      bru.setEnvVar('testSeriesId', seriesId);
+  })
+  
+}
+
+settings {
+  encodeUrl: true
+}

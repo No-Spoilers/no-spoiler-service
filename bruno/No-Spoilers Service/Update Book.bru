@@ -1,0 +1,61 @@
+meta {
+  name: Update Book
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{SPOILERS_HOST}}/book/:bookId/series/:seriesId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  bookId: {{testBookId}}
+  seriesId: {{testSeriesId}}
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+body:json {
+  {
+      "name": "{{testBookName}}",
+      "text": "{{testBookText}}"
+  }
+}
+
+script:pre-request {
+  const randomSuffix = Math.floor(Math.random() * 10000);
+  
+  bru.setEnvVar('testBookName', `New Name ${randomSuffix}`);
+  bru.setEnvVar('testBookText', `New Text ${randomSuffix} ${bru.interpolate('{{$randomLoremSentences}}')}`);
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+      test('PATCH /book/:bookId/series/:seriesId should succeed', () => {
+          expect(res.getStatus()).to.equal(200);
+      })
+  
+      test('PATCH /book/:bookId/series/:seriesId should return updated info', () => {
+          const { name, text } = res.getBody();
+          expect(name).to.equal(bru.getEnvVar('testBookName'));
+          expect(text).to.equal(bru.getEnvVar('testBookText'));
+      })
+  
+  } else {
+  
+      test('PATCH /book/:bookId/series/:seriesId should not pass with bad Book ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

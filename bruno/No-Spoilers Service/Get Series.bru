@@ -1,0 +1,32 @@
+meta {
+  name: Get Series
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{SPOILERS_HOST}}/series
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test('GET /series should succeed', () => {
+      expect(res.getStatus()).to.equal(200);
+  })
+  
+  test('GET /series should include test item', () => {
+      const seriesList = res.getBody();
+      const filteredList = seriesList.filter(series => series.seriesId === bru.getEnvVar('testSeriesId'));
+      expect(filteredList.length).to.equal(1);
+      const { seriesId, name, text, createdBy } = filteredList[0];
+      expect(seriesId).to.equal(bru.getEnvVar('testSeriesId'));
+      expect(name).to.equal(bru.getEnvVar('testSeriesName'));
+      expect(text).to.equal(bru.getEnvVar('testSeriesText'));
+      expect(createdBy).to.equal(bru.getEnvVar('testUserId'));
+  })
+}
+
+settings {
+  encodeUrl: true
+}

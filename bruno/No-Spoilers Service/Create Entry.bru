@@ -1,0 +1,62 @@
+meta {
+  name: Create Entry
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{SPOILERS_HOST}}/entry
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+body:json {
+  {
+      "seriesId": "{{testSeriesId}}",
+      "bookId": "{{testBookId}}",
+      "name": "{{testEntryName}}",
+      "text": "{{testEntryText}}"
+  }
+}
+
+script:pre-request {
+  bru.setEnvVar('testEntryText', bru.interpolate('{{$randomLoremParagraph}}'));
+  bru.setEnvVar('testEntryName', bru.interpolate('{{$randomFullName}}')); // Every entry will be about a person, place, item, group, or concept
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+      test('POST /entry should succeed', () => {
+          expect(res.getStatus()).to.equal(201);
+      })
+  
+      test('POST /entry should return data for created entry', () => {
+          const { seriesId, entryId, name, text, bookId } = res.getBody();
+          bru.setEnvVar('testEntryId', entryId);
+          expect(seriesId).to.equal(bru.getEnvVar('testSeriesId'));
+          expect(name).to.equal(bru.getEnvVar('testEntryName'));
+          
+          const entryKeys = Object.keys(text);
+          expect(entryKeys.length).to.equal(1);
+          expect(entryKeys[0]).to.equal(bru.getEnvVar('testBookId'));
+          expect(text[entryKeys[0]]).to.equal(bru.getEnvVar('testEntryText'));
+      })
+  
+  } else {
+  
+      test('POST /entry should not pass with bad Series ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

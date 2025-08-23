@@ -1,0 +1,53 @@
+meta {
+  name: Delete Series
+  type: http
+  seq: 17
+}
+
+delete {
+  url: {{SPOILERS_HOST}}/series/:seriesId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  seriesId: {{testSeriesId}}
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+      test('DELETE /series/:id should succeed', () => {
+          expect(res.getStatus()).to.equal(200);
+      })
+  
+      test('DELETE /series/:id should return deleted item', () => {
+          const { deletedSeries: { name, seriesId } } = res.getBody();
+          expect(seriesId).to.equal(bru.getEnvVar('testSeriesId'));
+          expect(name).to.equal(bru.getEnvVar('testSeriesName'));
+      })
+  
+      // End of first pass
+      bru.setEnvVar('testPass', '1');
+      bru.setNextRequest('Get Series By ID');
+  
+  } else {
+  
+      test('DELETE /series/:id should fail with bad ID', () => {
+          expect(res.getStatus()).to.equal(400);
+      })
+  
+      // End of looping tests
+      bru.setEnvVar('testPass', '0');
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

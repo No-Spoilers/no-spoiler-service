@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "No-Spoilers Service",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

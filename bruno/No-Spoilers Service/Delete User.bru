@@ -1,0 +1,39 @@
+meta {
+  name: Delete User
+  type: http
+  seq: 18
+}
+
+delete {
+  url: {{SPOILERS_HOST}}/user
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+body:json {
+  {
+      "email": "{{testUserEmail}}"
+  }
+}
+
+script:post-response {
+  
+  test('DELETE /user/:userId should succeed', () => {
+      expect(res.getStatus()).to.equal(200);
+  })
+  
+  test('DELETE /series/:userId should return deleted item', () => {
+      const { deletedUser: { name, email } } = res.getBody();
+      expect(name).to.equal(bru.getEnvVar('testUserName'));
+      expect(email).to.equal(bru.getEnvVar('testUserEmail'));
+  })
+  
+}
+
+settings {
+  encodeUrl: true
+}

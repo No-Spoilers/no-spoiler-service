@@ -1,0 +1,48 @@
+meta {
+  name: Create User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{SPOILERS_HOST}}/user
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "name": "{{testUserName}}",
+      "email": "{{testUserEmail}}",
+      "password": "{{testUserPassword}}"
+  }
+}
+
+script:pre-request {
+  const randomName = bru.interpolate('{{$randomFullName}}');
+  const randomEmail = bru.interpolate('{{$randomEmail}}');
+  const randomPassword = bru.interpolate('{{$randomPassword}}');
+  
+  bru.setEnvVar('testUserName', `Test-${randomName}`);
+  bru.setEnvVar('testUserEmail', randomEmail);
+  bru.setEnvVar('testUserPassword', randomPassword);
+}
+
+script:post-response {
+  test('POST /user should succeed', () => {
+      expect(res.getStatus()).to.equal(201);
+  })
+  
+  test('POST /user should return created user', () => {
+      const { name, email, createdAt, token } = res.getBody();
+      expect(name).to.equal(bru.getEnvVar('testUserName'));
+      expect(email).to.equal(bru.getEnvVar('testUserEmail'));
+      expect(createdAt).to.be.a('string');
+      expect(token).to.be.a('string');
+  })
+  
+}
+
+settings {
+  encodeUrl: true
+}

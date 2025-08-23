@@ -1,0 +1,47 @@
+meta {
+  name: Get Spoiler Levels
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{SPOILERS_HOST}}/level
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{testUserToken}}
+}
+
+script:post-response {
+  const testPass = parseInt(bru.getEnvVar('testPass'));
+  
+  if (testPass === 0) {
+  
+      test('GET /level should succeed', () => {
+          expect(res.getStatus()).to.equal(200);
+      })
+  
+      test('GET /level should include expected data', () => {
+          const response = res.getBody();
+          const seriesId = bru.getEnvVar('testSeriesId');
+          const bookId = bru.getEnvVar('testBookId');
+          const expectedResult = { [`${seriesId}`]: bookId };
+          expect(response).to.deep.equal(expectedResult);
+      })
+  
+  } else {
+  
+      test('GET /level should return no data for a bad ID', () => {
+          expect(res.getStatus()).to.equal(200);
+          const response = res.getBody();
+          expect(response).to.deep.equal({});
+      })
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+}

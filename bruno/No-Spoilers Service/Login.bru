@@ -1,0 +1,38 @@
+meta {
+  name: Login
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{SPOILERS_HOST}}/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "email": "{{testUserEmail}}",
+      "password": "{{testUserPassword}}"
+  }
+}
+
+script:post-response {
+  test('POST /login should succeed', () => {
+      expect(res.getStatus()).to.equal(200);
+  })
+  
+  test('POST /login should return token', () => {
+      const { token } = res.getBody();
+      expect(token).to.be.a('string');
+      bru.setEnvVar('testUserToken', token);
+      const tokenParts = token.split('.');
+      const payload = JSON.parse(atob(tokenParts[1]));
+      bru.setEnvVar('testUserId', payload.sub);
+  })
+  
+}
+
+settings {
+  encodeUrl: true
+}
