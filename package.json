@@ -12,8 +12,8 @@
   "scripts": {
     "lint:fix": "eslint . --fix",
     "lint": "eslint .",
-    "test": "NODE_ENV=test c8 -r text-summary npm run test:base",
-    "test:coverage": "c8 --check-coverage npm run test:base",
+    "test": "NODE_ENV=test c8 -r text-summary pnpm run test:base",
+    "test:coverage": "c8 --check-coverage pnpm run test:base",
     "test:base": "mocha test/**/*.test.js -r dotenv/config",
     "test:e2e": "newman run postman_tests.json -e postman_environment.dev.json",
     "test:watch": "mocha test/**/*.test.js -r dotenv/config --watch",

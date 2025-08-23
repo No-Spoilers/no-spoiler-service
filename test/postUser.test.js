@@ -7,28 +7,36 @@ import { handler } from '../src/handlers/user/postUser.js';
 describe('postUser', () => {
   let dynamoDBMock;
 
-  beforeEach(() => {
-    const dynamoDB = new DynamoDBClient({});
-    dynamoDBMock = mockClient(dynamoDB);
+  before(() => {
+    // Create a global mock that applies to all DynamoDB clients
+    dynamoDBMock = mockClient(DynamoDBClient);
   });
 
-  afterEach(() => {
+  beforeEach(() => {
+    // Reset the mock before each test but keep the same instance
     dynamoDBMock.reset();
   });
 
+  after(() => {
+    dynamoDBMock.restore();
+  });
+
   it('should call the database to create a new user', async () => {
+    // Mock the QueryCommand to return no existing user
     dynamoDBMock
       .on(QueryCommand)
-      .resolves({ Item: null });
+      .resolves({ Items: [] });
+
+    // Mock the PutItemCommand to return success
     dynamoDBMock
       .on(PutItemCommand)
-      .resolves({ Item: { foo: 'bar' } });
+      .resolves({});
 
     const event = {
       body: JSON.stringify({
         name: 'Test User',
         email: 'Test.User2@example.com',
-        password: 'Test Password'
+        password: 'TestPassword123'
       })
     };
 
@@ -55,5 +63,34 @@ describe('postUser', () => {
     expect(parsedBody.name).to.equal('Test User');
     expect(parsedBody.email).to.equal('Test.User2@example.com');
     expect(parsedBody.createdAt).to.match(/Z$/);
+  });
+
+  it('should return 400 if user already exists', async () => {
+    const existingUser = {
+      userId: 'u1234567890',
+      name: 'Existing User',
+      email: 'existing.user@example.com',
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z'
+    };
+
+    // Mock the QueryCommand to return an existing user
+    dynamoDBMock
+      .on(QueryCommand)
+      .resolves({ Items: [existingUser] });
+
+    const event = {
+      body: JSON.stringify({
+        name: 'Test User',
+        email: 'existing.user@example.com',
+        password: 'TestPassword123'
+      })
+    };
+
+    const result = await handler(event);
+
+    expect(result.statusCode).to.equal(400);
+    expect(result.body).to.have.property('message');
+    expect(result.body.message).to.include('already exists');
   });
 });
