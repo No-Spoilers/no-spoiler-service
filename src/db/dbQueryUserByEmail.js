@@ -18,7 +18,7 @@ export default async function dbQueryUserByEmail(email) {
       }
     };
 
-    const queryResult = searchDbItems(params);
+    const queryResult = await searchDbItems(params);
 
     if (!Array.isArray(queryResult) || queryResult.length === 0) return null;
 

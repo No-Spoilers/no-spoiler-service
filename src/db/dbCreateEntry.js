@@ -4,7 +4,7 @@ import { putDbItem } from '../lib/dynamodb-client.js';
 export default async function dbCreateEntry(entry, userId) {
   const now = new Date().toISOString();
 
-  const newSortKey = `e${generateId(9)}`;;
+  const newSortKey = `e${generateId(9)}`;
 
   const item = {
     primary_key: entry.seriesId,
@@ -16,7 +16,7 @@ export default async function dbCreateEntry(entry, userId) {
     updatedAt: now
   };
 
-  // TODO: Add check and retry for collisions:
+  // // TODO: Add check and retry for collisions:
   // {
   //   TableName: process.env.NO_SPOILERS_TABLE_NAME,
   //   Item: item

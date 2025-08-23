@@ -30,7 +30,7 @@ describe('postUser', () => {
         email: 'Test.User2@example.com',
         password: 'Test Password'
       })
-    }
+    };
 
     const result = await handler(event);
 

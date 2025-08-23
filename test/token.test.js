@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { createNewToken, verifyToken } from '../src/lib/token.js';
 
 describe('token', () => {
-  it('should create a new verifiable token', async () => {
+  it('should create a new verifiable token', () => {
     const user = {
       userId: 'test id'
     };
@@ -20,8 +20,7 @@ describe('token', () => {
       'exp',
       'sub',
       'jti'
-    )
+    );
     expect(verifiedToken.sub).to.equal('test id');
-
   });
 });

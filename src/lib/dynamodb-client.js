@@ -45,7 +45,7 @@ export async function searchDbItems(params) {
   }
 }
 
-export async function putDbItem(item) {
+export function putDbItem(item) {
   const Item = Object.entries(item).reduce((acc, [key, value]) => {
     if (typeof value === 'string') {
       acc[key] = { S: value };
@@ -101,7 +101,7 @@ export async function updateDbItem(item) {
   return Attributes;
 }
 
-export async function updateMultipleDbItems(items) {
+export function updateMultipleDbItems(items) {
   const input = {
     TransactItems: items.map(item => {
       return {
@@ -118,7 +118,7 @@ export async function updateMultipleDbItems(items) {
   return client.send(command);
 }
 
-export async function deleteDbItem(primary_key, sort_key) {
+export function deleteDbItem(primary_key, sort_key) {
   const params = {
     TableName,
     Key: {
