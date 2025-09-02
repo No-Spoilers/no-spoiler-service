@@ -3,10 +3,41 @@ import createError from 'http-errors';
 import validator from '@middy/validator';
 import { createNewToken } from '../../lib/token.js';
 import dbQueryUserByEmail from '../../db/dbQueryUserByEmail.js';
-import commonMiddleware from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
 import postLoginSchema from '../../schemas/postLoginSchema.js';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
-async function postLogin(event) {
+interface LoginBody {
+  email: string;
+  password: string;
+}
+
+interface LoginEvent extends HandlerEvent {
+  body: LoginBody;
+}
+
+interface LoginResponse {
+  name: string;
+  email: string;
+  token: string;
+}
+
+interface DbUser {
+  userId: string;
+  name: string;
+  preservedCaseEmail: string;
+  passwordHash: string;
+  [key: string]: unknown;
+}
+
+function extractStringValue(attrValue: AttributeValue | undefined): string {
+  if (attrValue && 'S' in attrValue) {
+    return attrValue.S || '';
+  }
+  return '';
+}
+
+async function postLogin(event: LoginEvent, _context: HandlerContext): Promise<HandlerResponse> {
   const { email, password } = event.body;
 
   try {
@@ -26,13 +57,20 @@ async function postLogin(event) {
       };
     }
 
-    const token = createNewToken(user);
-
-    const returnObject = {
+    const dbUser: DbUser = {
+      userId: user.userId,
       name: user.name,
-      email: user.preservedCaseEmail,
+      preservedCaseEmail: user.preservedCaseEmail,
+      passwordHash: user.passwordHash
+    };
+
+    const token = createNewToken(dbUser);
+
+    const returnObject: LoginResponse = {
+      name: dbUser.name,
+      email: dbUser.preservedCaseEmail,
       token
-    }
+    };
 
     return {
       statusCode: 200,
@@ -41,10 +79,9 @@ async function postLogin(event) {
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
-
 }
 
 export const handler = commonMiddleware(postLogin)
-  .use(validator({ inputSchema: postLoginSchema, useDefaults: true }));
+  .use(validator({ eventSchema: postLoginSchema }));

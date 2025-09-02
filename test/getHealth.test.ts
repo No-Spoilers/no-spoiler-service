@@ -1,11 +1,9 @@
 import { expect } from 'chai';
-
 import { handler } from '../src/handlers/health/getHealth.js';
 
 describe('getHealth', () => {
-
   it('should return 200', async () => {
-    const result = await handler({});
+    const result = await handler({}, {});
 
     expect(result).to.have.all.keys(
       'statusCode',
@@ -17,7 +15,7 @@ describe('getHealth', () => {
 
     expect(statusCode).to.equal(200);
 
-    const parsedBody = JSON.parse(body);
+    const parsedBody = JSON.parse(body as string);
 
     expect(parsedBody).to.have.all.keys(
       'packageVersion'

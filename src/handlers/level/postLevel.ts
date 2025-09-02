@@ -1,15 +1,38 @@
 import createError from 'http-errors';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 import dbUpdateUserLevel from '../../db/dbUpdateUserLevel.js';
-import commonMiddleware from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
 
-async function postLevel(event) {
+interface PostLevelBody {
+  seriesId: string;
+  bookId: string;
+  [key: string]: unknown;
+}
+
+interface PostLevelEvent extends HandlerEvent {
+  body: PostLevelBody;
+  token?: {
+    sub: string;
+    userId: string;
+    email: string;
+    [key: string]: unknown;
+  };
+}
+
+async function postLevel(event: PostLevelEvent, _context: HandlerContext): Promise<HandlerResponse> {
   // Currently only for saving a user's spoiler level in a given series.
   // The book ID represents how far the user has progressed, and therefor
   // what is or isn't a spoiler
 
   const { token } = event;
   const { seriesId, bookId } = event.body;
+
+  if (!token) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: 'invalid token' }),
+    };
+  }
 
   try {
     if (bookId !== '') {
@@ -27,14 +50,13 @@ async function postLevel(event) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify( spoilerState ),
+      body: JSON.stringify(spoilerState),
     };
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
-
 }
 
 export const handler = commonMiddleware(postLevel);

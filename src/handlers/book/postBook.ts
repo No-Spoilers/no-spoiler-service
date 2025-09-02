@@ -2,10 +2,28 @@ import validator from '@middy/validator';
 import postBookSchema from '../../schemas/postBookSchema.js';
 import createError from 'http-errors';
 import dbCreateBook from '../../db/dbCreateBook.js';
-import commonMiddleware from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbQuerySeriesById from '../../db/dbQuerySeriesById.js';
 
-async function postBook(event) {
+interface BookData {
+  seriesId: string;
+  pubDate: string;
+  name: string;
+  text: string;
+  [key: string]: unknown;
+}
+
+interface PostBookEvent extends HandlerEvent {
+  body: BookData;
+  token?: {
+    sub: string;
+    userId: string;
+    email: string;
+    [key: string]: unknown;
+  };
+}
+
+async function postBook(event: PostBookEvent, _context: HandlerContext): Promise<HandlerResponse> {
   const bookData = event.body;
   const { token } = event;
 
@@ -29,15 +47,14 @@ async function postBook(event) {
 
     return {
       statusCode: 201,
-      body: JSON.stringify( newBook ),
+      body: JSON.stringify(newBook),
     };
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
-
 }
 
 export const handler = commonMiddleware(postBook)
-  .use(validator({ inputSchema: postBookSchema, useDefaults: true }));
+  .use(validator({ eventSchema: postBookSchema }));

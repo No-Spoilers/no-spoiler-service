@@ -3,12 +3,31 @@ import generateId from './base64id.js';
 
 const { TOKEN_SECRET } = process.env;
 
-export function createNewToken(user) {
+interface User {
+  userId: string;
+  [key: string]: unknown;
+}
+
+interface TokenPayload {
+  [key: string]: unknown;
+}
+
+interface VerifiedToken {
+  userId: string;
+  email: string;
+  iat: number;
+  exp: number;
+  jti: string;
+  sub: string;
+  [key: string]: unknown;
+}
+
+export function createNewToken(user: User): string {
   if (!TOKEN_SECRET || typeof TOKEN_SECRET !== 'string') {
-    throw `Invalid TOKEN_SECRET ${TOKEN_SECRET}`;
+    throw new Error(`Invalid TOKEN_SECRET ${TOKEN_SECRET}`);
   }
 
-  const payload = {}; // to be determined
+  const payload: TokenPayload = {}; // to be determined
 
   const jwtId = generateId(20);
 
@@ -16,16 +35,21 @@ export function createNewToken(user) {
     expiresIn: '100d',
     jwtid: jwtId,
     subject: user.userId
-  })
+  });
 
   return token;
 }
 
-export function verifyToken(token) {
+export function verifyToken(token: string): VerifiedToken | false {
   try {
-    return jwt.verify(token, TOKEN_SECRET);
+    if (!TOKEN_SECRET || typeof TOKEN_SECRET !== 'string') {
+      return false;
+    }
+    return jwt.verify(token, TOKEN_SECRET) as VerifiedToken;
   } catch (error) {
     console.error(error);
     return false;
   }
 }
+
+export type { User, TokenPayload, VerifiedToken };

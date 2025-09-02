@@ -5,9 +5,42 @@ import httpErrorHandler from '@middy/http-error-handler';
 import httpEventNormalizer from '@middy/http-event-normalizer';
 import { verifyToken } from './token.js';
 
+interface TokenData {
+  userId: string;
+  email: string;
+  [key: string]: unknown;
+}
+
+interface HandlerEvent {
+  headers?: Record<string, string>;
+  body?: unknown;
+  token?: TokenData;
+  [key: string]: unknown;
+}
+
+interface HandlerContext {
+  [key: string]: unknown;
+}
+
+interface HandlerRequest {
+  event: HandlerEvent;
+  context: HandlerContext;
+}
+
+interface HandlerResponse {
+  statusCode: number;
+  body?: string;
+  headers?: Record<string, string>;
+  [key: string]: unknown;
+}
+
+type HandlerFunction = (event: HandlerEvent, context: HandlerContext) => HandlerResponse | Promise<HandlerResponse>;
+
+type TypedHandlerFunction<T = HandlerEvent> = (event: T, context: HandlerContext) => HandlerResponse | Promise<HandlerResponse>;
+
 function validateJwt() {
   return {
-    before: (handler) => {
+    before: (handler: HandlerRequest): void => {
       if (handler.event.headers?.Authorization) {
         const [type, token] = handler.event.headers.Authorization.split(' ');
         if (type === 'Bearer' && typeof token !== 'undefined') {
@@ -18,12 +51,12 @@ function validateJwt() {
         }
       }
     }
-  }
+  };
 }
 
 function logEvents() {
   return {
-    before: (request) => {
+    before: (request: HandlerRequest): void => {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
           logType: 'incoming request',
@@ -31,7 +64,7 @@ function logEvents() {
         });
       }
     },
-    after: (handler) => {
+    after: (handler: HandlerRequest): void => {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
           logType: 'request result',
@@ -39,12 +72,12 @@ function logEvents() {
         });
       }
     }
-  }
+  };
 }
 
 function bodyNormalizer() {
   return {
-    before: (handler) => {
+    before: (handler: HandlerRequest): void => {
       if (!handler.event.headers) {
         handler.event.headers = {};
       }
@@ -53,11 +86,11 @@ function bodyNormalizer() {
         handler.event.body = handler.event.body || '{}';
       }
     }
-  }
+  };
 }
 
-function commonMiddleware(handler) {
-  return middy(handler)
+function commonMiddleware<T = HandlerEvent>(handler: TypedHandlerFunction<T>) {
+  return middy(handler as HandlerFunction)
     .use([
       bodyNormalizer(),
       httpJsonBodyParser(),
@@ -76,4 +109,6 @@ function commonMiddleware(handler) {
       logEvents()
     ]);
 }
+
 export default commonMiddleware;
+export type { HandlerEvent, HandlerContext, HandlerResponse, HandlerFunction, TypedHandlerFunction, TokenData };

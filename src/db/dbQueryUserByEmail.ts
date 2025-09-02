@@ -1,30 +1,65 @@
 import createError from 'http-errors';
 import { searchDbItems } from '../lib/dynamodb-client.js';
+import { AttributeValue, QueryCommandInput, Condition, ComparisonOperator } from '@aws-sdk/client-dynamodb';
 
-export default async function dbQueryUserByEmail(email) {
+interface UserRecord {
+  userId: string;
+  name: string;
+  preservedCaseEmail: string;
+  passwordHash: string;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown;
+}
+
+export default async function dbQueryUserByEmail(email: string): Promise<UserRecord | null> {
   try {
     const normalizedEmail = email.toLowerCase();
 
-    const params = {
+    const params: Partial<QueryCommandInput> = {
       KeyConditions: {
         primary_key: {
           AttributeValueList: [{ S: 'user' }],
-          ComparisonOperator: 'EQ'
+          ComparisonOperator: 'EQ' as ComparisonOperator
         },
         sort_key: {
           AttributeValueList: [{ S: normalizedEmail }],
-          ComparisonOperator: 'EQ'
+          ComparisonOperator: 'EQ' as ComparisonOperator
         }
       }
     };
 
     const queryResult = await searchDbItems(params);
 
+    if (queryResult instanceof Error) {
+      throw queryResult;
+    }
+
     if (!Array.isArray(queryResult) || queryResult.length === 0) return null;
 
-    return queryResult[0];
+    // Convert DynamoDB AttributeValue to plain object
+    const userRecord = queryResult[0];
+    if (!userRecord) return null;
+
+    const user: UserRecord = {
+      userId: extractStringValue(userRecord.userId),
+      name: extractStringValue(userRecord.name),
+      preservedCaseEmail: extractStringValue(userRecord.preservedCaseEmail),
+      passwordHash: extractStringValue(userRecord.passwordHash),
+      createdAt: extractStringValue(userRecord.createdAt),
+      updatedAt: extractStringValue(userRecord.updatedAt)
+    };
+
+    return user;
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
+}
+
+function extractStringValue(attrValue: AttributeValue | undefined): string {
+  if (attrValue && 'S' in attrValue) {
+    return attrValue.S || '';
+  }
+  return '';
 }

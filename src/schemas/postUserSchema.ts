@@ -1,10 +1,12 @@
-const schema = {
+import { JSONSchema7 } from 'json-schema';
+
+const schema: JSONSchema7 = {
   type: 'object',
-  required: [ 'body' ],
+  required: ['body'],
   properties: {
     body: {
       type: 'object',
-      required: [ 'name', 'email', 'password' ],
+      required: ['name', 'email', 'password'],
       properties: {
         name: { type: 'string' },
         email: { type: 'string', format: 'email' },

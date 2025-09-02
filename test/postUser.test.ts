@@ -5,7 +5,7 @@ import { mockClient } from 'aws-sdk-client-mock';
 import { handler } from '../src/handlers/user/postUser.js';
 
 describe('postUser', () => {
-  let dynamoDBMock;
+  let dynamoDBMock: any;
 
   before(() => {
     // Create a global mock that applies to all DynamoDB clients
@@ -40,7 +40,7 @@ describe('postUser', () => {
       })
     };
 
-    const result = await handler(event);
+    const result = await handler(event, {});
 
     expect(result).to.have.all.keys(
       'statusCode',
@@ -52,9 +52,10 @@ describe('postUser', () => {
 
     expect(statusCode).to.equal(201);
 
-    const parsedBody = JSON.parse(body);
+    const parsedBody = JSON.parse(body as string);
 
     expect(parsedBody).to.have.all.keys(
+      'userId',
       'name',
       'email',
       'createdAt',
@@ -67,11 +68,11 @@ describe('postUser', () => {
 
   it('should return 400 if user already exists', async () => {
     const existingUser = {
-      userId: 'u1234567890',
-      name: 'Existing User',
-      email: 'existing.user@example.com',
-      createdAt: '2023-01-01T00:00:00.000Z',
-      updatedAt: '2023-01-01T00:00:00.000Z'
+      userId: { S: 'u1234567890' },
+      name: { S: 'Existing User' },
+      preservedCaseEmail: { S: 'existing.user@example.com' },
+      createdAt: { S: '2023-01-01T00:00:00.000Z' },
+      updatedAt: { S: '2023-01-01T00:00:00.000Z' }
     };
 
     // Mock the QueryCommand to return an existing user
@@ -87,10 +88,11 @@ describe('postUser', () => {
       })
     };
 
-    const result = await handler(event);
+    const result = await handler(event, {});
 
     expect(result.statusCode).to.equal(400);
-    expect(result.body).to.have.property('message');
-    expect(result.body.message).to.include('already exists');
+    const parsedBody = JSON.parse(result.body as string);
+    expect(parsedBody).to.have.property('message');
+    expect(parsedBody.message).to.include('already exists');
   });
 });

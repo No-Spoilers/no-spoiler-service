@@ -1,7 +1,43 @@
 import createError from 'http-errors';
 import { updateDbItem } from '../lib/dynamodb-client.js';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
-export default async function dbUpdateBook(bookData, token) {
+interface BookUpdateData {
+  seriesId: string;
+  bookId: string;
+  name?: string;
+  text?: string;
+  pubDate?: string;
+  [key: string]: unknown;
+}
+
+interface TokenData {
+  sub: string;
+  [key: string]: unknown;
+}
+
+interface BookRecord {
+  primary_key: string;
+  sort_key: string;
+  name?: string;
+  text?: string;
+  pubDate?: string;
+  updatedAt: string;
+  updatedBy: string;
+  [key: string]: unknown;
+}
+
+interface BookResponse {
+  seriesId: string;
+  bookId: string;
+  name?: string;
+  text?: string;
+  pubDate?: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+export default async function dbUpdateBook(bookData: BookUpdateData, token: TokenData): Promise<BookResponse> {
   try {
     const { seriesId, bookId } = bookData;
     const now = new Date();
@@ -11,12 +47,12 @@ export default async function dbUpdateBook(bookData, token) {
 
     let updateExpression = 'set updatedAt = :updatedAt, updatedBy=:updatedBy';
 
-    const expressionAttributeValues = {
-      ':updatedAt': now.toISOString(),
-      ':updatedBy': token.sub
-    }
+    const expressionAttributeValues: Record<string, AttributeValue> = {
+      ':updatedAt': { S: now.toISOString() },
+      ':updatedBy': { S: token.sub }
+    };
 
-    const expressionAttributeNames = {};
+    const expressionAttributeNames: Record<string, string> = {};
 
     const validFields = ['name', 'text', 'pubDate'];
 
@@ -24,14 +60,15 @@ export default async function dbUpdateBook(bookData, token) {
       if (bookData[field]) {
         updateExpression += `, #${field} = :${field}`;
         expressionAttributeNames[`#${field}`] = `${field}`;
-        expressionAttributeValues[`:${field}`] = bookData[field];
+        expressionAttributeValues[`:${field}`] = { S: bookData[field] as string };
       }
-    })
+    });
 
     const params = {
-      Key:{
-        primary_key: seriesId,
-        sort_key: bookId,
+      TableName: process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev',
+      Key: {
+        primary_key: { S: seriesId },
+        sort_key: { S: bookId },
       },
       UpdateExpression: updateExpression,
       ExpressionAttributeNames: expressionAttributeNames,
@@ -40,15 +77,31 @@ export default async function dbUpdateBook(bookData, token) {
 
     const book = await updateDbItem(params);
 
-    book.seriesId = book.primary_key;
-    book.bookId = book.sort_key;
-    delete book.primary_key;
-    delete book.sort_key;
+    if (!book) {
+      throw new Error('Failed to update book');
+    }
 
-    return book;
+    const bookResponse: BookResponse = {
+      seriesId: extractStringValue(book.primary_key),
+      bookId: extractStringValue(book.sort_key),
+      name: extractStringValue(book.name),
+      text: extractStringValue(book.text),
+      pubDate: extractStringValue(book.pubDate),
+      updatedAt: extractStringValue(book.updatedAt),
+      updatedBy: extractStringValue(book.updatedBy)
+    };
+
+    return bookResponse;
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
+}
+
+function extractStringValue(attrValue: AttributeValue | undefined): string {
+  if (attrValue && 'S' in attrValue) {
+    return attrValue.S || '';
+  }
+  return '';
 }

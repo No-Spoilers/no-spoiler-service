@@ -1,10 +1,26 @@
 import createError from 'http-errors';
 import validator from '@middy/validator';
 import postSeriesSchema from '../../schemas/postSeriesSchema.js';
-import commonMiddleware from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbCreateSeries from '../../db/dbCreateSeries.js';
 
-async function postSeries(event) {
+interface SeriesData {
+  name: string;
+  text: string;
+  [key: string]: unknown;
+}
+
+interface PostSeriesEvent extends HandlerEvent {
+  body: SeriesData;
+  token?: {
+    sub: string;
+    userId: string;
+    email: string;
+    [key: string]: unknown;
+  };
+}
+
+async function postSeries(event: PostSeriesEvent, _context: HandlerContext): Promise<HandlerResponse> {
   const seriesData = event.body;
   const { token } = event;
 
@@ -24,9 +40,9 @@ async function postSeries(event) {
     };
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
 }
 
 export const handler = commonMiddleware(postSeries)
-  .use(validator({ inputSchema: postSeriesSchema, useDefaults: true }));
+  .use(validator({ eventSchema: postSeriesSchema }));

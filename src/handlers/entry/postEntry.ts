@@ -2,10 +2,28 @@ import validator from '@middy/validator';
 import postEntrySchema from '../../schemas/postEntrySchema.js';
 import createError from 'http-errors';
 import dbCreateEntry from '../../db/dbCreateEntry.js';
-import commonMiddleware from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
-async function postEntry(event) {
+interface EntryData {
+  seriesId: string;
+  bookId: string;
+  name: string;
+  text: string;
+  [key: string]: unknown;
+}
+
+interface PostEntryEvent extends HandlerEvent {
+  body: EntryData;
+  token?: {
+    sub: string;
+    userId: string;
+    email: string;
+    [key: string]: unknown;
+  };
+}
+
+async function postEntry(event: PostEntryEvent, _context: HandlerContext): Promise<HandlerResponse> {
   const entryData = event.body;
   const { token } = event;
 
@@ -29,15 +47,14 @@ async function postEntry(event) {
 
     return {
       statusCode: 201,
-      body: JSON.stringify( newEntry ),
+      body: JSON.stringify(newEntry),
     };
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
-
 }
 
 export const handler = commonMiddleware(postEntry)
-  .use(validator({ inputSchema: postEntrySchema, useDefaults: true }));
+  .use(validator({ eventSchema: postEntrySchema }));

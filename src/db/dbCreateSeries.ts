@@ -1,10 +1,41 @@
 import generateId from '../lib/base64id.js';
 import { putDbItem } from '../lib/dynamodb-client.js';
 
-export default async function dbCreateSeries(seriesData, token) {
+interface SeriesData {
+  name: string;
+  text: string;
+  [key: string]: unknown;
+}
+
+interface TokenData {
+  sub: string;
+  [key: string]: unknown;
+}
+
+interface SeriesRecord {
+  primary_key: string;
+  sort_key: string;
+  name: string;
+  text: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown;
+}
+
+interface SeriesResponse {
+  seriesId: string;
+  name: string;
+  text: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export default async function dbCreateSeries(seriesData: SeriesData, token: TokenData): Promise<SeriesResponse> {
   const now = new Date().toISOString();
 
-  const series = {
+  const series: SeriesRecord = {
     primary_key: `t${generateId(10)}`,
     sort_key: 'TOP~',
     name: seriesData.name,
@@ -16,9 +47,14 @@ export default async function dbCreateSeries(seriesData, token) {
 
   await putDbItem(series);
 
-  series.seriesId = series.primary_key;
-  delete series.primary_key;
-  delete series.sort_key;
+  const seriesResponse: SeriesResponse = {
+    seriesId: series.primary_key,
+    name: series.name,
+    text: series.text,
+    createdBy: series.createdBy,
+    createdAt: series.createdAt,
+    updatedAt: series.updatedAt
+  };
 
-  return series;
+  return seriesResponse;
 }

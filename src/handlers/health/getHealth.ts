@@ -1,11 +1,9 @@
 import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 import commonMiddleware from '../../lib/commonMiddleware.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const packageJsonPath = join(__dirname, '../../../package.json');
+// Use a more robust path resolution that works both in source and compiled form
+const packageJsonPath = join(process.cwd(), 'package.json');
 
 function getHealth() {
   try {

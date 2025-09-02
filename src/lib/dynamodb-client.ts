@@ -6,15 +6,20 @@ import {
   QueryCommand,
   UpdateItemCommand,
   TransactWriteItemsCommand,
+  AttributeValue,
+  QueryCommandInput,
+  UpdateItemCommandInput,
+  TransactWriteItem,
+  ReturnValue,
 } from '@aws-sdk/client-dynamodb';
 
 const TableName = process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev';
-const ReturnValues = 'ALL_OLD';
+const ReturnValues: ReturnValue = 'ALL_OLD';
 const dynamoClientConfig = { region: 'us-east-1' };
 
 const client = new DynamoDBClient(dynamoClientConfig);
 
-export async function getDbItem(primary_key, sort_key) {
+export async function getDbItem(primary_key: AttributeValue, sort_key: AttributeValue): Promise<Record<string, AttributeValue> | undefined> {
   const params = {
     TableName,
     Key: {
@@ -29,7 +34,7 @@ export async function getDbItem(primary_key, sort_key) {
   return result.Item;
 }
 
-export async function searchDbItems(params) {
+export async function searchDbItems(params: Partial<QueryCommandInput>): Promise<Record<string, AttributeValue>[] | Error> {
   try {
     const command = new QueryCommand({
       TableName,
@@ -38,46 +43,46 @@ export async function searchDbItems(params) {
 
     const result = await client.send(command);
 
-    return result.Items;
+    return result.Items || [];
   } catch (error) {
     console.error('Error searching DB items:', error);
-    return error;
+    return error as Error;
   }
 }
 
-export function putDbItem(item) {
-  const Item = Object.entries(item).reduce((acc, [key, value]) => {
+export function putDbItem(item: Record<string, unknown>): Promise<unknown> {
+  const Item: Record<string, AttributeValue> = {};
+  
+  Object.entries(item).forEach(([key, value]) => {
     if (typeof value === 'string') {
-      acc[key] = { S: value };
-      return acc;
-    }
-    if (typeof value === 'number') {
-      acc[key] = { N: value.toString() }; // DynamoDB expects numbers as strings
-      return acc;
-    }
-    if (typeof value === 'object') {
+      Item[key] = { S: value };
+    } else if (typeof value === 'number') {
+      Item[key] = { N: value.toString() }; // DynamoDB expects numbers as strings
+    } else if (typeof value === 'object') {
       if (Array.isArray(value)) {
-        acc[key] = { L: value.map(v => ({ S: v })) };
-        return acc;
+        Item[key] = { L: value.map(v => ({ S: String(v) })) };
+      } else if (value === null) {
+        Item[key] = { NULL: true };
+      } else if (value !== undefined) {
+        const nestedMap: Record<string, AttributeValue> = {};
+        Object.entries(value as Record<string, unknown>).forEach(([subKey, subValue]) => {
+          if (typeof subValue === 'string') {
+            nestedMap[subKey] = { S: subValue };
+          } else if (typeof subValue === 'number') {
+            nestedMap[subKey] = { N: subValue.toString() };
+          } else if (typeof subValue === 'object' && subValue !== null) {
+            nestedMap[subKey] = { M: subValue as Record<string, AttributeValue> };
+          } else {
+            nestedMap[subKey] = { S: String(subValue) }; // Fallback for other types
+          }
+        });
+        Item[key] = { M: nestedMap };
       }
-      acc[key] = { M: {} };
-      Object.entries(value).forEach(([subKey, subValue]) => {
-        if (typeof subValue === 'string') {
-          acc[key].M[subKey] = { S: subValue };
-        } else if (typeof subValue === 'number') {
-          acc[key].M[subKey] = { N: subValue.toString() };
-        } else if (typeof subValue === 'object') {
-          acc[key].M[subKey] = { M: subValue };
-        } else {
-          acc[key].M[subKey] = { S: String(subValue) }; // Fallback for other types
-        }
-      });
-      return acc;
+    } else {
+      Item[key] = { S: String(value) }; // Fallback for other types
     }
-    const result = {};
-    result[key] = { S: String(value) }; // Fallback for other types
-    return result;
-  }, {});
+  });
+
   const input = {
     TableName,
     Item,
@@ -87,10 +92,9 @@ export function putDbItem(item) {
   return client.send(command);
 }
 
-export async function updateDbItem(item) {
+export async function updateDbItem(item: UpdateItemCommandInput): Promise<Record<string, AttributeValue> | undefined> {
   const input = {
-    TableName,
-    ReturnValues: 'ALL_NEW',
+    ReturnValues: 'ALL_NEW' as ReturnValue,
     ...item
   };
 
@@ -101,7 +105,7 @@ export async function updateDbItem(item) {
   return Attributes;
 }
 
-export function updateMultipleDbItems(items) {
+export function updateMultipleDbItems(items: Partial<UpdateItemCommandInput>[]): Promise<unknown> {
   const input = {
     TransactItems: items.map(item => {
       return {
@@ -109,7 +113,7 @@ export function updateMultipleDbItems(items) {
           TableName,
           ...item,
         }
-      };
+      } as TransactWriteItem;
     })
   };
 
@@ -118,7 +122,7 @@ export function updateMultipleDbItems(items) {
   return client.send(command);
 }
 
-export function deleteDbItem(primary_key, sort_key) {
+export function deleteDbItem(primary_key: AttributeValue, sort_key: AttributeValue): Promise<unknown> {
   const params = {
     TableName,
     Key: {
@@ -126,7 +130,7 @@ export function deleteDbItem(primary_key, sort_key) {
       sort_key
     },
     ConditionExpression: 'attribute_exists(sort_key)',
-    ReturnValues: 'ALL_OLD'
+    ReturnValues: 'ALL_OLD' as ReturnValue
   };
   const command = new DeleteItemCommand(params);
   return client.send(command);

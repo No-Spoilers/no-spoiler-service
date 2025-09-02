@@ -1,38 +1,76 @@
 import createError from 'http-errors';
 import { updateDbItem } from '../lib/dynamodb-client.js';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
-export default async function dbUpdateUserLevel(token, seriesId, bookId) {
+interface TokenData {
+  sub: string;
+  [key: string]: unknown;ß
+}
+
+interface UserLevelRecord {
+  primary_key: string;
+  sort_key: string;
+  level: string;
+  updatedAt: string;
+  updatedBy: string;
+  [key: string]: unknown;
+}
+
+interface UserLevelResponse {
+  userId: string;
+  seriesId: string;
+  level: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+export default async function dbUpdateUserLevel(token: TokenData, seriesId: string, bookId: string): Promise<UserLevelResponse> {
   try {
     const userId = token.sub;
     const now = new Date();
 
     const params = {
-      Key:{
-        primary_key: userId,
-        sort_key: seriesId,
+      TableName: process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev',
+      Key: {
+        primary_key: { S: userId },
+        sort_key: { S: seriesId },
       },
       UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, #level=:level',
       ExpressionAttributeNames: {
         '#level': 'level'
       },
       ExpressionAttributeValues: {
-        ':updatedAt': now.toISOString(),
-        ':updatedBy': token.sub,
-        ':level': bookId
+        ':updatedAt': { S: now.toISOString() },
+        ':updatedBy': { S: token.sub },
+        ':level': { S: bookId }
       },
     };
 
     const user = await updateDbItem(params);
 
-    user.userId = user.primary_key;
-    user.seriesId = user.sort_key;
-    delete user.primary_key;
-    delete user.sort_key;
+    if (!user) {
+      throw new Error('Failed to update user level');
+    }
 
-    return user;
+    const userLevelResponse: UserLevelResponse = {
+      userId: extractStringValue(user.primary_key),
+      seriesId: extractStringValue(user.sort_key),
+      level: extractStringValue(user.level),
+      updatedAt: extractStringValue(user.updatedAt),
+      updatedBy: extractStringValue(user.updatedBy)
+    };
+
+    return userLevelResponse;
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
+}
+
+function extractStringValue(attrValue: AttributeValue | undefined): string {
+  if (attrValue && 'S' in attrValue) {
+    return attrValue.S || '';
+  }
+  return '';
 }

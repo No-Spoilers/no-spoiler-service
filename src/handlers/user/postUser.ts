@@ -2,43 +2,74 @@ import validator from '@middy/validator';
 import postUserSchema from '../../schemas/postUserSchema.js';
 import createError from 'http-errors';
 import dbCreateUser from '../../db/dbCreateUser.js';
-import commonMiddleware from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
 import { createNewToken } from '../../lib/token.js';
 import { transpileSchema } from '@middy/validator/transpile';
 
-async function postUser(event) {
+interface PostUserBody {
+  name: string;
+  email: string;
+  password: string;
+}
+
+interface PostUserEvent extends HandlerEvent {
+  body: PostUserBody;
+}
+
+interface UserResponse {
+  userId: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  token: string;
+  [key: string]: unknown;
+}
+
+async function postUser(event: PostUserEvent, _context: HandlerContext): Promise<HandlerResponse> {
   const { name, email, password } = event.body;
 
   try {
     const user = await dbCreateUser(name, email, password);
 
-    if (user && user.existing) {
+    if (user && 'existing' in user && user.existing) {
       return {
         statusCode: 400,
-        body: { message: `User with email:${email} already exists.` },
+        body: JSON.stringify({ message: `User with email:${email} already exists.` }),
       };
     }
 
-    const token = createNewToken(user);
+    if (!('userId' in user)) {
+      throw new Error('Failed to create user');
+    }
 
-    const returnObject = {
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
+    // Create a user object compatible with createNewToken
+    const userForToken = {
+      userId: user.userId as string,
+      name: user.name as string,
+      email: user.email as string,
+      createdAt: user.createdAt as string
+    };
+
+    const token = createNewToken(userForToken);
+
+    const returnObject: UserResponse = {
+      userId: user.userId as string,
+      name: user.name as string,
+      email: user.email as string,
+      createdAt: user.createdAt as string,
       token
     };
 
     return {
       statusCode: 201,
-      body: JSON.stringify( returnObject ),
+      body: JSON.stringify(returnObject),
     };
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
-
 }
 
 export const handler = commonMiddleware(postUser)
-  .use(validator({ eventSchema: transpileSchema(postUserSchema, { useDefaults: true }) }));
+  .use(validator({ eventSchema: transpileSchema(postUserSchema) }));

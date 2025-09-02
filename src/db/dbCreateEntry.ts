@@ -1,12 +1,40 @@
 import generateId from '../lib/base64id.js';
 import { putDbItem } from '../lib/dynamodb-client.js';
 
-export default async function dbCreateEntry(entry, userId) {
+interface EntryData {
+  seriesId: string;
+  bookId: string;
+  name: string;
+  text: string;
+}
+
+interface EntryRecord {
+  primary_key: string;
+  sort_key: string;
+  name: string;
+  text: { key: string; value: string };
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown;
+}
+
+interface EntryResponse {
+  seriesId: string;
+  entryId: string;
+  name: string;
+  text: { key: string; value: string };
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export default async function dbCreateEntry(entry: EntryData, userId: string): Promise<EntryResponse> {
   const now = new Date().toISOString();
 
   const newSortKey = `e${generateId(9)}`;
 
-  const item = {
+  const item: EntryRecord = {
     primary_key: entry.seriesId,
     sort_key: newSortKey,
     name: entry.name,
@@ -26,10 +54,15 @@ export default async function dbCreateEntry(entry, userId) {
 
   await putDbItem(item);
 
-  item.seriesId = item.primary_key;
-  item.entryId = item.sort_key;
-  delete item.primary_key;
-  delete item.sort_key;
+  const entryResponse: EntryResponse = {
+    seriesId: item.primary_key,
+    entryId: item.sort_key,
+    name: item.name,
+    text: item.text,
+    createdBy: item.createdBy,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt
+  };
 
-  return item;
+  return entryResponse;
 }

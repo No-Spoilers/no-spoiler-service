@@ -1,21 +1,61 @@
 import createError from 'http-errors';
 import { getDbItem } from '../lib/dynamodb-client.js';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
-export default async function dbGetEntryBySeriesIdAndEntryId(seriesId, entryId) {
+interface EntryRecord {
+  seriesId: string;
+  entryId: string;
+  name?: string;
+  text?: { [key: string]: string };
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: unknown;
+}
+
+export default async function dbGetEntryBySeriesIdAndEntryId(seriesId: string, entryId: string): Promise<EntryRecord | null> {
   try {
-    const entry = await getDbItem(seriesId, entryId);
+    const entry = await getDbItem(
+      { S: seriesId },
+      { S: entryId }
+    );
 
     if (!entry) return null;
 
-    entry.seriesId = entry.primary_key,
-    entry.entryId = entry.sort_key,
-    delete entry.primary_key,
-    delete entry.sort_key
+    const entryRecord: EntryRecord = {
+      seriesId: extractStringValue(entry.primary_key),
+      entryId: extractStringValue(entry.sort_key),
+      name: extractStringValue(entry.name),
+      text: extractTextValue(entry.text),
+      createdBy: extractStringValue(entry.createdBy),
+      createdAt: extractStringValue(entry.createdAt),
+      updatedAt: extractStringValue(entry.updatedAt)
+    };
 
-    return entry;
+    return entryRecord;
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
+}
+
+function extractStringValue(attrValue: AttributeValue | undefined): string {
+  if (attrValue && 'S' in attrValue) {
+    return attrValue.S || '';
+  }
+  return '';
+}
+
+function extractTextValue(attrValue: AttributeValue | undefined): { [key: string]: string } {
+  if (attrValue && 'M' in attrValue && attrValue.M) {
+    const text: { [key: string]: string } = {};
+    Object.entries(attrValue.M).forEach(([key, value]) => {
+      if (value && 'S' in value) {
+        text[key] = value.S || '';
+      }
+    });
+    return text;
+  }
+  return {};
 }

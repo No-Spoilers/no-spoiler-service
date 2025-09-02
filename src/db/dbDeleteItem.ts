@@ -1,18 +1,27 @@
 import createError from 'http-errors';
 import { deleteDbItem } from '../lib/dynamodb-client.js';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
-export default async function dbDeleteItem(primary_key, sort_key) {
+interface DeleteResult {
+  Attributes?: Record<string, AttributeValue>;
+  [key: string]: unknown;
+}
+
+export default async function dbDeleteItem(primary_key: string, sort_key: string): Promise<Record<string, AttributeValue> | null> {
   try {
-    const result = await deleteDbItem(primary_key, sort_key);
+    const result = await deleteDbItem(
+      { S: primary_key },
+      { S: sort_key }
+    ) as DeleteResult;
 
-    return result.Attributes;
+    return result.Attributes || null;
 
   } catch (error) {
-    if(error && error.code && error.code === 'ConditionalCheckFailedException') {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'ConditionalCheckFailedException') {
       return null;
     }
 
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
 }

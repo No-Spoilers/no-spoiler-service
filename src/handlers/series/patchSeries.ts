@@ -1,17 +1,33 @@
-import commonMiddleware from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbUpdateSeries from '../../db/dbUpdateSeries.js';
 
-async function patchSeries(event) {
+interface PathParameters {
+  contentId: string;
+  [key: string]: string;
+}
+
+interface SeriesUpdateData {
+  name?: string;
+  text?: string;
+  [key: string]: unknown;
+}
+
+interface PatchSeriesEvent extends HandlerEvent {
+  pathParameters: PathParameters;
+  body: SeriesUpdateData;
+}
+
+async function patchSeries(event: PatchSeriesEvent, _context: HandlerContext): Promise<HandlerResponse> {
   const { contentId } = event.pathParameters;
   const seriesData = event.body;
 
   const updatedSeries = await dbUpdateSeries(contentId, seriesData);
 
-  if(!updatedSeries) {
+  if (!updatedSeries) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: `series:${contentId} not found` }),
-    }
+    };
   }
 
   return {

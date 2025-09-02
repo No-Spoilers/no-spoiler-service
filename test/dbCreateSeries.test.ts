@@ -5,7 +5,7 @@ import { mockClient } from 'aws-sdk-client-mock';
 import dbCreateSeries from '../src/db/dbCreateSeries.js';
 
 describe('dbCreateSeries', () => {
-  let dynamoDBMock;
+  let dynamoDBMock: any;
 
   beforeEach(() => {
     const dynamoDB = new DynamoDBClient({});
@@ -25,7 +25,7 @@ describe('dbCreateSeries', () => {
       name: 'test name',
       text: 'test text'
     };
-    const token = { sub: 'test_createdBy' }
+    const token = { sub: 'test_createdBy' };
 
     const result = await dbCreateSeries(seriesData, token);
 

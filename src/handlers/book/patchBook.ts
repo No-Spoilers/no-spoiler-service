@@ -1,12 +1,38 @@
 import createError from 'http-errors';
 import dbUpdateBook from '../../db/dbUpdateBook.js';
-import commonMiddleware from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
-async function patchBook(event) {
+interface PathParameters {
+  seriesId: string;
+  bookId: string;
+  [key: string]: string;
+}
+
+interface BookUpdateData {
+  name?: string;
+  text?: string;
+  pubDate?: string;
+  seriesId: string;
+  bookId: string;
+  [key: string]: unknown;
+}
+
+interface PatchBookEvent extends HandlerEvent {
+  pathParameters: PathParameters;
+  body: Partial<BookUpdateData>;
+  token?: {
+    sub: string;
+    userId: string;
+    email: string;
+    [key: string]: unknown;
+  };
+}
+
+async function patchBook(event: PatchBookEvent, _context: HandlerContext): Promise<HandlerResponse> {
   const { token } = event;
   const { seriesId, bookId } = event.pathParameters;
-  const bookData = {
+  const bookData: BookUpdateData = {
     ...event.body,
     seriesId,
     bookId
@@ -32,14 +58,13 @@ async function patchBook(event) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify( newBook ),
+      body: JSON.stringify(newBook),
     };
 
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error);
+    throw new createError.InternalServerError(error as string);
   }
-
 }
 
 export const handler = commonMiddleware(patchBook);
