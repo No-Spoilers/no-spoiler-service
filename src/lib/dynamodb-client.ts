@@ -88,7 +88,8 @@ export function putDbItem(item: Record<string, unknown>): Promise<unknown> {
         Item[key] = { M: nestedMap };
       }
     } else {
-      Item[key] = { S: String(value) }; // Fallback for other types
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      Item[key] = { S: String(value) }; // This whole function needs to be rewritten
     }
   });
 

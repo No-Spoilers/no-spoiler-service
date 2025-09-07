@@ -1,18 +1,18 @@
 import jwt from 'jsonwebtoken';
-import generateId from './base64id.js';
+import { generateId } from './base64id.js';
 
 const { TOKEN_SECRET } = process.env;
 
-interface User {
+export type User = {
   userId: string;
   [key: string]: unknown;
-}
+};
 
-interface TokenPayload {
+export type TokenPayload = {
   [key: string]: unknown;
-}
+};
 
-interface VerifiedToken {
+export type VerifiedToken = {
   userId: string;
   email: string;
   iat: number;
@@ -20,24 +20,18 @@ interface VerifiedToken {
   jti: string;
   sub: string;
   [key: string]: unknown;
-}
+};
 
 export function createNewToken(user: User): string {
   if (!TOKEN_SECRET || typeof TOKEN_SECRET !== 'string') {
-    throw new Error(`Invalid TOKEN_SECRET ${TOKEN_SECRET}`);
+    throw new Error('Invalid TOKEN_SECRET');
   }
 
-  const payload: TokenPayload = {}; // to be determined
-
-  const jwtId = generateId(20);
-
-  const token = jwt.sign(payload, TOKEN_SECRET, {
+  return jwt.sign({}, TOKEN_SECRET, {
     expiresIn: '100d',
-    jwtid: jwtId,
+    jwtid: generateId(20),
     subject: user.userId,
   });
-
-  return token;
 }
 
 export function verifyToken(token: string): VerifiedToken | false {
@@ -51,5 +45,3 @@ export function verifyToken(token: string): VerifiedToken | false {
     return false;
   }
 }
-
-export type { User, TokenPayload, VerifiedToken };
