@@ -1,6 +1,6 @@
 import { JSONSchema7 } from 'json-schema';
 
-const schema: JSONSchema7 = {
+export const postLoginSchema: JSONSchema7 = {
   type: 'object',
   required: ['body'],
   properties: {
@@ -14,5 +14,3 @@ const schema: JSONSchema7 = {
     },
   },
 };
-
-export default schema;
