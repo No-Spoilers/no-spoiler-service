@@ -1,3 +1,10 @@
+import type { MiddlewareObj, Request } from '@middy/core';
+import type {
+  Handler as LambdaHandler,
+  LambdaFunctionURLEvent as LambdaEvent,
+} from 'aws-lambda';
+import type { VerifiedToken } from './token.js';
+
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
@@ -5,64 +12,31 @@ import httpErrorHandler from '@middy/http-error-handler';
 import httpEventNormalizer from '@middy/http-event-normalizer';
 import { verifyToken } from './token.js';
 
-interface TokenData {
-  userId: string;
-  email: string;
-  [key: string]: unknown;
-}
+export type AuthLambdaEvent = LambdaEvent & {
+  token?: VerifiedToken;
+};
 
-interface HandlerEvent {
-  headers?: Record<string, string>;
-  body?: unknown;
-  token?: TokenData;
-  [key: string]: unknown;
-}
-
-interface HandlerContext {
-  [key: string]: unknown;
-}
-
-interface HandlerRequest {
-  event: HandlerEvent;
-  context: HandlerContext;
-}
-
-interface HandlerResponse {
-  statusCode: number;
-  body?: string;
-  headers?: Record<string, string>;
-  [key: string]: unknown;
-}
-
-type HandlerFunction = (
-  event: HandlerEvent,
-  context: HandlerContext,
-) => HandlerResponse | Promise<HandlerResponse>;
-
-type TypedHandlerFunction<T = HandlerEvent> = (
-  event: T,
-  context: HandlerContext,
-) => HandlerResponse | Promise<HandlerResponse>;
-
-function validateJwt() {
+function validateJwt(): MiddlewareObj<LambdaEvent> {
   return {
-    before: (handler: HandlerRequest): void => {
-      if (handler.event.headers?.Authorization) {
-        const [type, token] = handler.event.headers.Authorization.split(' ');
-        if (type === 'Bearer' && typeof token !== 'undefined') {
-          const tokenData = verifyToken(token);
-          if (tokenData) {
-            handler.event.token = tokenData;
-          }
-        }
+    before: (request: Request<LambdaEvent>): void => {
+      if (!request.event.headers?.Authorization) return;
+
+      const [type, token] = request.event.headers.Authorization.split(' ');
+
+      if (!token || type !== 'Bearer') return;
+
+      const tokenData = verifyToken(token);
+
+      if (tokenData) {
+        Object.assign(request.event, { token: tokenData });
       }
     },
   };
 }
 
-function logEvents() {
+function logEvents(): MiddlewareObj<LambdaEvent> {
   return {
-    before: (request: HandlerRequest): void => {
+    before: (request: Request<LambdaEvent>): void => {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
           logType: 'incoming request',
@@ -70,33 +44,33 @@ function logEvents() {
         });
       }
     },
-    after: (handler: HandlerRequest): void => {
+    after: (request: Request<LambdaEvent>): void => {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
           logType: 'request result',
-          ...handler.event,
+          ...request.event,
         });
       }
     },
   };
 }
 
-function bodyNormalizer() {
+function bodyNormalizer(): MiddlewareObj<LambdaEvent> {
   return {
-    before: (handler: HandlerRequest): void => {
-      if (!handler.event.headers) {
-        handler.event.headers = {};
+    before: (request: Request<LambdaEvent>): void => {
+      if (!request.event.headers) {
+        request.event.headers = {};
       }
-      if (!handler.event.headers['Content-Type']) {
-        handler.event.headers['Content-Type'] = 'application/json';
-        handler.event.body = handler.event.body || '{}';
+      if (!request.event.headers['Content-Type']) {
+        request.event.headers['Content-Type'] = 'application/json';
+        request.event.body = request.event.body || '{}';
       }
     },
   };
 }
 
-function commonMiddleware<T = HandlerEvent>(handler: TypedHandlerFunction<T>) {
-  return middy(handler as HandlerFunction).use([
+export function commonMiddleware(handler: LambdaHandler) {
+  return middy(handler).use([
     bodyNormalizer(),
     httpJsonBodyParser(),
     httpEventNormalizer(),
@@ -112,12 +86,3 @@ function commonMiddleware<T = HandlerEvent>(handler: TypedHandlerFunction<T>) {
     logEvents(),
   ]);
 }
-
-export default commonMiddleware;
-export type {
-  HandlerEvent,
-  HandlerResponse,
-  HandlerFunction,
-  TypedHandlerFunction,
-  TokenData,
-};
