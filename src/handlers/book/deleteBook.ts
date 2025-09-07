@@ -1,4 +1,7 @@
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbDeleteItem from '../../db/dbDeleteItem.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
@@ -26,13 +29,15 @@ async function deleteBook(event: DeleteBookEvent): Promise<HandlerResponse> {
   if (!removedBook) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `"${bookId}" from "${seriesId}" not found.` }),
+      body: JSON.stringify({
+        error: `"${bookId}" from "${seriesId}" not found.`,
+      }),
     };
   }
 
   const responseBook: DeletedBookResponse = {
     seriesId: extractStringValue(removedBook.primary_key),
-    bookId: extractStringValue(removedBook.sort_key)
+    bookId: extractStringValue(removedBook.sort_key),
   };
 
   // Copy other properties
@@ -44,7 +49,10 @@ async function deleteBook(event: DeleteBookEvent): Promise<HandlerResponse> {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'item successfully deleted', deletedBook: responseBook }),
+    body: JSON.stringify({
+      message: 'item successfully deleted',
+      deletedBook: responseBook,
+    }),
   };
 }
 

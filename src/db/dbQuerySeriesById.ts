@@ -19,20 +19,24 @@ interface SeriesRecord {
   [key: string]: unknown;
 }
 
-export default async function dbQuerySeriesById(contentId: string): Promise<SeriesItem[] | null> {
+export default async function dbQuerySeriesById(
+  contentId: string,
+): Promise<SeriesItem[] | null> {
   try {
     const reverseLookup = contentId.startsWith('s') ? false : true;
 
-    const params = reverseLookup ? {
-      IndexName: 'ReverseLookup',
-      KeyConditionExpression: '#sk = :sk',
-      ExpressionAttributeNames: { '#sk': 'sort_key' },
-      ExpressionAttributeValues: { ':sk': { S: contentId } }
-    } : {
-      KeyConditionExpression: '#pk = :pk',
-      ExpressionAttributeNames: { '#pk': 'primary_key' },
-      ExpressionAttributeValues: { ':pk': { S: contentId } }
-    };
+    const params = reverseLookup
+      ? {
+          IndexName: 'ReverseLookup',
+          KeyConditionExpression: '#sk = :sk',
+          ExpressionAttributeNames: { '#sk': 'sort_key' },
+          ExpressionAttributeValues: { ':sk': { S: contentId } },
+        }
+      : {
+          KeyConditionExpression: '#pk = :pk',
+          ExpressionAttributeNames: { '#pk': 'primary_key' },
+          ExpressionAttributeValues: { ':pk': { S: contentId } },
+        };
 
     const queryResult = await searchDbItems(params);
 
@@ -54,9 +58,9 @@ export default async function dbQuerySeriesById(contentId: string): Promise<Seri
       return null;
     }
 
-    const seriesItems: SeriesItem[] = queryResult.map(item => {
+    const seriesItems: SeriesItem[] = queryResult.map((item) => {
       const seriesItem: SeriesItem = {
-        seriesId: extractStringValue(item.primary_key)
+        seriesId: extractStringValue(item.primary_key),
       };
 
       const sortKey = extractStringValue(item.sort_key);
@@ -89,7 +93,6 @@ export default async function dbQuerySeriesById(contentId: string): Promise<Seri
     });
 
     return seriesItems;
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);

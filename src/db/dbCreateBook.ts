@@ -36,7 +36,10 @@ interface BookResponse {
   updatedAt: string;
 }
 
-export default async function dbCreateBook(bookData: BookData, token: TokenData): Promise<BookResponse> {
+export default async function dbCreateBook(
+  bookData: BookData,
+  token: TokenData,
+): Promise<BookResponse> {
   const now = new Date().toISOString();
   const formattedDate = new Date(bookData.pubDate).toISOString();
 
@@ -48,7 +51,7 @@ export default async function dbCreateBook(bookData: BookData, token: TokenData)
     pubDate: formattedDate,
     createdBy: token.sub,
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   };
 
   await putDbItem(book);
@@ -61,7 +64,7 @@ export default async function dbCreateBook(bookData: BookData, token: TokenData)
     pubDate: book.pubDate,
     createdBy: book.createdBy,
     createdAt: book.createdAt,
-    updatedAt: book.updatedAt
+    updatedAt: book.updatedAt,
   };
 
   return bookResponse;

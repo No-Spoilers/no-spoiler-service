@@ -1,4 +1,7 @@
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbDeleteItem from '../../db/dbDeleteItem.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
@@ -47,7 +50,7 @@ async function deleteLevel(event: DeleteLevelEvent): Promise<HandlerResponse> {
 
   const responseLevel: DeletedLevelResponse = {
     userId: extractStringValue(deletedLevel.primary_key),
-    seriesId: extractStringValue(deletedLevel.sort_key)
+    seriesId: extractStringValue(deletedLevel.sort_key),
   };
 
   // Copy other properties
@@ -59,7 +62,10 @@ async function deleteLevel(event: DeleteLevelEvent): Promise<HandlerResponse> {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'item successfully deleted', deletedLevel: responseLevel }),
+    body: JSON.stringify({
+      message: 'item successfully deleted',
+      deletedLevel: responseLevel,
+    }),
   };
 }
 

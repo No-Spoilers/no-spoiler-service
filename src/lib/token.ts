@@ -34,7 +34,7 @@ export function createNewToken(user: User): string {
   const token = jwt.sign(payload, TOKEN_SECRET, {
     expiresIn: '100d',
     jwtid: jwtId,
-    subject: user.userId
+    subject: user.userId,
   });
 
   return token;

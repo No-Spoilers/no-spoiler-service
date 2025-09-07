@@ -10,11 +10,11 @@ const schema: JSONSchema7 = {
         seriesId: { type: 'string' },
         entryId: { type: 'string' },
         bookId: { type: 'string' },
-        text: { type: 'string' }
+        text: { type: 'string' },
       },
-      required: ['seriesId', 'entryId', 'bookId', 'text']
-    }
-  }
+      required: ['seriesId', 'entryId', 'bookId', 'text'],
+    },
+  },
 };
 
 export default schema;

@@ -1,4 +1,7 @@
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbQuerySeriesById from '../../db/dbQuerySeriesById.js';
 
 interface PathParameters {
@@ -10,7 +13,9 @@ interface GetSeriesByIdEvent extends HandlerEvent {
   pathParameters: PathParameters;
 }
 
-async function getSeriesById(event: GetSeriesByIdEvent): Promise<HandlerResponse> {
+async function getSeriesById(
+  event: GetSeriesByIdEvent,
+): Promise<HandlerResponse> {
   const { contentId } = event.pathParameters;
 
   const series = await dbQuerySeriesById(contentId);
@@ -18,7 +23,9 @@ async function getSeriesById(event: GetSeriesByIdEvent): Promise<HandlerResponse
   if (!series) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `Series for ID "${contentId}" not found.` }),
+      body: JSON.stringify({
+        error: `Series for ID "${contentId}" not found.`,
+      }),
     };
   }
 

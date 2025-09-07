@@ -15,7 +15,11 @@ interface UserLevelResponse {
   updatedBy: string;
 }
 
-export default async function dbUpdateUserLevel(token: TokenData, seriesId: string, bookId: string): Promise<UserLevelResponse> {
+export default async function dbUpdateUserLevel(
+  token: TokenData,
+  seriesId: string,
+  bookId: string,
+): Promise<UserLevelResponse> {
   try {
     const userId = token.sub;
     const now = new Date();
@@ -26,14 +30,15 @@ export default async function dbUpdateUserLevel(token: TokenData, seriesId: stri
         primary_key: { S: userId },
         sort_key: { S: seriesId },
       },
-      UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, #level=:level',
+      UpdateExpression:
+        'set updatedAt=:updatedAt, updatedBy=:updatedBy, #level=:level',
       ExpressionAttributeNames: {
-        '#level': 'level'
+        '#level': 'level',
       },
       ExpressionAttributeValues: {
         ':updatedAt': { S: now.toISOString() },
         ':updatedBy': { S: token.sub },
-        ':level': { S: bookId }
+        ':level': { S: bookId },
       },
     };
 
@@ -48,11 +53,10 @@ export default async function dbUpdateUserLevel(token: TokenData, seriesId: stri
       seriesId: extractStringValue(user.sort_key),
       level: extractStringValue(user.level),
       updatedAt: extractStringValue(user.updatedAt),
-      updatedBy: extractStringValue(user.updatedBy)
+      updatedBy: extractStringValue(user.updatedBy),
     };
 
     return userLevelResponse;
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);

@@ -1,11 +1,16 @@
 import { expect } from 'chai';
 
-import { createNewToken, verifyToken, type User, type VerifiedToken } from '../src/lib/token.js';
+import {
+  createNewToken,
+  verifyToken,
+  type User,
+  type VerifiedToken,
+} from '../src/lib/token.js';
 
 describe('token', () => {
   it('should create a new verifiable token', () => {
     const user: User = {
-      userId: 'test id'
+      userId: 'test id',
     };
 
     const result = createNewToken(user);
@@ -15,15 +20,14 @@ describe('token', () => {
     const verifiedToken = verifyToken(result);
 
     expect(typeof verifiedToken).to.equal('object');
-    expect(verifiedToken).to.have.all.keys(
-      'iat',
-      'exp',
-      'sub',
-      'jti'
-    );
-    
-    if (verifiedToken && typeof verifiedToken === 'object' && 'sub' in verifiedToken) {
-      expect((verifiedToken as VerifiedToken).sub).to.equal('test id');
+    expect(verifiedToken).to.have.all.keys('iat', 'exp', 'sub', 'jti');
+
+
+      verifiedToken &&
+      typeof verifiedToken === 'object' &&
+      'sub' in verifiedToken
+    ) {
+      expect((verifiedToken).sub).to.equal('test id');
     }
   });
 });

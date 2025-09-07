@@ -14,12 +14,12 @@ interface BookRecord {
   [key: string]: unknown;
 }
 
-export default async function dbGetBookBySeriesIdAndBookId(seriesId: string, bookId: string): Promise<BookRecord | null> {
+export default async function dbGetBookBySeriesIdAndBookId(
+  seriesId: string,
+  bookId: string,
+): Promise<BookRecord | null> {
   try {
-    const book = await getDbItem(
-      { S: seriesId },
-      { S: bookId }
-    );
+    const book = await getDbItem({ S: seriesId }, { S: bookId });
 
     if (!book) return null;
 
@@ -31,11 +31,10 @@ export default async function dbGetBookBySeriesIdAndBookId(seriesId: string, boo
       pubDate: extractStringValue(book.pubDate),
       createdBy: extractStringValue(book.createdBy),
       createdAt: extractStringValue(book.createdAt),
-      updatedAt: extractStringValue(book.updatedAt)
+      updatedAt: extractStringValue(book.updatedAt),
     };
 
     return bookRecord;
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);

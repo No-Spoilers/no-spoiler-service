@@ -2,7 +2,10 @@ import validator from '@middy/validator';
 import postBookSchema from '../../schemas/postBookSchema.js';
 import createError from 'http-errors';
 import dbCreateBook from '../../db/dbCreateBook.js';
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbQuerySeriesById from '../../db/dbQuerySeriesById.js';
 
 interface BookData {
@@ -39,7 +42,9 @@ async function postBook(event: PostBookEvent): Promise<HandlerResponse> {
     if (!series) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: `Series with ID "${bookData.seriesId}" not found.` }),
+        body: JSON.stringify({
+          error: `Series with ID "${bookData.seriesId}" not found.`,
+        }),
       };
     }
 
@@ -49,12 +54,12 @@ async function postBook(event: PostBookEvent): Promise<HandlerResponse> {
       statusCode: 201,
       body: JSON.stringify(newBook),
     };
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);
   }
 }
 
-export const handler = commonMiddleware(postBook)
-  .use(validator({ eventSchema: postBookSchema }));
+export const handler = commonMiddleware(postBook).use(
+  validator({ eventSchema: postBookSchema }),
+);

@@ -18,11 +18,11 @@ export default async function dbQuerySeries(): Promise<SeriesRecord[] | Error> {
       IndexName: 'ReverseLookup',
       KeyConditionExpression: '#sk = :top',
       ExpressionAttributeNames: {
-        '#sk': 'sort_key'
+        '#sk': 'sort_key',
       },
       ExpressionAttributeValues: {
-        ':top': { S: 'TOP~' }
-      }
+        ':top': { S: 'TOP~' },
+      },
     };
 
     const queryResult = await searchDbItems(params);
@@ -32,14 +32,14 @@ export default async function dbQuerySeries(): Promise<SeriesRecord[] | Error> {
     }
 
     if (Array.isArray(queryResult)) {
-      const seriesList: SeriesRecord[] = queryResult.map(series => {
+      const seriesList: SeriesRecord[] = queryResult.map((series) => {
         const seriesRecord: SeriesRecord = {
           seriesId: extractStringValue(series.primary_key),
           name: extractStringValue(series.name),
           text: extractStringValue(series.text),
           createdBy: extractStringValue(series.createdBy),
           createdAt: extractStringValue(series.createdAt),
-          updatedAt: extractStringValue(series.updatedAt)
+          updatedAt: extractStringValue(series.updatedAt),
         };
         return seriesRecord;
       });
@@ -47,7 +47,6 @@ export default async function dbQuerySeries(): Promise<SeriesRecord[] | Error> {
     }
 
     return [];
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);

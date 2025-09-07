@@ -1,4 +1,7 @@
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbUpdateSeries from '../../db/dbUpdateSeries.js';
 
 interface PathParameters {
@@ -32,7 +35,10 @@ async function patchSeries(event: PatchSeriesEvent): Promise<HandlerResponse> {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'item successfully updated', updatedSeries }),
+    body: JSON.stringify({
+      message: 'item successfully updated',
+      updatedSeries,
+    }),
   };
 }
 

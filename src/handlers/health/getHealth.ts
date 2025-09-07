@@ -14,17 +14,21 @@ function getHealth() {
 
     const packageJson: unknown = JSON.parse(file);
 
-    if (typeof packageJson !== 'object' || packageJson === null || !('version' in packageJson)) {
+    if (
+      typeof packageJson !== 'object' ||
+      packageJson === null ||
+      !('version' in packageJson)
+    ) {
       throw new Error('Failed to parse package.json');
     }
 
     const responseBody = {
-      packageVersion: packageJson.version
+      packageVersion: packageJson.version,
     };
 
     return {
       statusCode: 200,
-      body: JSON.stringify(responseBody)
+      body: JSON.stringify(responseBody),
     };
   } catch (error) {
     console.error('Health check failed:', error);
@@ -33,8 +37,8 @@ function getHealth() {
       statusCode: 500,
       body: JSON.stringify({
         error: 'Health check failed',
-        message: 'Unable to read package information'
-      })
+        message: 'Unable to read package information',
+      }),
     };
   }
 }

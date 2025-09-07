@@ -5,11 +5,7 @@ describe('getHealth', () => {
   it('should return 200', async () => {
     const result = await handler({}, {});
 
-    expect(result).to.have.all.keys(
-      'statusCode',
-      'body',
-      'headers'
-    );
+    expect(result).to.have.all.keys('statusCode', 'body', 'headers');
 
     const { statusCode, body } = result;
 
@@ -17,8 +13,6 @@ describe('getHealth', () => {
 
     const parsedBody = JSON.parse(body as string);
 
-    expect(parsedBody).to.have.all.keys(
-      'packageVersion'
-    );
+    expect(parsedBody).to.have.all.keys('packageVersion');
   });
 });

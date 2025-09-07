@@ -8,11 +8,11 @@ const schema: JSONSchema7 = {
       type: 'object',
       properties: {
         email: { type: 'string' },
-        password: { type: 'string' }
+        password: { type: 'string' },
       },
-      required: ['email', 'password']
-    }
-  }
+      required: ['email', 'password'],
+    },
+  },
 };
 
 export default schema;

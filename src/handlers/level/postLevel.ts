@@ -1,7 +1,10 @@
 import createError from 'http-errors';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 import dbUpdateUserLevel from '../../db/dbUpdateUserLevel.js';
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 
 interface PostLevelBody {
   seriesId: string;
@@ -52,7 +55,6 @@ async function postLevel(event: PostLevelEvent): Promise<HandlerResponse> {
       statusCode: 200,
       body: JSON.stringify(spoilerState),
     };
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);

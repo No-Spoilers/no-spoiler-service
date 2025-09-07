@@ -1,6 +1,9 @@
 import createError from 'http-errors';
 import patchEntrySchema from '../../schemas/patchEntrySchema.js';
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbGetEntryBySeriesIdAndEntryId from '../../db/dbGetEntryBySeriesIdAndEntryId.js';
 import dbUpdateEntry from '../../db/dbUpdateEntry.js';
 import validator from '@middy/validator';
@@ -35,11 +38,16 @@ async function patchEntry(event: PatchEntryEvent): Promise<HandlerResponse> {
   }
 
   try {
-    const entry = await dbGetEntryBySeriesIdAndEntryId(newEntry.seriesId, newEntry.entryId);
+    const entry = await dbGetEntryBySeriesIdAndEntryId(
+      newEntry.seriesId,
+      newEntry.entryId,
+    );
     if (!entry) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: `Entry with ID "${newEntry.entryId}" in "${newEntry.seriesId}" not found.` }),
+        body: JSON.stringify({
+          error: `Entry with ID "${newEntry.entryId}" in "${newEntry.seriesId}" not found.`,
+        }),
       };
     }
 
@@ -49,12 +57,12 @@ async function patchEntry(event: PatchEntryEvent): Promise<HandlerResponse> {
       statusCode: 200,
       body: JSON.stringify(result),
     };
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);
   }
 }
 
-export const handler = commonMiddleware(patchEntry)
-  .use(validator({ eventSchema: patchEntrySchema }));
+export const handler = commonMiddleware(patchEntry).use(
+  validator({ eventSchema: patchEntrySchema }),
+);

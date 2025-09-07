@@ -31,7 +31,7 @@ interface ExistingUserResponse {
 export default async function dbCreateUser(
   name: string,
   preservedCaseEmail: string,
-  password: string
+  password: string,
 ): Promise<UserResponse | ExistingUserResponse> {
   const email = preservedCaseEmail.toLowerCase();
   const now = new Date().toISOString();
@@ -52,7 +52,7 @@ export default async function dbCreateUser(
     preservedCaseEmail,
     passwordHash,
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   };
 
   await putDbItem(newUser);
@@ -62,7 +62,7 @@ export default async function dbCreateUser(
     name: newUser.name,
     email: newUser.preservedCaseEmail,
     createdAt: newUser.createdAt,
-    updatedAt: newUser.updatedAt
+    updatedAt: newUser.updatedAt,
   };
 
   return userResponse;

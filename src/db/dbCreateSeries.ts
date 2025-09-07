@@ -32,7 +32,10 @@ interface SeriesResponse {
   updatedAt: string;
 }
 
-export default async function dbCreateSeries(seriesData: SeriesData, token: TokenData): Promise<SeriesResponse> {
+export default async function dbCreateSeries(
+  seriesData: SeriesData,
+  token: TokenData,
+): Promise<SeriesResponse> {
   const now = new Date().toISOString();
 
   const series: SeriesRecord = {
@@ -42,7 +45,7 @@ export default async function dbCreateSeries(seriesData: SeriesData, token: Toke
     text: seriesData.text,
     createdBy: token.sub,
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   };
 
   await putDbItem(series);
@@ -53,7 +56,7 @@ export default async function dbCreateSeries(seriesData: SeriesData, token: Toke
     text: series.text,
     createdBy: series.createdBy,
     createdAt: series.createdAt,
-    updatedAt: series.updatedAt
+    updatedAt: series.updatedAt,
   };
 
   return seriesResponse;

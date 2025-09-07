@@ -8,10 +8,10 @@ const schema: JSONSchema7 = {
       type: 'object',
       required: ['name'],
       properties: {
-        name: { type: 'string' }
-      }
-    }
-  }
+        name: { type: 'string' },
+      },
+    },
+  },
 };
 
 export default schema;

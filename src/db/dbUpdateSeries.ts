@@ -15,14 +15,17 @@ interface SeriesResponse {
   updatedAt: string;
 }
 
-export default async function dbUpdateSeries(seriesId: string, seriesData: SeriesUpdateData): Promise<SeriesResponse | null> {
+export default async function dbUpdateSeries(
+  seriesId: string,
+  seriesData: SeriesUpdateData,
+): Promise<SeriesResponse | null> {
   try {
     const now = new Date();
 
     let updateExpression = 'set updatedAt = :updatedAt';
 
     const expressionAttributeValues: Record<string, AttributeValue> = {
-      ':updatedAt': { S: now.toISOString() }
+      ':updatedAt': { S: now.toISOString() },
     };
 
     const expressionAttributeNames: Record<string, string> = {};
@@ -43,7 +46,7 @@ export default async function dbUpdateSeries(seriesId: string, seriesData: Serie
       TableName: process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev',
       Key: {
         primary_key: { S: seriesId },
-        sort_key: { S: 'TOP~' }
+        sort_key: { S: 'TOP~' },
       },
       ConditionExpression: 'attribute_exists(sort_key)',
       UpdateExpression: updateExpression,
@@ -61,13 +64,17 @@ export default async function dbUpdateSeries(seriesId: string, seriesData: Serie
       seriesId: extractStringValue(series.primary_key),
       name: extractStringValue(series.name),
       text: extractStringValue(series.text),
-      updatedAt: extractStringValue(series.updatedAt)
+      updatedAt: extractStringValue(series.updatedAt),
     };
 
     return seriesResponse;
-
   } catch (error) {
-    if (error && typeof error === 'object' && 'code' in error && error.code === 'ConditionalCheckFailedException') {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'ConditionalCheckFailedException'
+    ) {
       return null;
     }
     console.error(error);

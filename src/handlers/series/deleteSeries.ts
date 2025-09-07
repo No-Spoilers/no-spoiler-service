@@ -1,4 +1,7 @@
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbDeleteItem from '../../db/dbDeleteItem.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
@@ -16,7 +19,9 @@ interface DeletedSeriesResponse {
   [key: string]: unknown;
 }
 
-async function deleteSeries(event: DeleteSeriesEvent): Promise<HandlerResponse> {
+async function deleteSeries(
+  event: DeleteSeriesEvent,
+): Promise<HandlerResponse> {
   const { contentId } = event.pathParameters;
 
   const deletedSeries = await dbDeleteItem(contentId, 'TOP~');
@@ -24,12 +29,14 @@ async function deleteSeries(event: DeleteSeriesEvent): Promise<HandlerResponse> 
   if (!deletedSeries) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `Series with ID "${contentId}" not found.` }),
+      body: JSON.stringify({
+        error: `Series with ID "${contentId}" not found.`,
+      }),
     };
   }
 
   const responseSeries: DeletedSeriesResponse = {
-    seriesId: extractStringValue(deletedSeries.primary_key)
+    seriesId: extractStringValue(deletedSeries.primary_key),
   };
 
   // Copy other properties
@@ -41,7 +48,10 @@ async function deleteSeries(event: DeleteSeriesEvent): Promise<HandlerResponse> 
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'item successfully deleted', deletedSeries: responseSeries }),
+    body: JSON.stringify({
+      message: 'item successfully deleted',
+      deletedSeries: responseSeries,
+    }),
   };
 }
 

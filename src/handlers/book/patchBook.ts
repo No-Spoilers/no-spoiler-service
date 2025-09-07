@@ -1,6 +1,9 @@
 import createError from 'http-errors';
 import dbUpdateBook from '../../db/dbUpdateBook.js';
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
 interface PathParameters {
@@ -35,7 +38,7 @@ async function patchBook(event: PatchBookEvent): Promise<HandlerResponse> {
   const bookData: BookUpdateData = {
     ...event.body,
     seriesId,
-    bookId
+    bookId,
   };
 
   if (!token) {
@@ -50,7 +53,9 @@ async function patchBook(event: PatchBookEvent): Promise<HandlerResponse> {
     if (!book) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: `Book with ID "${seriesId}/${bookId}" not found.` }),
+        body: JSON.stringify({
+          error: `Book with ID "${seriesId}/${bookId}" not found.`,
+        }),
       };
     }
 
@@ -60,7 +65,6 @@ async function patchBook(event: PatchBookEvent): Promise<HandlerResponse> {
       statusCode: 200,
       body: JSON.stringify(newBook),
     };
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);

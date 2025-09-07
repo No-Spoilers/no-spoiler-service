@@ -1,6 +1,11 @@
 import createError from 'http-errors';
 import { searchDbItems } from '../lib/dynamodb-client.js';
-import { AttributeValue, QueryCommandInput, Condition, ComparisonOperator } from '@aws-sdk/client-dynamodb';
+import {
+  AttributeValue,
+  QueryCommandInput,
+  Condition,
+  ComparisonOperator,
+} from '@aws-sdk/client-dynamodb';
 
 interface UserRecord {
   userId: string;
@@ -12,7 +17,9 @@ interface UserRecord {
   [key: string]: unknown;
 }
 
-export default async function dbQueryUserByEmail(email: string): Promise<UserRecord | null> {
+export default async function dbQueryUserByEmail(
+  email: string,
+): Promise<UserRecord | null> {
   try {
     const normalizedEmail = email.toLowerCase();
 
@@ -20,13 +27,13 @@ export default async function dbQueryUserByEmail(email: string): Promise<UserRec
       KeyConditions: {
         primary_key: {
           AttributeValueList: [{ S: 'user' }],
-          ComparisonOperator: 'EQ' as ComparisonOperator
+          ComparisonOperator: 'EQ' as ComparisonOperator,
         },
         sort_key: {
           AttributeValueList: [{ S: normalizedEmail }],
-          ComparisonOperator: 'EQ' as ComparisonOperator
-        }
-      }
+          ComparisonOperator: 'EQ' as ComparisonOperator,
+        },
+      },
     };
 
     const queryResult = await searchDbItems(params);
@@ -47,7 +54,7 @@ export default async function dbQueryUserByEmail(email: string): Promise<UserRec
       preservedCaseEmail: extractStringValue(userRecord.preservedCaseEmail),
       passwordHash: extractStringValue(userRecord.passwordHash),
       createdAt: extractStringValue(userRecord.createdAt),
-      updatedAt: extractStringValue(userRecord.updatedAt)
+      updatedAt: extractStringValue(userRecord.updatedAt),
     };
 
     return user;

@@ -19,13 +19,16 @@ const dynamoClientConfig = { region: 'us-east-1' };
 
 const client = new DynamoDBClient(dynamoClientConfig);
 
-export async function getDbItem(primary_key: AttributeValue, sort_key: AttributeValue): Promise<Record<string, AttributeValue> | undefined> {
+export async function getDbItem(
+  primary_key: AttributeValue,
+  sort_key: AttributeValue,
+): Promise<Record<string, AttributeValue> | undefined> {
   const params = {
     TableName,
     Key: {
       primary_key,
-      sort_key
-    }
+      sort_key,
+    },
   };
   const command = new GetItemCommand(params);
 
@@ -34,11 +37,13 @@ export async function getDbItem(primary_key: AttributeValue, sort_key: Attribute
   return result.Item;
 }
 
-export async function searchDbItems(params: Partial<QueryCommandInput>): Promise<Record<string, AttributeValue>[] | Error> {
+export async function searchDbItems(
+  params: Partial<QueryCommandInput>,
+): Promise<Record<string, AttributeValue>[] | Error> {
   try {
     const command = new QueryCommand({
       TableName,
-      ...params
+      ...params,
     });
 
     const result = await client.send(command);
@@ -52,7 +57,7 @@ export async function searchDbItems(params: Partial<QueryCommandInput>): Promise
 
 export function putDbItem(item: Record<string, unknown>): Promise<unknown> {
   const Item: Record<string, AttributeValue> = {};
-  
+
   Object.entries(item).forEach(([key, value]) => {
     if (typeof value === 'string') {
       Item[key] = { S: value };
@@ -60,22 +65,26 @@ export function putDbItem(item: Record<string, unknown>): Promise<unknown> {
       Item[key] = { N: value.toString() }; // DynamoDB expects numbers as strings
     } else if (typeof value === 'object') {
       if (Array.isArray(value)) {
-        Item[key] = { L: value.map(v => ({ S: String(v) })) };
+        Item[key] = { L: value.map((v) => ({ S: String(v) })) };
       } else if (value === null) {
         Item[key] = { NULL: true };
       } else if (value !== undefined) {
         const nestedMap: Record<string, AttributeValue> = {};
-        Object.entries(value as Record<string, unknown>).forEach(([subKey, subValue]) => {
-          if (typeof subValue === 'string') {
-            nestedMap[subKey] = { S: subValue };
-          } else if (typeof subValue === 'number') {
-            nestedMap[subKey] = { N: subValue.toString() };
-          } else if (typeof subValue === 'object' && subValue !== null) {
-            nestedMap[subKey] = { M: subValue as Record<string, AttributeValue> };
-          } else {
-            nestedMap[subKey] = { S: String(subValue) }; // Fallback for other types
-          }
-        });
+        Object.entries(value as Record<string, unknown>).forEach(
+          ([subKey, subValue]) => {
+            if (typeof subValue === 'string') {
+              nestedMap[subKey] = { S: subValue };
+            } else if (typeof subValue === 'number') {
+              nestedMap[subKey] = { N: subValue.toString() };
+            } else if (typeof subValue === 'object' && subValue !== null) {
+              nestedMap[subKey] = {
+                M: subValue as Record<string, AttributeValue>,
+              };
+            } else {
+              nestedMap[subKey] = { S: String(subValue) }; // Fallback for other types
+            }
+          },
+        );
         Item[key] = { M: nestedMap };
       }
     } else {
@@ -86,16 +95,18 @@ export function putDbItem(item: Record<string, unknown>): Promise<unknown> {
   const input = {
     TableName,
     Item,
-    ReturnValues
+    ReturnValues,
   };
   const command = new PutItemCommand(input);
   return client.send(command);
 }
 
-export async function updateDbItem(item: UpdateItemCommandInput): Promise<Record<string, AttributeValue> | undefined> {
+export async function updateDbItem(
+  item: UpdateItemCommandInput,
+): Promise<Record<string, AttributeValue> | undefined> {
   const input = {
     ReturnValues: 'ALL_NEW' as ReturnValue,
-    ...item
+    ...item,
   };
 
   const command = new UpdateItemCommand(input);
@@ -105,16 +116,18 @@ export async function updateDbItem(item: UpdateItemCommandInput): Promise<Record
   return Attributes;
 }
 
-export function updateMultipleDbItems(items: Partial<UpdateItemCommandInput>[]): Promise<unknown> {
+export function updateMultipleDbItems(
+  items: Partial<UpdateItemCommandInput>[],
+): Promise<unknown> {
   const input = {
-    TransactItems: items.map(item => {
+    TransactItems: items.map((item) => {
       return {
         Update: {
           TableName,
           ...item,
-        }
+        },
       } as TransactWriteItem;
-    })
+    }),
   };
 
   const command = new TransactWriteItemsCommand(input);
@@ -122,15 +135,18 @@ export function updateMultipleDbItems(items: Partial<UpdateItemCommandInput>[]):
   return client.send(command);
 }
 
-export function deleteDbItem(primary_key: AttributeValue, sort_key: AttributeValue): Promise<unknown> {
+export function deleteDbItem(
+  primary_key: AttributeValue,
+  sort_key: AttributeValue,
+): Promise<unknown> {
   const params = {
     TableName,
     Key: {
       primary_key,
-      sort_key
+      sort_key,
     },
     ConditionExpression: 'attribute_exists(sort_key)',
-    ReturnValues: 'ALL_OLD' as ReturnValue
+    ReturnValues: 'ALL_OLD' as ReturnValue,
   };
   const command = new DeleteItemCommand(params);
   return client.send(command);

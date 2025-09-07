@@ -2,10 +2,15 @@ import globals from 'globals';
 import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
 
 export default [
   {
     files: ['**/*.js'],
+    plugins: {
+      prettier,
+    },
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -16,6 +21,8 @@ export default [
       },
     },
     rules: {
+      ...prettierConfig.rules, // Disable conflicting ESLint rules
+      'prettier/prettier': 'error', // Enforce Prettier formatting as ESLint errors
       'no-console': 'off',
       'no-trailing-spaces': 'error',
       'quote-props': ['error', 'as-needed'],
@@ -24,7 +31,6 @@ export default [
       'prefer-const': 'error',
       'comma-style': 'error',
       'object-curly-spacing': ['error', 'always'],
-      indent: ['error', 2, { SwitchCase: 1 }],
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'no-undef': 'error',
       'no-unreachable': 'error',
@@ -63,8 +69,8 @@ export default [
       'prefer-promise-reject-errors': 'error',
       'require-await': 'error',
       'use-isnan': 'error',
-      'valid-typeof': 'error'
-    }
+      'valid-typeof': 'error',
+    },
   },
 
   {
@@ -86,10 +92,13 @@ export default [
     },
     plugins: {
       '@typescript-eslint': typescript,
+      prettier,
     },
     rules: {
       ...typescript.configs.recommended.rules,
       ...typescript.configs['recommended-type-checked'].rules,
+      ...prettierConfig.rules, // Disable conflicting ESLint rules
+      'prettier/prettier': 'error', // Enforce Prettier formatting as ESLint errors
       'no-console': 'off',
       'no-trailing-spaces': 'error',
       'quote-props': ['error', 'as-needed'],
@@ -98,8 +107,7 @@ export default [
       'prefer-const': 'error',
       'comma-style': 'error',
       'object-curly-spacing': ['error', 'always'],
-      indent: ['error', 2, { SwitchCase: 1 }],
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -140,8 +148,8 @@ export default [
       'prefer-promise-reject-errors': 'error',
       'require-await': 'error',
       'use-isnan': 'error',
-      'valid-typeof': 'error'
-    }
+      'valid-typeof': 'error',
+    },
   },
 
   js.configs.recommended,

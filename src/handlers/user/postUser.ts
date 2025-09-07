@@ -2,7 +2,10 @@ import validator from '@middy/validator';
 import postUserSchema from '../../schemas/postUserSchema.js';
 import createError from 'http-errors';
 import dbCreateUser from '../../db/dbCreateUser.js';
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import { createNewToken } from '../../lib/token.js';
 import { transpileSchema } from '@middy/validator/transpile';
 
@@ -34,7 +37,9 @@ async function postUser(event: PostUserEvent): Promise<HandlerResponse> {
     if (user && 'existing' in user && user.existing) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: `User with email:${email} already exists.` }),
+        body: JSON.stringify({
+          message: `User with email:${email} already exists.`,
+        }),
       };
     }
 
@@ -47,7 +52,7 @@ async function postUser(event: PostUserEvent): Promise<HandlerResponse> {
       userId: user.userId as string,
       name: user.name as string,
       email: user.email as string,
-      createdAt: user.createdAt as string
+      createdAt: user.createdAt as string,
     };
 
     const token = createNewToken(userForToken);
@@ -57,19 +62,19 @@ async function postUser(event: PostUserEvent): Promise<HandlerResponse> {
       name: user.name as string,
       email: user.email as string,
       createdAt: user.createdAt as string,
-      token
+      token,
     };
 
     return {
       statusCode: 201,
       body: JSON.stringify(returnObject),
     };
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);
   }
 }
 
-export const handler = commonMiddleware(postUser)
-  .use(validator({ eventSchema: transpileSchema(postUserSchema) }));
+export const handler = commonMiddleware(postUser).use(
+  validator({ eventSchema: transpileSchema(postUserSchema) }),
+);

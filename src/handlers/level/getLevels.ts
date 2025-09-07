@@ -1,6 +1,9 @@
 import createError from 'http-errors';
 import dbQueryUserLevels from '../../db/dbQueryUserLevels.js';
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 
 interface GetLevelsEvent extends HandlerEvent {
   token?: {

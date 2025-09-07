@@ -37,7 +37,10 @@ interface BookResponse {
   updatedBy: string;
 }
 
-export default async function dbUpdateBook(bookData: BookUpdateData, token: TokenData): Promise<BookResponse> {
+export default async function dbUpdateBook(
+  bookData: BookUpdateData,
+  token: TokenData,
+): Promise<BookResponse> {
   try {
     const { seriesId, bookId } = bookData;
     const now = new Date();
@@ -49,18 +52,20 @@ export default async function dbUpdateBook(bookData: BookUpdateData, token: Toke
 
     const expressionAttributeValues: Record<string, AttributeValue> = {
       ':updatedAt': { S: now.toISOString() },
-      ':updatedBy': { S: token.sub }
+      ':updatedBy': { S: token.sub },
     };
 
     const expressionAttributeNames: Record<string, string> = {};
 
     const validFields = ['name', 'text', 'pubDate'];
 
-    validFields.forEach(field => {
+    validFields.forEach((field) => {
       if (bookData[field]) {
         updateExpression += `, #${field} = :${field}`;
         expressionAttributeNames[`#${field}`] = `${field}`;
-        expressionAttributeValues[`:${field}`] = { S: bookData[field] as string };
+        expressionAttributeValues[`:${field}`] = {
+          S: bookData[field] as string,
+        };
       }
     });
 
@@ -88,11 +93,10 @@ export default async function dbUpdateBook(bookData: BookUpdateData, token: Toke
       text: extractStringValue(book.text),
       pubDate: extractStringValue(book.pubDate),
       updatedAt: extractStringValue(book.updatedAt),
-      updatedBy: extractStringValue(book.updatedBy)
+      updatedBy: extractStringValue(book.updatedBy),
     };
 
     return bookResponse;
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);

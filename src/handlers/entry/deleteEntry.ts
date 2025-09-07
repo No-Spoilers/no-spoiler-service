@@ -1,4 +1,7 @@
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbDeleteItem from '../../db/dbDeleteItem.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
@@ -26,13 +29,15 @@ async function deleteEntry(event: DeleteEntryEvent): Promise<HandlerResponse> {
   if (!removedEntry) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `"${entryId}" from "${seriesId}" not found.` }),
+      body: JSON.stringify({
+        error: `"${entryId}" from "${seriesId}" not found.`,
+      }),
     };
   }
 
   const responseEntry: DeletedEntryResponse = {
     seriesId: extractStringValue(removedEntry.primary_key),
-    entryId: extractStringValue(removedEntry.sort_key)
+    entryId: extractStringValue(removedEntry.sort_key),
   };
 
   // Copy other properties
@@ -44,7 +49,10 @@ async function deleteEntry(event: DeleteEntryEvent): Promise<HandlerResponse> {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'item successfully deleted', deletedEntry: responseEntry }),
+    body: JSON.stringify({
+      message: 'item successfully deleted',
+      deletedEntry: responseEntry,
+    }),
   };
 }
 

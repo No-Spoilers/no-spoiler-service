@@ -29,7 +29,10 @@ interface EntryResponse {
   updatedAt: string;
 }
 
-export default async function dbCreateEntry(entry: EntryData, userId: string): Promise<EntryResponse> {
+export default async function dbCreateEntry(
+  entry: EntryData,
+  userId: string,
+): Promise<EntryResponse> {
   const now = new Date().toISOString();
 
   const newSortKey = `e${generateId(9)}`;
@@ -41,7 +44,7 @@ export default async function dbCreateEntry(entry: EntryData, userId: string): P
     text: { key: entry.bookId, value: entry.text },
     createdBy: userId,
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   };
 
   // // TODO: Add check and retry for collisions:
@@ -61,7 +64,7 @@ export default async function dbCreateEntry(entry: EntryData, userId: string): P
     text: item.text,
     createdBy: item.createdBy,
     createdAt: item.createdAt,
-    updatedAt: item.updatedAt
+    updatedAt: item.updatedAt,
   };
 
   return entryResponse;

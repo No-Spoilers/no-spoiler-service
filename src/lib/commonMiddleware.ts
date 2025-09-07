@@ -34,9 +34,15 @@ interface HandlerResponse {
   [key: string]: unknown;
 }
 
-type HandlerFunction = (event: HandlerEvent, context: HandlerContext) => HandlerResponse | Promise<HandlerResponse>;
+type HandlerFunction = (
+  event: HandlerEvent,
+  context: HandlerContext,
+) => HandlerResponse | Promise<HandlerResponse>;
 
-type TypedHandlerFunction<T = HandlerEvent> = (event: T, context: HandlerContext) => HandlerResponse | Promise<HandlerResponse>;
+type TypedHandlerFunction<T = HandlerEvent> = (
+  event: T,
+  context: HandlerContext,
+) => HandlerResponse | Promise<HandlerResponse>;
 
 function validateJwt() {
   return {
@@ -50,7 +56,7 @@ function validateJwt() {
           }
         }
       }
-    }
+    },
   };
 }
 
@@ -60,7 +66,7 @@ function logEvents() {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
           logType: 'incoming request',
-          ...request.event
+          ...request.event,
         });
       }
     },
@@ -68,10 +74,10 @@ function logEvents() {
       if (process.env.NODE_ENV !== 'test') {
         console.log({
           logType: 'request result',
-          ...handler.event
+          ...handler.event,
         });
       }
-    }
+    },
   };
 }
 
@@ -85,30 +91,33 @@ function bodyNormalizer() {
         handler.event.headers['Content-Type'] = 'application/json';
         handler.event.body = handler.event.body || '{}';
       }
-    }
+    },
   };
 }
 
 function commonMiddleware<T = HandlerEvent>(handler: TypedHandlerFunction<T>) {
-  return middy(handler as HandlerFunction)
-    .use([
-      bodyNormalizer(),
-      httpJsonBodyParser(),
-      httpEventNormalizer(),
-      httpErrorHandler(),
-      cors(
-        {
-          origins: [
-            'https://no-spoilers.net',
-            'https://www.no-spoilers.net',
-            'https://api.no-spoilers.net'
-          ]
-        }
-      ),
-      validateJwt(),
-      logEvents()
-    ]);
+  return middy(handler as HandlerFunction).use([
+    bodyNormalizer(),
+    httpJsonBodyParser(),
+    httpEventNormalizer(),
+    httpErrorHandler(),
+    cors({
+      origins: [
+        'https://no-spoilers.net',
+        'https://www.no-spoilers.net',
+        'https://api.no-spoilers.net',
+      ],
+    }),
+    validateJwt(),
+    logEvents(),
+  ]);
 }
 
 export default commonMiddleware;
-export type { HandlerEvent, HandlerResponse, HandlerFunction, TypedHandlerFunction, TokenData };
+export type {
+  HandlerEvent,
+  HandlerResponse,
+  HandlerFunction,
+  TypedHandlerFunction,
+  TokenData,
+};

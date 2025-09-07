@@ -10,10 +10,10 @@ const schema: JSONSchema7 = {
       properties: {
         name: { type: 'string' },
         email: { type: 'string', format: 'email' },
-        password: { type: 'string', minLength: 6 }
-      }
-    }
-  }
+        password: { type: 'string', minLength: 6 },
+      },
+    },
+  },
 };
 
 export default schema;

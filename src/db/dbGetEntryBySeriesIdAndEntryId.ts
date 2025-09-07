@@ -13,12 +13,12 @@ interface EntryRecord {
   [key: string]: unknown;
 }
 
-export default async function dbGetEntryBySeriesIdAndEntryId(seriesId: string, entryId: string): Promise<EntryRecord | null> {
+export default async function dbGetEntryBySeriesIdAndEntryId(
+  seriesId: string,
+  entryId: string,
+): Promise<EntryRecord | null> {
   try {
-    const entry = await getDbItem(
-      { S: seriesId },
-      { S: entryId }
-    );
+    const entry = await getDbItem({ S: seriesId }, { S: entryId });
 
     if (!entry) return null;
 
@@ -29,11 +29,10 @@ export default async function dbGetEntryBySeriesIdAndEntryId(seriesId: string, e
       text: extractTextValue(entry.text),
       createdBy: extractStringValue(entry.createdBy),
       createdAt: extractStringValue(entry.createdAt),
-      updatedAt: extractStringValue(entry.updatedAt)
+      updatedAt: extractStringValue(entry.updatedAt),
     };
 
     return entryRecord;
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);
@@ -47,7 +46,9 @@ function extractStringValue(attrValue: AttributeValue | undefined): string {
   return '';
 }
 
-function extractTextValue(attrValue: AttributeValue | undefined): { [key: string]: string } {
+function extractTextValue(attrValue: AttributeValue | undefined): {
+  [key: string]: string;
+} {
   if (attrValue && 'M' in attrValue && attrValue.M) {
     const text: { [key: string]: string } = {};
     Object.entries(attrValue.M).forEach(([key, value]) => {

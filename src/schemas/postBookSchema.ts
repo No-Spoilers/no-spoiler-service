@@ -9,11 +9,11 @@ const schema: JSONSchema7 = {
       properties: {
         seriesId: { type: 'string' },
         name: { type: 'string' },
-        pubDate: { type: 'string' }
+        pubDate: { type: 'string' },
       },
-      required: ['seriesId', 'name', 'pubDate']
-    }
-  }
+      required: ['seriesId', 'name', 'pubDate'],
+    },
+  },
 };
 
 export default schema;

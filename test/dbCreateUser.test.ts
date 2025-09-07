@@ -1,5 +1,9 @@
 import { expect } from 'chai';
-import { DynamoDBClient, QueryCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  QueryCommand,
+  PutItemCommand,
+} from '@aws-sdk/client-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 
 import dbCreateUser from '../src/db/dbCreateUser.js';
@@ -23,14 +27,10 @@ describe('dbCreateUser', () => {
 
   it('should create a new user in the database', async () => {
     // Mock the QueryCommand to return no existing user
-    dynamoDBMock
-      .on(QueryCommand)
-      .resolves({ Items: [] });
+    dynamoDBMock.on(QueryCommand).resolves({ Items: [] });
 
     // Mock the PutItemCommand to return success
-    dynamoDBMock
-      .on(PutItemCommand)
-      .resolves({});
+    dynamoDBMock.on(PutItemCommand).resolves({});
 
     const name = 'Test User';
     const preservedCaseEmail = 'Test.User1@example.com';
@@ -44,7 +44,7 @@ describe('dbCreateUser', () => {
       'email',
       'name',
       'updatedAt',
-      'userId'
+      'userId',
     ]);
 
     expect(result.name).to.equal('Test User');
@@ -66,13 +66,11 @@ describe('dbCreateUser', () => {
       name: { S: 'Existing User' },
       preservedCaseEmail: { S: 'existing.user@example.com' },
       createdAt: { S: '2023-01-01T00:00:00.000Z' },
-      updatedAt: { S: '2023-01-01T00:00:00.000Z' }
+      updatedAt: { S: '2023-01-01T00:00:00.000Z' },
     };
 
     // Mock the QueryCommand to return an existing user
-    dynamoDBMock
-      .on(QueryCommand)
-      .resolves({ Items: [existingUser] });
+    dynamoDBMock.on(QueryCommand).resolves({ Items: [existingUser] });
 
     const name = 'Existing User';
     const preservedCaseEmail = 'existing.user@example.com';

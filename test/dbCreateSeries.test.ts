@@ -17,13 +17,11 @@ describe('dbCreateSeries', () => {
   });
 
   it('should create a new series', async () => {
-    dynamoDBMock
-      .on(PutItemCommand)
-      .resolves({ Item: { foo: 'bar' } });
+    dynamoDBMock.on(PutItemCommand).resolves({ Item: { foo: 'bar' } });
 
     const seriesData = {
       name: 'test name',
-      text: 'test text'
+      text: 'test text',
     };
     const token = { sub: 'test_createdBy' };
 
@@ -35,7 +33,7 @@ describe('dbCreateSeries', () => {
       'createdBy',
       'createdAt',
       'updatedAt',
-      'seriesId'
+      'seriesId',
     );
     expect(result.name).to.equal('test name');
     expect(result.text).to.equal('test text');

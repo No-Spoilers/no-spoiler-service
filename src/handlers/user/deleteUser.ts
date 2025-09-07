@@ -1,4 +1,7 @@
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbDeleteItem from '../../db/dbDeleteItem.js';
 import dbQueryUserByEmail from '../../db/dbQueryUserByEmail.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
@@ -63,7 +66,7 @@ async function deleteUser(event: DeleteUserEvent): Promise<HandlerResponse> {
 
   const deletedUser: DeletedUserResponse = {
     name: extractStringValue(result.name),
-    email: extractStringValue(result.preservedCaseEmail)
+    email: extractStringValue(result.preservedCaseEmail),
   };
 
   return {

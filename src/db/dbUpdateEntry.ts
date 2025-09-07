@@ -34,7 +34,11 @@ interface EntryResponse {
   updatedBy: string;
 }
 
-export default async function dbUpdateEntry(entry: EntryData | EntryUpdateRecord, newEntry: NewEntryData, userId: string): Promise<EntryResponse> {
+export default async function dbUpdateEntry(
+  entry: EntryData | EntryUpdateRecord,
+  newEntry: NewEntryData,
+  userId: string,
+): Promise<EntryResponse> {
   try {
     const now = new Date();
 
@@ -45,23 +49,24 @@ export default async function dbUpdateEntry(entry: EntryData | EntryUpdateRecord
 
     const newText: EntryText = {
       ...entryText,
-      [`${newEntry.bookId}`]: newEntry.text
+      [`${newEntry.bookId}`]: newEntry.text,
     };
 
     const params = {
       TableName: process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev',
       Key: {
         primary_key: { S: seriesId },
-        sort_key: { S: entryId }
+        sort_key: { S: entryId },
       },
-      UpdateExpression: 'set updatedAt=:updatedAt, updatedBy=:updatedBy, #text=:text',
+      UpdateExpression:
+        'set updatedAt=:updatedAt, updatedBy=:updatedBy, #text=:text',
       ExpressionAttributeNames: {
-        '#text': 'text'
+        '#text': 'text',
       },
       ExpressionAttributeValues: {
         ':updatedAt': { S: now.toISOString() },
         ':updatedBy': { S: userId },
-        ':text': { M: convertToAttributeValue(newText) }
+        ':text': { M: convertToAttributeValue(newText) },
       },
     };
 
@@ -76,11 +81,10 @@ export default async function dbUpdateEntry(entry: EntryData | EntryUpdateRecord
       entryId: extractStringValue(updatedEntry.sort_key),
       text: extractTextValue(updatedEntry.text),
       updatedAt: extractStringValue(updatedEntry.updatedAt),
-      updatedBy: extractStringValue(updatedEntry.updatedBy)
+      updatedBy: extractStringValue(updatedEntry.updatedBy),
     };
 
     return entryResponse;
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);
@@ -107,7 +111,9 @@ function extractTextValue(attrValue: AttributeValue | undefined): EntryText {
   return {};
 }
 
-function convertToAttributeValue(text: EntryText): Record<string, AttributeValue> {
+function convertToAttributeValue(
+  text: EntryText,
+): Record<string, AttributeValue> {
   const result: Record<string, AttributeValue> = {};
   Object.entries(text).forEach(([key, value]) => {
     result[key] = { S: value };

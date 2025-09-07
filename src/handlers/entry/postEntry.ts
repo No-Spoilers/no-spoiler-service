@@ -2,7 +2,10 @@ import validator from '@middy/validator';
 import postEntrySchema from '../../schemas/postEntrySchema.js';
 import createError from 'http-errors';
 import dbCreateEntry from '../../db/dbCreateEntry.js';
-import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, {
+  HandlerEvent,
+  HandlerResponse,
+} from '../../lib/commonMiddleware.js';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
 interface EntryData {
@@ -35,11 +38,16 @@ async function postEntry(event: PostEntryEvent): Promise<HandlerResponse> {
   }
 
   try {
-    const book = await dbGetBookBySeriesIdAndBookId(entryData.seriesId, entryData.bookId);
+    const book = await dbGetBookBySeriesIdAndBookId(
+      entryData.seriesId,
+      entryData.bookId,
+    );
     if (!book) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: `Book with ID "${entryData.bookId}" in "${entryData.seriesId}" not found.` }),
+        body: JSON.stringify({
+          error: `Book with ID "${entryData.bookId}" in "${entryData.seriesId}" not found.`,
+        }),
       };
     }
 
@@ -49,12 +57,12 @@ async function postEntry(event: PostEntryEvent): Promise<HandlerResponse> {
       statusCode: 201,
       body: JSON.stringify(newEntry),
     };
-
   } catch (error) {
     console.error(error);
     throw new createError.InternalServerError(error as string);
   }
 }
 
-export const handler = commonMiddleware(postEntry)
-  .use(validator({ eventSchema: postEntrySchema }));
+export const handler = commonMiddleware(postEntry).use(
+  validator({ eventSchema: postEntrySchema }),
+);
