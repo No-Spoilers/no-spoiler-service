@@ -1,7 +1,7 @@
 import createError from 'http-errors';
 import validator from '@middy/validator';
 import postSeriesSchema from '../../schemas/postSeriesSchema.js';
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbCreateSeries from '../../db/dbCreateSeries.js';
 
 interface SeriesData {
@@ -20,7 +20,7 @@ interface PostSeriesEvent extends HandlerEvent {
   };
 }
 
-async function postSeries(event: PostSeriesEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function postSeries(event: PostSeriesEvent): Promise<HandlerResponse> {
   const seriesData = event.body;
   const { token } = event;
 

@@ -2,7 +2,7 @@ import validator from '@middy/validator';
 import postEntrySchema from '../../schemas/postEntrySchema.js';
 import createError from 'http-errors';
 import dbCreateEntry from '../../db/dbCreateEntry.js';
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
 interface EntryData {
@@ -23,7 +23,7 @@ interface PostEntryEvent extends HandlerEvent {
   };
 }
 
-async function postEntry(event: PostEntryEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function postEntry(event: PostEntryEvent): Promise<HandlerResponse> {
   const entryData = event.body;
   const { token } = event;
 

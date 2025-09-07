@@ -1,6 +1,6 @@
 import createError from 'http-errors';
 import dbUpdateBook from '../../db/dbUpdateBook.js';
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
 interface PathParameters {
@@ -29,7 +29,7 @@ interface PatchBookEvent extends HandlerEvent {
   };
 }
 
-async function patchBook(event: PatchBookEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function patchBook(event: PatchBookEvent): Promise<HandlerResponse> {
   const { token } = event;
   const { seriesId, bookId } = event.pathParameters;
   const bookData: BookUpdateData = {

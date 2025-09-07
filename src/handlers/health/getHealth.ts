@@ -7,7 +7,16 @@ const packageJsonPath = join(process.cwd(), 'package.json');
 
 function getHealth() {
   try {
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+    const file = readFileSync(packageJsonPath, 'utf8');
+    if (typeof file !== 'string') {
+      throw new Error('Failed to read package.json');
+    }
+
+    const packageJson: unknown = JSON.parse(file);
+
+    if (typeof packageJson !== 'object' || packageJson === null || !('version' in packageJson)) {
+      throw new Error('Failed to parse package.json');
+    }
 
     const responseBody = {
       packageVersion: packageJson.version

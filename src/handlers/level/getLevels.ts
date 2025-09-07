@@ -1,6 +1,6 @@
 import createError from 'http-errors';
 import dbQueryUserLevels from '../../db/dbQueryUserLevels.js';
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 
 interface GetLevelsEvent extends HandlerEvent {
   token?: {
@@ -11,7 +11,7 @@ interface GetLevelsEvent extends HandlerEvent {
   };
 }
 
-async function getLevels(event: GetLevelsEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function getLevels(event: GetLevelsEvent): Promise<HandlerResponse> {
   try {
     const { token } = event;
 

@@ -1,4 +1,4 @@
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbDeleteItem from '../../db/dbDeleteItem.js';
 import dbQueryUserByEmail from '../../db/dbQueryUserByEmail.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
@@ -23,7 +23,7 @@ interface DeletedUserResponse {
   email: string;
 }
 
-async function deleteUser(event: DeleteUserEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function deleteUser(event: DeleteUserEvent): Promise<HandlerResponse> {
   const { token } = event;
   let { email } = event.body;
 

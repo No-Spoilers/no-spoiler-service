@@ -1,4 +1,4 @@
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbDeleteItem from '../../db/dbDeleteItem.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
@@ -18,7 +18,7 @@ interface DeletedBookResponse {
   [key: string]: unknown;
 }
 
-async function deleteBook(event: DeleteBookEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function deleteBook(event: DeleteBookEvent): Promise<HandlerResponse> {
   const { bookId, seriesId } = event.pathParameters;
 
   const removedBook = await dbDeleteItem(seriesId, bookId);

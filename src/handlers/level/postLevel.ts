@@ -1,7 +1,7 @@
 import createError from 'http-errors';
 import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
 import dbUpdateUserLevel from '../../db/dbUpdateUserLevel.js';
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 
 interface PostLevelBody {
   seriesId: string;
@@ -19,7 +19,7 @@ interface PostLevelEvent extends HandlerEvent {
   };
 }
 
-async function postLevel(event: PostLevelEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function postLevel(event: PostLevelEvent): Promise<HandlerResponse> {
   // Currently only for saving a user's spoiler level in a given series.
   // The book ID represents how far the user has progressed, and therefor
   // what is or isn't a spoiler

@@ -4,15 +4,6 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface TokenData {
   sub: string;
-  [key: string]: unknown;ß
-}
-
-interface UserLevelRecord {
-  primary_key: string;
-  sort_key: string;
-  level: string;
-  updatedAt: string;
-  updatedBy: string;
   [key: string]: unknown;
 }
 

@@ -3,9 +3,8 @@ import createError from 'http-errors';
 import validator from '@middy/validator';
 import { createNewToken } from '../../lib/token.js';
 import dbQueryUserByEmail from '../../db/dbQueryUserByEmail.js';
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import postLoginSchema from '../../schemas/postLoginSchema.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface LoginBody {
   email: string;
@@ -30,14 +29,7 @@ interface DbUser {
   [key: string]: unknown;
 }
 
-function extractStringValue(attrValue: AttributeValue | undefined): string {
-  if (attrValue && 'S' in attrValue) {
-    return attrValue.S || '';
-  }
-  return '';
-}
-
-async function postLogin(event: LoginEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function postLogin(event: LoginEvent): Promise<HandlerResponse> {
   const { email, password } = event.body;
 
   try {

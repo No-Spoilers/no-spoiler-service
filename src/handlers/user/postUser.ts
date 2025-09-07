@@ -2,7 +2,7 @@ import validator from '@middy/validator';
 import postUserSchema from '../../schemas/postUserSchema.js';
 import createError from 'http-errors';
 import dbCreateUser from '../../db/dbCreateUser.js';
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import { createNewToken } from '../../lib/token.js';
 import { transpileSchema } from '@middy/validator/transpile';
 
@@ -25,7 +25,7 @@ interface UserResponse {
   [key: string]: unknown;
 }
 
-async function postUser(event: PostUserEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function postUser(event: PostUserEvent): Promise<HandlerResponse> {
   const { name, email, password } = event.body;
 
   try {

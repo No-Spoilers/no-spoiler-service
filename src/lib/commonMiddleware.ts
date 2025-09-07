@@ -111,4 +111,4 @@ function commonMiddleware<T = HandlerEvent>(handler: TypedHandlerFunction<T>) {
 }
 
 export default commonMiddleware;
-export type { HandlerEvent, HandlerContext, HandlerResponse, HandlerFunction, TypedHandlerFunction, TokenData };
+export type { HandlerEvent, HandlerResponse, HandlerFunction, TypedHandlerFunction, TokenData };

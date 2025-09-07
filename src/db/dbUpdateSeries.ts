@@ -8,15 +8,6 @@ interface SeriesUpdateData {
   [key: string]: unknown;
 }
 
-interface SeriesRecord {
-  primary_key: string;
-  sort_key: string;
-  name?: string;
-  text?: string;
-  updatedAt: string;
-  [key: string]: unknown;
-}
-
 interface SeriesResponse {
   seriesId: string;
   name?: string;

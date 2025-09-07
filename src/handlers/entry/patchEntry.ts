@@ -1,6 +1,6 @@
 import createError from 'http-errors';
 import patchEntrySchema from '../../schemas/patchEntrySchema.js';
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbGetEntryBySeriesIdAndEntryId from '../../db/dbGetEntryBySeriesIdAndEntryId.js';
 import dbUpdateEntry from '../../db/dbUpdateEntry.js';
 import validator from '@middy/validator';
@@ -23,7 +23,7 @@ interface PatchEntryEvent extends HandlerEvent {
   };
 }
 
-async function patchEntry(event: PatchEntryEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function patchEntry(event: PatchEntryEvent): Promise<HandlerResponse> {
   const newEntry = event.body;
   const { token } = event;
 

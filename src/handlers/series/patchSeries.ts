@@ -1,4 +1,4 @@
-import commonMiddleware, { HandlerEvent, HandlerContext, HandlerResponse } from '../../lib/commonMiddleware.js';
+import commonMiddleware, { HandlerEvent, HandlerResponse } from '../../lib/commonMiddleware.js';
 import dbUpdateSeries from '../../db/dbUpdateSeries.js';
 
 interface PathParameters {
@@ -17,7 +17,7 @@ interface PatchSeriesEvent extends HandlerEvent {
   body: SeriesUpdateData;
 }
 
-async function patchSeries(event: PatchSeriesEvent, _context: HandlerContext): Promise<HandlerResponse> {
+async function patchSeries(event: PatchSeriesEvent): Promise<HandlerResponse> {
   const { contentId } = event.pathParameters;
   const seriesData = event.body;
 
