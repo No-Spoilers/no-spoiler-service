@@ -1,6 +1,7 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { updateDbItem } from '../lib/dynamodb-client.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface SeriesUpdateData {
   name?: string;
@@ -15,7 +16,7 @@ interface SeriesResponse {
   updatedAt: string;
 }
 
-export default async function dbUpdateSeries(
+export async function dbUpdateSeries(
   seriesId: string,
   seriesData: SeriesUpdateData,
 ): Promise<SeriesResponse | null> {

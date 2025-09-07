@@ -1,4 +1,4 @@
-import generateId from '../lib/base64id.js';
+import { generateId } from '../lib/base64id.js';
 import { putDbItem } from '../lib/dynamodb-client.js';
 
 interface SeriesData {
@@ -32,7 +32,7 @@ interface SeriesResponse {
   updatedAt: string;
 }
 
-export default async function dbCreateSeries(
+export async function dbCreateSeries(
   seriesData: SeriesData,
   token: TokenData,
 ): Promise<SeriesResponse> {

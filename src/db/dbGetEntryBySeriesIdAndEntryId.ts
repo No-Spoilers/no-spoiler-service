@@ -1,6 +1,7 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { getDbItem } from '../lib/dynamodb-client.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface EntryRecord {
   seriesId: string;
@@ -13,7 +14,7 @@ interface EntryRecord {
   [key: string]: unknown;
 }
 
-export default async function dbGetEntryBySeriesIdAndEntryId(
+export async function dbGetEntryBySeriesIdAndEntryId(
   seriesId: string,
   entryId: string,
 ): Promise<EntryRecord | null> {

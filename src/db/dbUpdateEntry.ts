@@ -1,6 +1,7 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { updateDbItem } from '../lib/dynamodb-client.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface EntryText {
   [bookId: string]: string;
@@ -34,7 +35,7 @@ interface EntryResponse {
   updatedBy: string;
 }
 
-export default async function dbUpdateEntry(
+export async function dbUpdateEntry(
   entry: EntryData | EntryUpdateRecord,
   newEntry: NewEntryData,
   userId: string,

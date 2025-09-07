@@ -1,6 +1,7 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { updateDbItem } from '../lib/dynamodb-client.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface TokenData {
   sub: string;
@@ -15,7 +16,7 @@ interface UserLevelResponse {
   updatedBy: string;
 }
 
-export default async function dbUpdateUserLevel(
+export async function dbUpdateUserLevel(
   token: TokenData,
   seriesId: string,
   bookId: string,

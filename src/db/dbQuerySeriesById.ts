@@ -1,6 +1,7 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { searchDbItems } from '../lib/dynamodb-client.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface SeriesItem {
   seriesId: string;
@@ -11,15 +12,7 @@ interface SeriesItem {
   [key: string]: unknown;
 }
 
-interface SeriesRecord {
-  primary_key: string;
-  sort_key: string;
-  name?: string;
-  text?: string;
-  [key: string]: unknown;
-}
-
-export default async function dbQuerySeriesById(
+export async function dbQuerySeriesById(
   contentId: string,
 ): Promise<SeriesItem[] | null> {
   try {

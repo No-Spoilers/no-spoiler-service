@@ -1,11 +1,11 @@
-import createError from 'http-errors';
-import { searchDbItems } from '../lib/dynamodb-client.js';
-import {
+import type {
   AttributeValue,
   QueryCommandInput,
-  Condition,
   ComparisonOperator,
 } from '@aws-sdk/client-dynamodb';
+
+import createError from 'http-errors';
+import { searchDbItems } from '../lib/dynamodb-client.js';
 
 interface UserRecord {
   userId: string;
@@ -17,7 +17,7 @@ interface UserRecord {
   [key: string]: unknown;
 }
 
-export default async function dbQueryUserByEmail(
+export async function dbQueryUserByEmail(
   email: string,
 ): Promise<UserRecord | null> {
   try {

@@ -1,6 +1,10 @@
+import type {
+  AttributeValue,
+  QueryCommandInput,
+} from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { searchDbItems } from '../lib/dynamodb-client.js';
-import { AttributeValue, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 
 interface SeriesRecord {
   seriesId: string;
@@ -12,7 +16,7 @@ interface SeriesRecord {
   [key: string]: unknown;
 }
 
-export default async function dbQuerySeries(): Promise<SeriesRecord[] | Error> {
+export async function dbQuerySeries(): Promise<SeriesRecord[] | Error> {
   try {
     const params: Partial<QueryCommandInput> = {
       IndexName: 'ReverseLookup',

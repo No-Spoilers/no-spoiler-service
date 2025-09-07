@@ -1,4 +1,4 @@
-import generateId from '../lib/base64id.js';
+import { generateId } from '../lib/base64id.js';
 import { putDbItem } from '../lib/dynamodb-client.js';
 
 interface BookData {
@@ -36,7 +36,7 @@ interface BookResponse {
   updatedAt: string;
 }
 
-export default async function dbCreateBook(
+export async function dbCreateBook(
   bookData: BookData,
   token: TokenData,
 ): Promise<BookResponse> {

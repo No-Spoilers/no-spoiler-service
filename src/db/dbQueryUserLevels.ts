@@ -1,18 +1,13 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { searchDbItems } from '../lib/dynamodb-client.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
-
-interface UserLevelRecord {
-  sort_key: string;
-  level: string;
-  [key: string]: unknown;
-}
 
 interface LevelsBySeries {
   [seriesId: string]: string;
 }
 
-export default async function dbQueryUserLevels(
+export async function dbQueryUserLevels(
   userId: string,
 ): Promise<LevelsBySeries> {
   try {

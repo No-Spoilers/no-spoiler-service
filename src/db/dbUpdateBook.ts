@@ -1,6 +1,7 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { updateDbItem } from '../lib/dynamodb-client.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface BookUpdateData {
   seriesId: string;
@@ -16,17 +17,6 @@ interface TokenData {
   [key: string]: unknown;
 }
 
-interface BookRecord {
-  primary_key: string;
-  sort_key: string;
-  name?: string;
-  text?: string;
-  pubDate?: string;
-  updatedAt: string;
-  updatedBy: string;
-  [key: string]: unknown;
-}
-
 interface BookResponse {
   seriesId: string;
   bookId: string;
@@ -37,7 +27,7 @@ interface BookResponse {
   updatedBy: string;
 }
 
-export default async function dbUpdateBook(
+export async function dbUpdateBook(
   bookData: BookUpdateData,
   token: TokenData,
 ): Promise<BookResponse> {

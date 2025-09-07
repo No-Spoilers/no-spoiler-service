@@ -1,13 +1,14 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import createError from 'http-errors';
 import { deleteDbItem } from '../lib/dynamodb-client.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface DeleteResult {
   Attributes?: Record<string, AttributeValue>;
   [key: string]: unknown;
 }
 
-export default async function dbDeleteItem(
+export async function dbDeleteItem(
   primary_key: string,
   sort_key: string,
 ): Promise<Record<string, AttributeValue> | null> {

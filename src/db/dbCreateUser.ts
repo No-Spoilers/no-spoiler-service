@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
-import generateId from '../lib/base64id.js';
+import { generateId } from '../lib/base64id.js';
 import { putDbItem } from '../lib/dynamodb-client.js';
-import dbQueryUserByEmail from './dbQueryUserByEmail.js';
+import { dbQueryUserByEmail } from './dbQueryUserByEmail.js';
 
 interface User {
   primary_key: string;
@@ -28,7 +28,7 @@ interface ExistingUserResponse {
   [key: string]: unknown;
 }
 
-export default async function dbCreateUser(
+export async function dbCreateUser(
   name: string,
   preservedCaseEmail: string,
   password: string,
