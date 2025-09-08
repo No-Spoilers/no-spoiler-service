@@ -1,10 +1,9 @@
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
 import createError from 'http-errors';
-import dbUpdateBook from '../../db/dbUpdateBook.js';
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { dbUpdateBook } from '../../db/dbUpdateBook.js';
+import { dbGetBookBySeriesIdAndBookId } from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
 interface PathParameters {
   seriesId: string;
@@ -21,22 +20,18 @@ interface BookUpdateData {
   [key: string]: unknown;
 }
 
-interface PatchBookEvent extends HandlerEvent {
+interface PatchBookEvent extends AuthLambdaEvent {
   pathParameters: PathParameters;
   body: Partial<BookUpdateData>;
-  token?: {
-    sub: string;
-    userId: string;
-    email: string;
-    [key: string]: unknown;
-  };
 }
 
-async function patchBook(event: PatchBookEvent): Promise<HandlerResponse> {
+async function patchBook(event: PatchBookEvent) {
   const { token } = event;
   const { seriesId, bookId } = event.pathParameters;
+  const foo = event.body;
+
   const bookData: BookUpdateData = {
-    ...event.body,
+    ...foo,
     seriesId,
     bookId,
   };

@@ -1,8 +1,6 @@
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import dbDeleteItem from '../../db/dbDeleteItem.js';
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { dbDeleteItem } from '../../db/dbDeleteItem.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface PathParameters {
@@ -10,7 +8,7 @@ interface PathParameters {
   [key: string]: string;
 }
 
-interface DeleteSeriesEvent extends HandlerEvent {
+interface DeleteSeriesEvent extends AuthLambdaEvent {
   pathParameters: PathParameters;
 }
 
@@ -19,9 +17,7 @@ interface DeletedSeriesResponse {
   [key: string]: unknown;
 }
 
-async function deleteSeries(
-  event: DeleteSeriesEvent,
-): Promise<HandlerResponse> {
+async function deleteSeries(event: DeleteSeriesEvent) {
   const { contentId } = event.pathParameters;
 
   const deletedSeries = await dbDeleteItem(contentId, 'TOP~');

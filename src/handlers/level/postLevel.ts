@@ -1,10 +1,9 @@
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
 import createError from 'http-errors';
-import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
-import dbUpdateUserLevel from '../../db/dbUpdateUserLevel.js';
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
+import { dbGetBookBySeriesIdAndBookId } from '../../db/dbGetBookBySeriesIdAndBookId.js';
+import { dbUpdateUserLevel } from '../../db/dbUpdateUserLevel.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
 
 interface PostLevelBody {
   seriesId: string;
@@ -12,17 +11,11 @@ interface PostLevelBody {
   [key: string]: unknown;
 }
 
-interface PostLevelEvent extends HandlerEvent {
+interface PostLevelEvent extends AuthLambdaEvent {
   body: PostLevelBody;
-  token?: {
-    sub: string;
-    userId: string;
-    email: string;
-    [key: string]: unknown;
-  };
 }
 
-async function postLevel(event: PostLevelEvent): Promise<HandlerResponse> {
+async function postLevel(event: PostLevelEvent) {
   // Currently only for saving a user's spoiler level in a given series.
   // The book ID represents how far the user has progressed, and therefor
   // what is or isn't a spoiler

@@ -1,12 +1,11 @@
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
 import createError from 'http-errors';
-import patchEntrySchema from '../../schemas/patchEntrySchema.js';
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import dbGetEntryBySeriesIdAndEntryId from '../../db/dbGetEntryBySeriesIdAndEntryId.js';
-import dbUpdateEntry from '../../db/dbUpdateEntry.js';
 import validator from '@middy/validator';
+import { patchEntrySchema } from '../../schemas/patchEntrySchema.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { dbGetEntryBySeriesIdAndEntryId } from '../../db/dbGetEntryBySeriesIdAndEntryId.js';
+import { dbUpdateEntry } from '../../db/dbUpdateEntry.js';
 
 interface NewEntryData {
   seriesId: string;
@@ -16,17 +15,11 @@ interface NewEntryData {
   [key: string]: unknown;
 }
 
-interface PatchEntryEvent extends HandlerEvent {
+interface PatchEntryEvent extends AuthLambdaEvent {
   body: NewEntryData;
-  token?: {
-    sub: string;
-    userId: string;
-    email: string;
-    [key: string]: unknown;
-  };
 }
 
-async function patchEntry(event: PatchEntryEvent): Promise<HandlerResponse> {
+async function patchEntry(event: PatchEntryEvent) {
   const newEntry = event.body;
   const { token } = event;
 

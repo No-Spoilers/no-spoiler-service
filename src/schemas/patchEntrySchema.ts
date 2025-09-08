@@ -1,6 +1,6 @@
 import { JSONSchema7 } from 'json-schema';
 
-export const postBookSchema: JSONSchema7 = {
+export const patchEntrySchema: JSONSchema7 = {
   type: 'object',
   required: ['body'],
   properties: {

@@ -1,9 +1,8 @@
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import dbDeleteItem from '../../db/dbDeleteItem.js';
-import dbQueryUserByEmail from '../../db/dbQueryUserByEmail.js';
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { dbDeleteItem } from '../../db/dbDeleteItem.js';
+import { dbQueryUserByEmail } from '../../db/dbQueryUserByEmail.js';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface DeleteUserBody {
@@ -11,14 +10,8 @@ interface DeleteUserBody {
   [key: string]: unknown;
 }
 
-interface DeleteUserEvent extends HandlerEvent {
+interface DeleteUserEvent extends AuthLambdaEvent {
   body: DeleteUserBody;
-  token?: {
-    sub: string;
-    userId: string;
-    email: string;
-    [key: string]: unknown;
-  };
 }
 
 interface DeletedUserResponse {
@@ -26,7 +19,7 @@ interface DeletedUserResponse {
   email: string;
 }
 
-async function deleteUser(event: DeleteUserEvent): Promise<HandlerResponse> {
+async function deleteUser(event: DeleteUserEvent) {
   const { token } = event;
   let { email } = event.body;
 

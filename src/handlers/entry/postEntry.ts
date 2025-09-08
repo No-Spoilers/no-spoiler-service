@@ -1,12 +1,11 @@
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
 import validator from '@middy/validator';
-import postEntrySchema from '../../schemas/postEntrySchema.js';
 import createError from 'http-errors';
-import dbCreateEntry from '../../db/dbCreateEntry.js';
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import dbGetBookBySeriesIdAndBookId from '../../db/dbGetBookBySeriesIdAndBookId.js';
+import { postEntrySchema } from '../../schemas/postEntrySchema.js';
+import { dbCreateEntry } from '../../db/dbCreateEntry.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { dbGetBookBySeriesIdAndBookId } from '../../db/dbGetBookBySeriesIdAndBookId.js';
 
 interface EntryData {
   seriesId: string;
@@ -16,17 +15,11 @@ interface EntryData {
   [key: string]: unknown;
 }
 
-interface PostEntryEvent extends HandlerEvent {
+interface PostEntryEvent extends AuthLambdaEvent {
   body: EntryData;
-  token?: {
-    sub: string;
-    userId: string;
-    email: string;
-    [key: string]: unknown;
-  };
 }
 
-async function postEntry(event: PostEntryEvent): Promise<HandlerResponse> {
+async function postEntry(event: PostEntryEvent) {
   const entryData = event.body;
   const { token } = event;
 

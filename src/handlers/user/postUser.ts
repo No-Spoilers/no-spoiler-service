@@ -1,11 +1,10 @@
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
 import validator from '@middy/validator';
-import postUserSchema from '../../schemas/postUserSchema.js';
 import createError from 'http-errors';
-import dbCreateUser from '../../db/dbCreateUser.js';
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
+import { postUserSchema } from '../../schemas/postUserSchema.js';
+import { dbCreateUser } from '../../db/dbCreateUser.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
 import { createNewToken } from '../../lib/token.js';
 import { transpileSchema } from '@middy/validator/transpile';
 
@@ -15,7 +14,7 @@ interface PostUserBody {
   password: string;
 }
 
-interface PostUserEvent extends HandlerEvent {
+interface PostUserEvent extends AuthLambdaEvent {
   body: PostUserBody;
 }
 
@@ -28,7 +27,7 @@ interface UserResponse {
   [key: string]: unknown;
 }
 
-async function postUser(event: PostUserEvent): Promise<HandlerResponse> {
+async function postUser(event: PostUserEvent) {
   const { name, email, password } = event.body;
 
   try {

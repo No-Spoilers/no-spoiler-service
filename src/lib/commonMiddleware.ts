@@ -12,7 +12,7 @@ import httpErrorHandler from '@middy/http-error-handler';
 import httpEventNormalizer from '@middy/http-event-normalizer';
 import { verifyToken } from './token.js';
 
-export type AuthLambdaEvent = LambdaEvent & {
+export type AuthLambdaEvent = Omit<LambdaEvent, 'body'> & {
   token?: VerifiedToken;
 };
 

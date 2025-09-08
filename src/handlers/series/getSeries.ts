@@ -1,10 +1,8 @@
 import createError from 'http-errors';
-import dbQuerySeries from '../../db/dbQuerySeries.js';
-import commonMiddleware, {
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
+import { dbQuerySeries } from '../../db/dbQuerySeries.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
 
-async function getSeries(): Promise<HandlerResponse> {
+async function getSeries() {
   try {
     const seriesList = await dbQuerySeries();
 

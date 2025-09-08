@@ -1,20 +1,10 @@
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+
 import createError from 'http-errors';
-import dbQueryUserLevels from '../../db/dbQueryUserLevels.js';
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
+import { dbQueryUserLevels } from '../../db/dbQueryUserLevels.js';
 
-interface GetLevelsEvent extends HandlerEvent {
-  token?: {
-    sub: string;
-    userId: string;
-    email: string;
-    [key: string]: unknown;
-  };
-}
-
-async function getLevels(event: GetLevelsEvent): Promise<HandlerResponse> {
+async function getLevels(event: AuthLambdaEvent) {
   try {
     const { token } = event;
 

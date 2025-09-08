@@ -1,11 +1,10 @@
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
 import createError from 'http-errors';
 import validator from '@middy/validator';
-import postSeriesSchema from '../../schemas/postSeriesSchema.js';
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import dbCreateSeries from '../../db/dbCreateSeries.js';
+import { postSeriesSchema } from '../../schemas/postSeriesSchema.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { dbCreateSeries } from '../../db/dbCreateSeries.js';
 
 interface SeriesData {
   name: string;
@@ -13,17 +12,11 @@ interface SeriesData {
   [key: string]: unknown;
 }
 
-interface PostSeriesEvent extends HandlerEvent {
+interface PostSeriesEvent extends AuthLambdaEvent {
   body: SeriesData;
-  token?: {
-    sub: string;
-    userId: string;
-    email: string;
-    [key: string]: unknown;
-  };
 }
 
-async function postSeries(event: PostSeriesEvent): Promise<HandlerResponse> {
+async function postSeries(event: PostSeriesEvent) {
   const seriesData = event.body;
   const { token } = event;
 

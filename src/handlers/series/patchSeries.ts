@@ -1,8 +1,7 @@
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import dbUpdateSeries from '../../db/dbUpdateSeries.js';
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { dbUpdateSeries } from '../../db/dbUpdateSeries.js';
 
 interface PathParameters {
   contentId: string;
@@ -15,12 +14,12 @@ interface SeriesUpdateData {
   [key: string]: unknown;
 }
 
-interface PatchSeriesEvent extends HandlerEvent {
+interface PatchSeriesEvent extends AuthLambdaEvent {
   pathParameters: PathParameters;
   body: SeriesUpdateData;
 }
 
-async function patchSeries(event: PatchSeriesEvent): Promise<HandlerResponse> {
+async function patchSeries(event: PatchSeriesEvent) {
   const { contentId } = event.pathParameters;
   const seriesData = event.body;
 

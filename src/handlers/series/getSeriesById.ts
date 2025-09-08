@@ -1,21 +1,18 @@
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import dbQuerySeriesById from '../../db/dbQuerySeriesById.js';
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { dbQuerySeriesById } from '../../db/dbQuerySeriesById.js';
 
 interface PathParameters {
   contentId: string;
   [key: string]: string;
 }
 
-interface GetSeriesByIdEvent extends HandlerEvent {
+interface GetSeriesByIdEvent extends AuthLambdaEvent {
   pathParameters: PathParameters;
 }
 
-async function getSeriesById(
-  event: GetSeriesByIdEvent,
-): Promise<HandlerResponse> {
+async function getSeriesById(event: GetSeriesByIdEvent) {
   const { contentId } = event.pathParameters;
 
   const series = await dbQuerySeriesById(contentId);

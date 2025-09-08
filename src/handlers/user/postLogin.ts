@@ -1,20 +1,19 @@
+import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
 import bcrypt from 'bcryptjs';
 import createError from 'http-errors';
 import validator from '@middy/validator';
 import { createNewToken } from '../../lib/token.js';
-import dbQueryUserByEmail from '../../db/dbQueryUserByEmail.js';
-import commonMiddleware, {
-  HandlerEvent,
-  HandlerResponse,
-} from '../../lib/commonMiddleware.js';
-import postLoginSchema from '../../schemas/postLoginSchema.js';
+import { dbQueryUserByEmail } from '../../db/dbQueryUserByEmail.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { postLoginSchema } from '../../schemas/postLoginSchema.js';
 
 interface LoginBody {
   email: string;
   password: string;
 }
 
-interface LoginEvent extends HandlerEvent {
+interface LoginEvent extends AuthLambdaEvent {
   body: LoginBody;
 }
 
@@ -32,7 +31,7 @@ interface DbUser {
   [key: string]: unknown;
 }
 
-async function postLogin(event: LoginEvent): Promise<HandlerResponse> {
+async function postLogin(event: LoginEvent) {
   const { email, password } = event.body;
 
   try {
