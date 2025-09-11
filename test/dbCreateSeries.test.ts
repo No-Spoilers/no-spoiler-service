@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 
-import { dbCreateSeries } from '../src/db/dbCreateSeries.js';
+import { dbCreateSeries } from '../src/handlers/series/postSeries.js';
 
 describe('dbCreateSeries', () => {
   it('should create a new series', async () => {
