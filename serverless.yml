@@ -16,11 +16,11 @@ provider:
   iam:
     role:
       statements:
-        - ${file(iam/NoSpoilersTableIAM.yml):NoSpoilersTableIAM}
+        - ${file(lambda/iam/NoSpoilersTableIAM.yml):NoSpoilersTableIAM}
 
 resources:
   Resources:
-    NoSpoilersTable: ${file(resources/NoSpoilersTable.yml):NoSpoilersTable}
+    NoSpoilersTable: ${file(lambda/resources/NoSpoilersTable.yml):NoSpoilersTable}
     GatewayResponseDefault4XX:
       Type: 'AWS::ApiGateway::GatewayResponse'
       Properties:
@@ -32,30 +32,30 @@ resources:
           Ref: 'ApiGatewayRestApi'
 
 functions:
-  getRoot: ${file(src/rootFunctions.yml):RootFunctions.getRoot}
-  getHealth: ${file(src/healthFunctions.yml):HealthFunctions.getHealth}
+  getRoot: ${file(lambda/functions/rootFunctions.yml):RootFunctions.getRoot}
+  getHealth: ${file(lambda/functions/healthFunctions.yml):HealthFunctions.getHealth}
 
-  getSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeries}
-  getSeriesById: ${file(src/seriesFunctions.yml):SeriesFunctions.getSeriesById}
-  postSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.postSeries}
-  patchSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.patchSeries}
-  deleteSeries: ${file(src/seriesFunctions.yml):SeriesFunctions.deleteSeries}
+  getSeries: ${file(lambda/functions/seriesFunctions.yml):SeriesFunctions.getSeries}
+  getSeriesById: ${file(lambda/functions/seriesFunctions.yml):SeriesFunctions.getSeriesById}
+  postSeries: ${file(lambda/functions/seriesFunctions.yml):SeriesFunctions.postSeries}
+  patchSeries: ${file(lambda/functions/seriesFunctions.yml):SeriesFunctions.patchSeries}
+  deleteSeries: ${file(lambda/functions/seriesFunctions.yml):SeriesFunctions.deleteSeries}
   
-  postBook: ${file(src/bookFunctions.yml):BookFunctions.postBook}
-  patchBook: ${file(src/bookFunctions.yml):BookFunctions.patchBook}
-  deleteBook: ${file(src/bookFunctions.yml):BookFunctions.deleteBook}
+  postBook: ${file(lambda/functions/bookFunctions.yml):BookFunctions.postBook}
+  patchBook: ${file(lambda/functions/bookFunctions.yml):BookFunctions.patchBook}
+  deleteBook: ${file(lambda/functions/bookFunctions.yml):BookFunctions.deleteBook}
   
-  postEntry: ${file(src/entryFunctions.yml):EntryFunctions.postEntry}
-  patchEntry: ${file(src/entryFunctions.yml):EntryFunctions.patchEntry}
-  deleteEntry: ${file(src/entryFunctions.yml):EntryFunctions.deleteEntry}
+  postEntry: ${file(lambda/functions/entryFunctions.yml):EntryFunctions.postEntry}
+  patchEntry: ${file(lambda/functions/entryFunctions.yml):EntryFunctions.patchEntry}
+  deleteEntry: ${file(lambda/functions/entryFunctions.yml):EntryFunctions.deleteEntry}
   
-  postUser: ${file(src/userFunctions.yml):UserFunctions.postUser}
-  deleteUser: ${file(src/userFunctions.yml):UserFunctions.deleteUser}
-  postLogin: ${file(src/userFunctions.yml):UserFunctions.postLogin}
+  postUser: ${file(lambda/functions/userFunctions.yml):UserFunctions.postUser}
+  deleteUser: ${file(lambda/functions/userFunctions.yml):UserFunctions.deleteUser}
+  postLogin: ${file(lambda/functions/userFunctions.yml):UserFunctions.postLogin}
 
-  getLevels: ${file(src/levelFunctions.yml):LevelFunctions.getLevels}
-  postLevel: ${file(src/levelFunctions.yml):LevelFunctions.postLevel}
-  deleteLevel: ${file(src/levelFunctions.yml):LevelFunctions.deleteLevel}
+  getLevels: ${file(lambda/functions/levelFunctions.yml):LevelFunctions.getLevels}
+  postLevel: ${file(lambda/functions/levelFunctions.yml):LevelFunctions.postLevel}
+  deleteLevel: ${file(lambda/functions/levelFunctions.yml):LevelFunctions.deleteLevel}
   
 custom:
   NoSpoilersTable:
