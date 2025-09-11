@@ -1,3 +1,7 @@
+import type {
+  APIGatewayProxyEventV2,
+  APIGatewayProxyResultV2,
+} from 'aws-lambda';
 import type { MiddlewareObj, Request } from '@middy/core';
 import type {
   Handler as LambdaHandler,
@@ -11,6 +15,7 @@ import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpErrorHandler from '@middy/http-error-handler';
 import httpEventNormalizer from '@middy/http-event-normalizer';
 import { verifyToken } from './token.js';
+import { logger } from './utils.js';
 
 export type AuthLambdaEvent = Omit<LambdaEvent, 'body'> & {
   token?: VerifiedToken;
@@ -38,7 +43,7 @@ function logEvents(): MiddlewareObj<LambdaEvent> {
   return {
     before: (request: Request<LambdaEvent>): void => {
       if (process.env.NODE_ENV !== 'test') {
-        console.log({
+        logger({
           logType: 'incoming request',
           ...request.event,
         });
@@ -46,7 +51,7 @@ function logEvents(): MiddlewareObj<LambdaEvent> {
     },
     after: (request: Request<LambdaEvent>): void => {
       if (process.env.NODE_ENV !== 'test') {
-        console.log({
+        logger({
           logType: 'request result',
           ...request.event,
         });
@@ -70,7 +75,7 @@ function bodyNormalizer(): MiddlewareObj<LambdaEvent> {
 }
 
 export function commonMiddleware(handler: LambdaHandler) {
-  return middy(handler).use([
+  return middy<APIGatewayProxyEventV2, APIGatewayProxyResultV2>(handler).use([
     bodyNormalizer(),
     httpJsonBodyParser(),
     httpEventNormalizer(),

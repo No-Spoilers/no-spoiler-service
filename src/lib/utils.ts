@@ -47,3 +47,9 @@ export function internalServerError(error: unknown) {
   console.error('internalServerError:', error);
   return new createError.InternalServerError(String(error));
 }
+
+export function logger(message: unknown) {
+  if (process.env.NODE_ENV !== 'test') {
+    console.log(message);
+  }
+}

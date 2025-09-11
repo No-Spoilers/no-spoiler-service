@@ -2,22 +2,15 @@ import { expect } from 'chai';
 import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 
-import dbCreateSeries from '../src/db/dbCreateSeries.js';
+import { dbCreateSeries } from '../src/db/dbCreateSeries.js';
 
 describe('dbCreateSeries', () => {
-  let dynamoDBMock: any;
-
-  beforeEach(() => {
-    const dynamoDB = new DynamoDBClient({});
-    dynamoDBMock = mockClient(dynamoDB);
-  });
-
-  afterEach(() => {
-    dynamoDBMock.reset();
-  });
-
   it('should create a new series', async () => {
-    dynamoDBMock.on(PutItemCommand).resolves({ Item: { foo: 'bar' } });
+    const dynamoDB = new DynamoDBClient({});
+    const dynamoDBMock = mockClient(dynamoDB);
+    dynamoDBMock.on(PutItemCommand).resolves({
+      Attributes: { foo: { S: 'bar' } },
+    });
 
     const seriesData = {
       name: 'test name',
@@ -41,5 +34,6 @@ describe('dbCreateSeries', () => {
     expect(result.seriesId).to.match(/^t/);
     expect(result.createdAt).to.match(/Z$/);
     expect(result.updatedAt).to.match(/Z$/);
+    dynamoDBMock.reset();
   });
 });

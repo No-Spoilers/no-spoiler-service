@@ -1,4 +1,8 @@
 {
+  "include": [
+    "src/**/*",
+    "test/**/*"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -28,10 +32,6 @@
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo"
   },
-  "include": [
-    "src/**/*",
-    "test/**/*"
-  ],
   "exclude": [
     "node_modules",
     "dist",

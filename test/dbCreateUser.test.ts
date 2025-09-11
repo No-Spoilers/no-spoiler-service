@@ -6,15 +6,10 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 
-import dbCreateUser from '../src/db/dbCreateUser.js';
+import { dbCreateUser } from '../src/db/dbCreateUser.js';
 
 describe('dbCreateUser', () => {
-  let dynamoDBMock: any;
-
-  before(() => {
-    // Create a global mock that applies to all DynamoDB clients
-    dynamoDBMock = mockClient(DynamoDBClient);
-  });
+  const dynamoDBMock = mockClient(DynamoDBClient);
 
   beforeEach(() => {
     // Reset the mock before each test but keep the same instance
