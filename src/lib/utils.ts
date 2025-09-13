@@ -17,6 +17,21 @@ export function extractStringValue(
   return '';
 }
 
+export function extractTextValue(attrValue: AttributeValue | undefined): {
+  [key: string]: string;
+} {
+  if (attrValue && 'M' in attrValue && attrValue.M) {
+    const text: { [key: string]: string } = {};
+    Object.entries(attrValue.M).forEach(([key, value]) => {
+      if (value && 'S' in value) {
+        text[key] = value.S || '';
+      }
+    });
+    return text;
+  }
+  return {};
+}
+
 export function success(body: unknown) {
   return {
     statusCode: 200,

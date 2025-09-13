@@ -1,9 +1,9 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
-import createError from 'http-errors';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
 import { dbUpdateBook } from '../../db/dbUpdateBook.js';
-import { dbGetBookBySeriesIdAndBookId } from '../../db/dbGetBookBySeriesIdAndBookId.js';
+import { getDbItem } from '../../lib/dynamodb-client.js';
+import { internalServerError } from '../../lib/utils.js';
 
 interface PathParameters {
   seriesId: string;
@@ -42,15 +42,19 @@ async function patchBook(event: PatchBookEvent) {
       body: JSON.stringify({ error: 'invalid token' }),
     };
   }
+  if (!seriesId || !bookId) {
+    return {
+      statusCode: 400,
+      body: { error: 'Series and book IDs are required.' },
+    };
+  }
 
   try {
-    const book = await dbGetBookBySeriesIdAndBookId(seriesId, bookId);
+    const book = await getDbItem(seriesId, bookId);
     if (!book) {
       return {
         statusCode: 400,
-        body: JSON.stringify({
-          error: `Book with ID "${seriesId}/${bookId}" not found.`,
-        }),
+        body: { error: `Book with ID "${seriesId}/${bookId}" not found.` },
       };
     }
 
@@ -61,8 +65,7 @@ async function patchBook(event: PatchBookEvent) {
       body: JSON.stringify(newBook),
     };
   } catch (error) {
-    console.error(error);
-    throw new createError.InternalServerError(error as string);
+    throw internalServerError(error);
   }
 }
 

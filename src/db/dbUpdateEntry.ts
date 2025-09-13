@@ -1,6 +1,10 @@
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 
-import { extractStringValue, internalServerError } from '../lib/utils.js';
+import {
+  extractStringValue,
+  extractTextValue,
+  internalServerError,
+} from '../lib/utils.js';
 import { updateDbItem } from '../lib/dynamodb-client.js';
 
 interface EntryText {
@@ -89,19 +93,6 @@ export async function dbUpdateEntry(
   } catch (error) {
     throw internalServerError(error);
   }
-}
-
-function extractTextValue(attrValue: AttributeValue | undefined): EntryText {
-  if (attrValue && 'M' in attrValue && attrValue.M) {
-    const text: EntryText = {};
-    Object.entries(attrValue.M).forEach(([key, value]) => {
-      if (value && 'S' in value) {
-        text[key] = value.S || '';
-      }
-    });
-    return text;
-  }
-  return {};
 }
 
 function convertToAttributeValue(

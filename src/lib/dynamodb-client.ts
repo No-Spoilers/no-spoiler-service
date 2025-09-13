@@ -20,14 +20,14 @@ const dynamoClientConfig = { region: 'us-east-1' };
 const client = new DynamoDBClient(dynamoClientConfig);
 
 export async function getDbItem(
-  primary_key: AttributeValue,
-  sort_key: AttributeValue,
+  primaryKey: string,
+  sortKey: string,
 ): Promise<Record<string, AttributeValue> | undefined> {
   const params = {
     TableName,
     Key: {
-      primary_key,
-      sort_key,
+      primary_key: { S: primaryKey },
+      sort_key: { S: sortKey },
     },
   };
   const command = new GetItemCommand(params);

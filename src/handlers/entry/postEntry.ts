@@ -1,12 +1,12 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
 import validator from '@middy/validator';
-import createError from 'http-errors';
 import { postEntrySchema } from '../../schemas/postEntrySchema.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
-import { dbGetBookBySeriesIdAndBookId } from '../../db/dbGetBookBySeriesIdAndBookId.js';
 import { generateId } from '../../lib/base64id.js';
 import { putDbItem } from '../../lib/dynamodb-client.js';
+import { getDbItem } from '../../lib/dynamodb-client.js';
+import { internalServerError } from '../../lib/utils.js';
 
 interface EntryRecord {
   primary_key: string;
@@ -44,6 +44,7 @@ interface PostEntryEvent extends AuthLambdaEvent {
 async function postEntry(event: PostEntryEvent) {
   const entryData = event.body;
   const { token } = event;
+  const { seriesId, bookId } = event.body;
 
   if (!token) {
     return {
@@ -51,18 +52,19 @@ async function postEntry(event: PostEntryEvent) {
       body: JSON.stringify({ error: 'invalid token' }),
     };
   }
+  if (!seriesId || !bookId) {
+    return {
+      statusCode: 400,
+      body: { error: 'Series and book IDs are required.' },
+    };
+  }
 
   try {
-    const book = await dbGetBookBySeriesIdAndBookId(
-      entryData.seriesId,
-      entryData.bookId,
-    );
+    const book = await getDbItem(seriesId, bookId);
     if (!book) {
       return {
         statusCode: 400,
-        body: JSON.stringify({
-          error: `Book with ID "${entryData.bookId}" in "${entryData.seriesId}" not found.`,
-        }),
+        body: { error: `Book with ID "${bookId}" in "${seriesId}" not found.` },
       };
     }
 
@@ -73,8 +75,7 @@ async function postEntry(event: PostEntryEvent) {
       body: JSON.stringify(newEntry),
     };
   } catch (error) {
-    console.error(error);
-    throw new createError.InternalServerError(error as string);
+    throw internalServerError(error);
   }
 }
 

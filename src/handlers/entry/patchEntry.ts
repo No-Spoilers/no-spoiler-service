@@ -1,11 +1,15 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
-import createError from 'http-errors';
 import validator from '@middy/validator';
 import { patchEntrySchema } from '../../schemas/patchEntrySchema.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
-import { dbGetEntryBySeriesIdAndEntryId } from '../../db/dbGetEntryBySeriesIdAndEntryId.js';
 import { dbUpdateEntry } from '../../db/dbUpdateEntry.js';
+import { getDbItem } from '../../lib/dynamodb-client.js';
+import {
+  extractStringValue,
+  extractTextValue,
+  internalServerError,
+} from '../../lib/utils.js';
 
 interface NewEntryData {
   seriesId: string;
@@ -22,6 +26,7 @@ interface PatchEntryEvent extends AuthLambdaEvent {
 async function patchEntry(event: PatchEntryEvent) {
   const newEntry = event.body;
   const { token } = event;
+  const { seriesId, entryId } = event.body;
 
   if (!token) {
     return {
@@ -29,30 +34,38 @@ async function patchEntry(event: PatchEntryEvent) {
       body: JSON.stringify({ error: 'invalid token' }),
     };
   }
+  if (!seriesId || !entryId) {
+    return {
+      statusCode: 400,
+      body: { error: 'Series and entry IDs are required.' },
+    };
+  }
 
   try {
-    const entry = await dbGetEntryBySeriesIdAndEntryId(
-      newEntry.seriesId,
-      newEntry.entryId,
-    );
+    const entry = await getDbItem(seriesId, entryId);
     if (!entry) {
       return {
         statusCode: 400,
-        body: JSON.stringify({
-          error: `Entry with ID "${newEntry.entryId}" in "${newEntry.seriesId}" not found.`,
-        }),
+        body: {
+          error: `Entry with ID "${entryId}" in "${seriesId}" not found.`,
+        },
       };
     }
 
-    const result = await dbUpdateEntry(entry, newEntry, token.sub);
+    const entryRecord = {
+      seriesId: extractStringValue(entry.primary_key),
+      entryId: extractStringValue(entry.sort_key),
+      text: extractTextValue(entry.text),
+    };
+
+    const result = await dbUpdateEntry(entryRecord, newEntry, token.sub);
 
     return {
       statusCode: 200,
       body: JSON.stringify(result),
     };
   } catch (error) {
-    console.error(error);
-    throw new createError.InternalServerError(error as string);
+    throw internalServerError(error);
   }
 }
 

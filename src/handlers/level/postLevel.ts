@@ -1,9 +1,9 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
-import createError from 'http-errors';
-import { dbGetBookBySeriesIdAndBookId } from '../../db/dbGetBookBySeriesIdAndBookId.js';
+import { internalServerError } from '../../lib/utils.js';
 import { dbUpdateUserLevel } from '../../db/dbUpdateUserLevel.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { getDbItem } from '../../lib/dynamodb-client.js';
 
 interface PostLevelBody {
   seriesId: string;
@@ -29,17 +29,21 @@ async function postLevel(event: PostLevelEvent) {
       body: JSON.stringify({ error: 'invalid token' }),
     };
   }
+  if (!seriesId || !bookId) {
+    return {
+      statusCode: 400,
+      body: { error: 'Series and book IDs are required.' },
+    };
+  }
 
   try {
-    if (bookId !== '') {
-      const book = await dbGetBookBySeriesIdAndBookId(seriesId, bookId);
+    const book = await getDbItem(seriesId, bookId);
 
-      if (!book) {
-        return {
-          statusCode: 400,
-          body: JSON.stringify({ error: 'Series or Book not found.' }),
-        };
-      }
+    if (!book) {
+      return {
+        statusCode: 400,
+        body: { error: `Book with ID "${bookId}" in "${seriesId}" not found.` },
+      };
     }
 
     const spoilerState = await dbUpdateUserLevel(token, seriesId, bookId);
@@ -49,8 +53,7 @@ async function postLevel(event: PostLevelEvent) {
       body: JSON.stringify(spoilerState),
     };
   } catch (error) {
-    console.error(error);
-    throw new createError.InternalServerError(error as string);
+    throw internalServerError(error);
   }
 }
 
