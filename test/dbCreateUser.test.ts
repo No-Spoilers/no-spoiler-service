@@ -6,7 +6,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 
-import { dbCreateUser } from '../src/db/dbCreateUser.js';
+import { dbCreateUser } from '../src/handlers/user/postUser.js';
 
 describe('dbCreateUser', () => {
   const dynamoDBMock = mockClient(DynamoDBClient);

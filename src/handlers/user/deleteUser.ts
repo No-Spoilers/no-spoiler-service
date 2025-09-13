@@ -1,9 +1,9 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
-import { dbDeleteItem } from '../../db/dbDeleteItem.js';
+import { extractStringValue } from '../../lib/utils.js';
+import { deleteDbItem } from '../../lib/dynamodb-client.js';
 import { dbQueryUserByEmail } from '../../db/dbQueryUserByEmail.js';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 interface DeleteUserBody {
   email: string;
@@ -48,31 +48,29 @@ async function deleteUser(event: DeleteUserEvent) {
     };
   }
 
-  const result = await dbDeleteItem('user', email);
+  const result = await deleteDbItem('user', email);
 
-  if (!result) {
+  const deletedUser = result.Attributes;
+
+  if (!deletedUser) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: `user:${email} not found.` }),
     };
   }
 
-  const deletedUser: DeletedUserResponse = {
-    name: extractStringValue(result.name),
-    email: extractStringValue(result.preservedCaseEmail),
+  const responseUser: DeletedUserResponse = {
+    name: extractStringValue(deletedUser.name),
+    email: extractStringValue(deletedUser.preservedCaseEmail),
   };
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'user successfully deleted', deletedUser }),
+    body: JSON.stringify({
+      message: 'user successfully deleted',
+      responseUser,
+    }),
   };
-}
-
-function extractStringValue(attrValue: AttributeValue | undefined): string {
-  if (attrValue && 'S' in attrValue) {
-    return attrValue.S || '';
-  }
-  return '';
 }
 
 export const handler = commonMiddleware(deleteUser);

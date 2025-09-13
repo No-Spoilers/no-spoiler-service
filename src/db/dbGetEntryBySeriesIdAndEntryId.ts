@@ -1,6 +1,6 @@
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 
-import createError from 'http-errors';
+import { internalServerError, extractStringValue } from '../lib/utils.js';
 import { getDbItem } from '../lib/dynamodb-client.js';
 
 interface EntryRecord {
@@ -35,16 +35,8 @@ export async function dbGetEntryBySeriesIdAndEntryId(
 
     return entryRecord;
   } catch (error) {
-    console.error(error);
-    throw new createError.InternalServerError(error as string);
+    throw internalServerError(error);
   }
-}
-
-function extractStringValue(attrValue: AttributeValue | undefined): string {
-  if (attrValue && 'S' in attrValue) {
-    return attrValue.S || '';
-  }
-  return '';
 }
 
 function extractTextValue(attrValue: AttributeValue | undefined): {

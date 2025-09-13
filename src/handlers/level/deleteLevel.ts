@@ -2,7 +2,7 @@ import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
-import { dbDeleteItem } from '../../db/dbDeleteItem.js';
+import { deleteDbItem } from '../../lib/dynamodb-client.js';
 
 interface PathParameters {
   seriesId: string;
@@ -32,7 +32,9 @@ async function deleteLevel(event: DeleteLevelEvent) {
 
   const { sub: userId } = token;
 
-  const deletedLevel = await dbDeleteItem(userId, seriesId);
+  const result = await deleteDbItem(userId, seriesId);
+
+  const deletedLevel = result.Attributes;
 
   if (!deletedLevel) {
     return {

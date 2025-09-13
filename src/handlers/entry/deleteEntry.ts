@@ -1,8 +1,8 @@
-import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
-import { dbDeleteItem } from '../../db/dbDeleteItem.js';
+import { extractStringValue } from '../../lib/utils.js';
+import { deleteDbItem } from '../../lib/dynamodb-client.js';
 
 interface PathParameters {
   seriesId: string;
@@ -23,7 +23,9 @@ interface DeletedEntryResponse {
 async function deleteEntry(event: DeleteEntryEvent) {
   const { seriesId, entryId } = event.pathParameters;
 
-  const removedEntry = await dbDeleteItem(seriesId, entryId);
+  const result = await deleteDbItem(seriesId, entryId);
+
+  const removedEntry = result.Attributes;
 
   if (!removedEntry) {
     return {
@@ -53,13 +55,6 @@ async function deleteEntry(event: DeleteEntryEvent) {
       deletedEntry: responseEntry,
     }),
   };
-}
-
-function extractStringValue(attrValue: AttributeValue | undefined): string {
-  if (attrValue && 'S' in attrValue) {
-    return attrValue.S || '';
-  }
-  return '';
 }
 
 export const handler = commonMiddleware(deleteEntry);

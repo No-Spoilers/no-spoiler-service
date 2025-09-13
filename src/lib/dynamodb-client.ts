@@ -136,15 +136,12 @@ export function updateMultipleDbItems(
   return client.send(command);
 }
 
-export function deleteDbItem(
-  primary_key: AttributeValue,
-  sort_key: AttributeValue,
-): Promise<unknown> {
+export function deleteDbItem(primaryKey: string, sortKey: string) {
   const params = {
     TableName,
     Key: {
-      primary_key,
-      sort_key,
+      primary_key: { S: primaryKey },
+      sort_key: { S: sortKey },
     },
     ConditionExpression: 'attribute_exists(sort_key)',
     ReturnValues: 'ALL_OLD' as ReturnValue,

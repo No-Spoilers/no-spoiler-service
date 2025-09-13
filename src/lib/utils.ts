@@ -26,7 +26,7 @@ export function success(body: unknown) {
 
 // 400
 export function badRequestError(message: string) {
-  console.error('badRequestError:', message);
+  console.warn('badRequestError:', message);
   return new createError.BadRequest(message);
 }
 
