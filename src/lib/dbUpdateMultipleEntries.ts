@@ -1,8 +1,10 @@
+// Saved for reference. This works, but does not provide any feedback, so I'm not using it.
+
 import type { UpdateItemCommandInput } from '@aws-sdk/client-dynamodb';
 
 import createError from 'http-errors';
-import { generateId } from '../lib/base64id.js';
-import { updateMultipleDbItems } from '../lib/dynamodb-client.js';
+import { generateId } from './base64id.js';
+import { updateMultipleDbItems } from './dynamodb-client.js';
 
 interface EntryMention {
   entryId?: string;
@@ -17,7 +19,6 @@ interface EntryList {
   [key: string]: unknown;
 }
 
-// Saved for reference. This works, but does not provide any feedback, so I'm not using it.
 export async function dbUpdateMultipleEntries(
   entryList: EntryList,
   userId: string,

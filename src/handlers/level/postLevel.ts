@@ -1,9 +1,22 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
-import { internalServerError } from '../../lib/utils.js';
-import { dbUpdateUserLevel } from '../../db/dbUpdateUserLevel.js';
+import { extractStringValue, internalServerError } from '../../lib/utils.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
 import { getDbItem } from '../../lib/dynamodb-client.js';
+import { updateDbItem } from '../../lib/dynamodb-client.js';
+
+interface TokenData {
+  sub: string;
+  [key: string]: unknown;
+}
+
+interface UserLevelResponse {
+  userId: string;
+  seriesId: string;
+  level: string;
+  updatedAt: string;
+  updatedBy: string;
+}
 
 interface PostLevelBody {
   seriesId: string;
@@ -14,6 +27,8 @@ interface PostLevelBody {
 interface PostLevelEvent extends AuthLambdaEvent {
   body: PostLevelBody;
 }
+
+export const handler = commonMiddleware(postLevel);
 
 async function postLevel(event: PostLevelEvent) {
   // Currently only for saving a user's spoiler level in a given series.
@@ -57,4 +72,49 @@ async function postLevel(event: PostLevelEvent) {
   }
 }
 
-export const handler = commonMiddleware(postLevel);
+async function dbUpdateUserLevel(
+  token: TokenData,
+  seriesId: string,
+  bookId: string,
+): Promise<UserLevelResponse> {
+  try {
+    const userId = token.sub;
+    const now = new Date();
+
+    const params = {
+      TableName: process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev',
+      Key: {
+        primary_key: { S: userId },
+        sort_key: { S: seriesId },
+      },
+      UpdateExpression:
+        'set updatedAt=:updatedAt, updatedBy=:updatedBy, #level=:level',
+      ExpressionAttributeNames: {
+        '#level': 'level',
+      },
+      ExpressionAttributeValues: {
+        ':updatedAt': { S: now.toISOString() },
+        ':updatedBy': { S: token.sub },
+        ':level': { S: bookId },
+      },
+    };
+
+    const user = await updateDbItem(params);
+
+    if (!user) {
+      throw new Error('Failed to update user level');
+    }
+
+    const userLevelResponse: UserLevelResponse = {
+      userId: extractStringValue(user.primary_key),
+      seriesId: extractStringValue(user.sort_key),
+      level: extractStringValue(user.level),
+      updatedAt: extractStringValue(user.updatedAt),
+      updatedBy: extractStringValue(user.updatedBy),
+    };
+
+    return userLevelResponse;
+  } catch (error) {
+    throw internalServerError(error);
+  }
+}
