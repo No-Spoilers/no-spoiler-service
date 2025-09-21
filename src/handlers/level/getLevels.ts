@@ -1,8 +1,14 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+
+import { extractStringValue, internalServerError } from '../../lib/utils.js';
+import { searchDbItems } from '../../lib/dynamodb-client.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
 
-import createError from 'http-errors';
-import { dbQueryUserLevels } from '../../db/dbQueryUserLevels.js';
+interface LevelsBySeries {
+  [seriesId: string]: string;
+}
+
+export const handler = commonMiddleware(getLevels);
 
 async function getLevels(event: AuthLambdaEvent) {
   try {
@@ -23,8 +29,41 @@ async function getLevels(event: AuthLambdaEvent) {
     };
   } catch (error) {
     console.error(error);
-    throw new createError.InternalServerError(error as string);
+    throw internalServerError(error);
   }
 }
 
-export const handler = commonMiddleware(getLevels);
+export async function dbQueryUserLevels(
+  userId: string,
+): Promise<LevelsBySeries> {
+  try {
+    const params = {
+      KeyConditionExpression: 'primary_key = :primary_key',
+      ExpressionAttributeValues: {
+        ':primary_key': { S: userId },
+      },
+    };
+
+    const queryResult = await searchDbItems(params);
+
+    if (queryResult instanceof Error) {
+      throw queryResult;
+    }
+
+    const levelsBySeries: LevelsBySeries = queryResult.reduce(
+      (acc: LevelsBySeries, entry) => {
+        const seriesId = extractStringValue(entry.sort_key);
+        const level = extractStringValue(entry.level);
+        if (seriesId && level) {
+          acc[seriesId] = level;
+        }
+        return acc;
+      },
+      {},
+    );
+
+    return levelsBySeries;
+  } catch (error) {
+    throw internalServerError(error);
+  }
+}

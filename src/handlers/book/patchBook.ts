@@ -1,9 +1,24 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
+import { internalServerError, extractStringValue } from '../../lib/utils.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
-import { dbUpdateBook } from '../../db/dbUpdateBook.js';
-import { getDbItem } from '../../lib/dynamodb-client.js';
-import { internalServerError } from '../../lib/utils.js';
+import { getDbItem, updateDbItem } from '../../lib/dynamodb-client.js';
+
+interface TokenData {
+  sub: string;
+  [key: string]: unknown;
+}
+
+interface BookResponse {
+  seriesId: string;
+  bookId: string;
+  name?: string;
+  text?: string;
+  pubDate?: string;
+  updatedAt: string;
+  updatedBy: string;
+}
 
 interface PathParameters {
   seriesId: string;
@@ -70,3 +85,68 @@ async function patchBook(event: PatchBookEvent) {
 }
 
 export const handler = commonMiddleware(patchBook);
+
+async function dbUpdateBook(
+  bookData: BookUpdateData,
+  token: TokenData,
+): Promise<BookResponse> {
+  try {
+    const { seriesId, bookId } = bookData;
+    const now = new Date();
+    if (bookData.pubDate) {
+      bookData.pubDate = new Date(bookData.pubDate).toISOString();
+    }
+
+    let updateExpression = 'set updatedAt = :updatedAt, updatedBy=:updatedBy';
+
+    const expressionAttributeValues: Record<string, AttributeValue> = {
+      ':updatedAt': { S: now.toISOString() },
+      ':updatedBy': { S: token.sub },
+    };
+
+    const expressionAttributeNames: Record<string, string> = {};
+
+    const validFields = ['name', 'text', 'pubDate'];
+
+    validFields.forEach((field) => {
+      if (bookData[field]) {
+        updateExpression += `, #${field} = :${field}`;
+        expressionAttributeNames[`#${field}`] = `${field}`;
+        expressionAttributeValues[`:${field}`] = {
+          S: bookData[field] as string,
+        };
+      }
+    });
+
+    const params = {
+      TableName: process.env.NO_SPOILERS_TABLE_NAME || 'NoSpoilersTable-dev',
+      Key: {
+        primary_key: { S: seriesId },
+        sort_key: { S: bookId },
+      },
+      UpdateExpression: updateExpression,
+      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeValues: expressionAttributeValues,
+    };
+
+    const book = await updateDbItem(params);
+
+    if (!book) {
+      throw new Error('Failed to update book');
+    }
+
+    const bookResponse: BookResponse = {
+      seriesId: extractStringValue(book.primary_key),
+      bookId: extractStringValue(book.sort_key),
+      name: extractStringValue(book.name),
+      text: extractStringValue(book.text),
+      pubDate: extractStringValue(book.pubDate),
+      updatedAt: extractStringValue(book.updatedAt),
+      updatedBy: extractStringValue(book.updatedBy),
+    };
+
+    return bookResponse;
+  } catch (error) {
+    throw internalServerError(error);
+  }
+}
