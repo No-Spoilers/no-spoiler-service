@@ -1,9 +1,23 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+import type {
+  QueryCommandInput,
+  ComparisonOperator,
+} from '@aws-sdk/client-dynamodb';
 
+import { extractStringValue, internalServerError } from '../../lib/utils.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
-import { extractStringValue } from '../../lib/utils.js';
 import { deleteDbItem } from '../../lib/dynamodb-client.js';
-import { dbQueryUserByEmail } from '../../db/dbQueryUserByEmail.js';
+import { searchDbItems } from '../../lib/dynamodb-client.js';
+
+interface UserRecord {
+  userId: string;
+  name: string;
+  preservedCaseEmail: string;
+  passwordHash: string;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown;
+}
 
 interface DeleteUserBody {
   email: string;
@@ -18,6 +32,8 @@ interface DeletedUserResponse {
   name: string;
   email: string;
 }
+
+export const handler = commonMiddleware(deleteUser);
 
 async function deleteUser(event: DeleteUserEvent) {
   const { token } = event;
@@ -73,4 +89,46 @@ async function deleteUser(event: DeleteUserEvent) {
   };
 }
 
-export const handler = commonMiddleware(deleteUser);
+async function dbQueryUserByEmail(email: string): Promise<UserRecord | null> {
+  try {
+    const normalizedEmail = email.toLowerCase();
+
+    const params: Partial<QueryCommandInput> = {
+      KeyConditions: {
+        primary_key: {
+          AttributeValueList: [{ S: 'user' }],
+          ComparisonOperator: 'EQ' as ComparisonOperator,
+        },
+        sort_key: {
+          AttributeValueList: [{ S: normalizedEmail }],
+          ComparisonOperator: 'EQ' as ComparisonOperator,
+        },
+      },
+    };
+
+    const queryResult = await searchDbItems(params);
+
+    if (queryResult instanceof Error) {
+      throw queryResult;
+    }
+
+    if (!Array.isArray(queryResult) || queryResult.length === 0) return null;
+
+    // Convert DynamoDB AttributeValue to plain object
+    const userRecord = queryResult[0];
+    if (!userRecord) return null;
+
+    const user: UserRecord = {
+      userId: extractStringValue(userRecord.userId),
+      name: extractStringValue(userRecord.name),
+      preservedCaseEmail: extractStringValue(userRecord.preservedCaseEmail),
+      passwordHash: extractStringValue(userRecord.passwordHash),
+      createdAt: extractStringValue(userRecord.createdAt),
+      updatedAt: extractStringValue(userRecord.updatedAt),
+    };
+
+    return user;
+  } catch (error) {
+    throw internalServerError(error);
+  }
+}

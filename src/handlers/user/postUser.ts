@@ -1,4 +1,8 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
+import type {
+  QueryCommandInput,
+  ComparisonOperator,
+} from '@aws-sdk/client-dynamodb';
 
 import validator from '@middy/validator';
 import { postUserSchema } from '../../schemas/postUserSchema.js';
@@ -9,8 +13,22 @@ import { commonMiddleware } from '../../lib/commonMiddleware.js';
 import { createNewToken } from '../../lib/token.js';
 import { generateId } from '../../lib/base64id.js';
 import { putDbItem } from '../../lib/dynamodb-client.js';
-import { dbQueryUserByEmail } from '../../db/dbQueryUserByEmail.js';
-import { badRequestError, internalServerError } from '../../lib/utils.js';
+import { searchDbItems } from '../../lib/dynamodb-client.js';
+import {
+  badRequestError,
+  internalServerError,
+  extractStringValue,
+} from '../../lib/utils.js';
+
+interface UserRecord {
+  userId: string;
+  name: string;
+  preservedCaseEmail: string;
+  passwordHash: string;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown;
+}
 
 interface User {
   primary_key: string;
@@ -42,6 +60,10 @@ interface UserResponse {
   token: string;
   [key: string]: unknown;
 }
+
+export const handler = commonMiddleware(postUser).use(
+  validator({ eventSchema: transpileSchema(postUserSchema) }),
+);
 
 async function postUser(event: PostUserEvent) {
   const { name, email, password } = event.body;
@@ -80,10 +102,6 @@ async function postUser(event: PostUserEvent) {
   }
 }
 
-export const handler = commonMiddleware(postUser).use(
-  validator({ eventSchema: transpileSchema(postUserSchema) }),
-);
-
 export async function dbCreateUser(
   name: string,
   preservedCaseEmail: string,
@@ -120,4 +138,48 @@ export async function dbCreateUser(
     createdAt: newUser.createdAt,
     updatedAt: newUser.updatedAt,
   };
+}
+
+async function dbQueryUserByEmail(email: string): Promise<UserRecord | null> {
+  try {
+    const normalizedEmail = email.toLowerCase();
+
+    const params: Partial<QueryCommandInput> = {
+      KeyConditions: {
+        primary_key: {
+          AttributeValueList: [{ S: 'user' }],
+          ComparisonOperator: 'EQ' as ComparisonOperator,
+        },
+        sort_key: {
+          AttributeValueList: [{ S: normalizedEmail }],
+          ComparisonOperator: 'EQ' as ComparisonOperator,
+        },
+      },
+    };
+
+    const queryResult = await searchDbItems(params);
+
+    if (queryResult instanceof Error) {
+      throw queryResult;
+    }
+
+    if (!Array.isArray(queryResult) || queryResult.length === 0) return null;
+
+    // Convert DynamoDB AttributeValue to plain object
+    const userRecord = queryResult[0];
+    if (!userRecord) return null;
+
+    const user: UserRecord = {
+      userId: extractStringValue(userRecord.userId),
+      name: extractStringValue(userRecord.name),
+      preservedCaseEmail: extractStringValue(userRecord.preservedCaseEmail),
+      passwordHash: extractStringValue(userRecord.passwordHash),
+      createdAt: extractStringValue(userRecord.createdAt),
+      updatedAt: extractStringValue(userRecord.updatedAt),
+    };
+
+    return user;
+  } catch (error) {
+    throw internalServerError(error);
+  }
 }
