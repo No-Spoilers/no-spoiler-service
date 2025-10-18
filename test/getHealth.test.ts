@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { event, mockContext } from './test-helpers.js';
 import { handler } from '../src/handlers/health/getHealth.js';
 
@@ -10,7 +9,7 @@ describe('getHealth', () => {
       throw new Error('Result is a string');
     }
 
-    expect(result).to.have.all.keys('statusCode', 'body', 'headers');
+    expect(Object.keys(result)).toEqual(['statusCode', 'body', 'headers']);
 
     const { statusCode, body } = result;
 
@@ -18,7 +17,7 @@ describe('getHealth', () => {
       throw new Error('Status code is undefined');
     }
 
-    expect(statusCode).to.equal(200);
+    expect(statusCode).toBe(200);
 
     if (typeof body !== 'string') {
       throw new Error('Result is a string');
@@ -26,6 +25,6 @@ describe('getHealth', () => {
 
     const parsedBody: unknown = JSON.parse(body);
 
-    expect(parsedBody).to.have.all.keys('packageVersion');
+    expect(Object.keys(parsedBody as object)).toEqual(['packageVersion']);
   });
 });

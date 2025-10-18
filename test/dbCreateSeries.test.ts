@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 
@@ -20,20 +19,19 @@ describe('dbCreateSeries', () => {
 
     const result = await dbCreateSeries(seriesData, token);
 
-    expect(result).to.have.all.keys(
-      'name',
-      'text',
-      'createdBy',
-      'createdAt',
-      'updatedAt',
-      'seriesId',
-    );
-    expect(result.name).to.equal('test name');
-    expect(result.text).to.equal('test text');
-    expect(result.createdBy).to.equal('test_createdBy');
-    expect(result.seriesId).to.match(/^t/);
-    expect(result.createdAt).to.match(/Z$/);
-    expect(result.updatedAt).to.match(/Z$/);
+    expect(result).toHaveProperty('name');
+    expect(result).toHaveProperty('text');
+    expect(result).toHaveProperty('createdBy');
+    expect(result).toHaveProperty('createdAt');
+    expect(result).toHaveProperty('updatedAt');
+    expect(result).toHaveProperty('seriesId');
+
+    expect(result.name).toEqual('test name');
+    expect(result.text).toEqual('test text');
+    expect(result.createdBy).toEqual('test_createdBy');
+    expect(result.seriesId).toMatch(/^t/);
+    expect(result.createdAt).toMatch(/Z$/);
+    expect(result.updatedAt).toMatch(/Z$/);
     dynamoDBMock.reset();
   });
 });

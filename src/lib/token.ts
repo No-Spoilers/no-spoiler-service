@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { generateId } from './base64id.js';
 
-const { TOKEN_SECRET } = process.env;
-
 export type User = {
   userId: string;
   [key: string]: unknown;
@@ -23,6 +21,8 @@ export type VerifiedToken = {
 };
 
 export function createNewToken(user: User): string {
+  const { TOKEN_SECRET } = process.env;
+
   if (!TOKEN_SECRET || typeof TOKEN_SECRET !== 'string') {
     throw new Error('Invalid TOKEN_SECRET');
   }
@@ -35,6 +35,8 @@ export function createNewToken(user: User): string {
 }
 
 export function verifyToken(token: string): VerifiedToken | false {
+  const { TOKEN_SECRET } = process.env;
+
   try {
     if (!TOKEN_SECRET || typeof TOKEN_SECRET !== 'string') {
       return false;

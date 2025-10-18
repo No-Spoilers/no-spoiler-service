@@ -4,6 +4,7 @@ import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import prettier from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
+import viteConfig from 'eslint-plugin-vitest';
 
 export default [
   {
@@ -16,8 +17,6 @@ export default [
       sourceType: 'module',
       globals: {
         ...globals.node,
-        ...globals.mocha,
-        ...globals.chai,
       },
     },
     rules: {
@@ -80,8 +79,6 @@ export default [
       sourceType: 'module',
       globals: {
         ...globals.node,
-        ...globals.mocha,
-        ...globals.chai,
       },
       parser: typescriptParser,
       parserOptions: {
@@ -149,6 +146,16 @@ export default [
       'require-await': 'error',
       'use-isnan': 'error',
       'valid-typeof': 'error',
+    },
+  },
+
+  {
+    files: ['**/*.test.ts'],
+    plugins: {
+      vitest,
+    },
+    rules: {
+      ...vitest.configs.recommended.rules,
     },
   },
 

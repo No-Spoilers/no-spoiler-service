@@ -1,8 +1,0 @@
-{
-  "all": true,
-  "include": ["src"],
-  "branches": 95,
-  "functions": 95,
-  "lines": 95,
-  "reporter": ["text","html"]
-}

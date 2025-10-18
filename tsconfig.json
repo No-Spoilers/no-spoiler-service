@@ -1,8 +1,5 @@
 {
-  "include": [
-    "src/**/*",
-    "test/**/*"
-  ],
+  "include": [ "." ],
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -30,7 +27,8 @@
     "removeComments": false,
     "noEmitOnError": true,
     "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "types": ["vitest/globals"]
   },
   "exclude": [
     "node_modules",
