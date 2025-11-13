@@ -5,8 +5,8 @@ import { dbCreateSeries } from '../src/handlers/series/postSeries.js';
 
 describe('dbCreateSeries', () => {
   it('should create a new series', async () => {
-    const dynamoDB = new DynamoDBClient({});
-    const dynamoDBMock = mockClient(dynamoDB);
+    const dynamoDBMock = mockClient(DynamoDBClient);
+
     dynamoDBMock.on(PutItemCommand).resolves({
       Attributes: { foo: { S: 'bar' } },
     });

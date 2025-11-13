@@ -1,9 +1,9 @@
-import { event, mockContext } from './test-helpers.js';
+import { mockEvent, mockContext } from './test-helpers.js';
 import { handler } from '../src/handlers/health/getHealth.js';
 
 describe('getHealth', () => {
   it('should return 200', async () => {
-    const result = await handler(event, mockContext);
+    const result = await handler(mockEvent, mockContext);
 
     if (typeof result === 'string') {
       throw new Error('Result is a string');

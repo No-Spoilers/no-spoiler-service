@@ -35,9 +35,6 @@ importers:
       dotenv:
         specifier: 17.2.2
         version: 17.2.2
-      eslint-plugin-vitest:
-        specifier: ^0.5.4
-        version: 0.5.4(@typescript-eslint/eslint-plugin@8.44.0(@typescript-eslint/parser@8.44.0(eslint@9.36.0)(typescript@5.9.2))(eslint@9.36.0)(typescript@5.9.2))(eslint@9.36.0)(typescript@5.9.2)(vitest@3.2.4(@types/node@24.5.2))
       http-errors:
         specifier: 2.0.0
         version: 2.0.0
@@ -87,6 +84,9 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.5.4
         version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0))(eslint@9.36.0)(prettier@3.6.2)
+      eslint-plugin-vitest:
+        specifier: ^0.5.4
+        version: 0.5.4(@typescript-eslint/eslint-plugin@8.44.0(@typescript-eslint/parser@8.44.0(eslint@9.36.0)(typescript@5.9.2))(eslint@9.36.0)(typescript@5.9.2))(eslint@9.36.0)(typescript@5.9.2)(vitest@3.2.4(@types/node@24.5.2))
       globals:
         specifier: 16.4.0
         version: 16.4.0

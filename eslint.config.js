@@ -1,100 +1,41 @@
 import globals from 'globals';
 import js from '@eslint/js';
-import typescript from '@typescript-eslint/eslint-plugin';
-import typescriptParser from '@typescript-eslint/parser';
-import prettier from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
-import viteConfig from 'eslint-plugin-vitest';
+import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
+import typescriptEslintParser from '@typescript-eslint/parser';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginVitest from 'eslint-plugin-vitest';
 
 export default [
+  js.configs.recommended,
+
   {
-    files: ['**/*.js'],
-    plugins: {
-      prettier,
-    },
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module',
-      globals: {
-        ...globals.node,
-      },
-    },
-    rules: {
-      ...prettierConfig.rules, // Disable conflicting ESLint rules
-      'prettier/prettier': 'error', // Enforce Prettier formatting as ESLint errors
-      'no-console': 'off',
-      'no-trailing-spaces': 'error',
-      'quote-props': ['error', 'as-needed'],
-      quotes: ['error', 'single'],
-      'no-var': 'error',
-      'prefer-const': 'error',
-      'comma-style': 'error',
-      'object-curly-spacing': ['error', 'always'],
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      'no-undef': 'error',
-      'no-unreachable': 'error',
-      'no-constant-condition': 'error',
-      'no-dupe-keys': 'error',
-      'no-dupe-args': 'error',
-      'no-dupe-else-if': 'error',
-      'no-dupe-class-members': 'error',
-      'no-duplicate-case': 'error',
-      'no-empty': 'error',
-      'no-empty-function': 'error',
-      'no-extra-semi': 'error',
-      'no-func-assign': 'error',
-      'no-import-assign': 'error',
-      'no-invalid-regexp': 'error',
-      'no-irregular-whitespace': 'error',
-      'no-misleading-character-class': 'error',
-      'no-mixed-spaces-and-tabs': 'error',
-      'no-obj-calls': 'error',
-      'no-prototype-builtins': 'error',
-      'no-redeclare': 'error',
-      'no-regex-spaces': 'error',
-      'no-self-assign': 'error',
-      'no-self-compare': 'error',
-      'no-sparse-arrays': 'error',
-      'no-template-curly-in-string': 'error',
-      'no-unexpected-multiline': 'error',
-      'no-unmodified-loop-condition': 'error',
-      'no-unused-labels': 'error',
-      'no-useless-call': 'error',
-      'no-useless-catch': 'error',
-      'no-useless-escape': 'error',
-      'no-useless-return': 'error',
-      'no-void': 'error',
-      'no-warning-comments': 'warn',
-      'prefer-promise-reject-errors': 'error',
-      'require-await': 'error',
-      'use-isnan': 'error',
-      'valid-typeof': 'error',
-    },
+    ignores: ['node_modules/', 'dist/', 'build/', '.serverless/'],
   },
 
   {
     files: ['**/*.ts'],
     languageOptions: {
-      ecmaVersion: 2022,
+      ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
         ...globals.node,
       },
-      parser: typescriptParser,
+      parser: typescriptEslintParser,
       parserOptions: {
-        ecmaVersion: 2022,
+        ecmaVersion: 'latest',
         sourceType: 'module',
         project: './tsconfig.json',
       },
     },
     plugins: {
-      '@typescript-eslint': typescript,
-      prettier,
+      '@typescript-eslint': typescriptEslintPlugin,
+      prettier: eslintPluginPrettier,
     },
     rules: {
-      ...typescript.configs.recommended.rules,
-      ...typescript.configs['recommended-type-checked'].rules,
-      ...prettierConfig.rules, // Disable conflicting ESLint rules
+      ...typescriptEslintPlugin.configs.recommended.rules,
+      ...typescriptEslintPlugin.configs['recommended-type-checked'].rules,
+      ...eslintConfigPrettier.rules, // Disable conflicting ESLint rules
       'prettier/prettier': 'error', // Enforce Prettier formatting as ESLint errors
       'no-console': 'off',
       'no-trailing-spaces': 'error',
@@ -151,17 +92,16 @@ export default [
 
   {
     files: ['**/*.test.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.vitest,
+      },
+    },
     plugins: {
-      vitest,
+      vitest: eslintPluginVitest,
     },
     rules: {
-      ...vitest.configs.recommended.rules,
+      ...eslintPluginVitest.configs.recommended.rules,
     },
-  },
-
-  js.configs.recommended,
-
-  {
-    ignores: ['node_modules/', 'dist/', 'build/'],
   },
 ];

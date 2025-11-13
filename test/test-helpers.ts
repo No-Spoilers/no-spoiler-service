@@ -59,7 +59,7 @@ const requestContext: APIGatewayEventRequestContextWithAuthorizer<APIGatewayEven
 const multiValueQueryStringParameters: APIGatewayProxyEventMultiValueQueryStringParameters =
   {};
 
-export const event: APIGatewayProxyEvent & {
+export const mockEvent: APIGatewayProxyEvent & {
   multiValueQueryStringParameters: Exclude<
     APIGatewayProxyEvent['multiValueQueryStringParameters'],
     null

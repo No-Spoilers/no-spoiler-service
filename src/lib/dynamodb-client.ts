@@ -48,6 +48,10 @@ export async function searchDbItems(
 
     const result = await client.send(command);
 
+    if (!result) {
+      throw new Error('No result from DynamoDB query');
+    }
+
     return result.Items || [];
   } catch (error) {
     console.error('Error searching DB items:', error);

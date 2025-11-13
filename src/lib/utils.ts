@@ -1,5 +1,5 @@
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
-import createError from 'http-errors';
+import createHttpError from 'http-errors';
 
 export function validateString(value: unknown): string {
   if (typeof value !== 'string') {
@@ -41,30 +41,37 @@ export function success(body: unknown) {
 
 // 400
 export function badRequestError(message: string) {
-  console.warn('badRequestError:', message);
-  return new createError.BadRequest(message);
+  log.error('badRequestError:', message);
+  return new createHttpError.BadRequest(message);
 }
 
 // 401
 export function unauthorizedError(message: string) {
-  console.error('unauthorizedError:', message);
-  return new createError.Unauthorized(message);
+  log.error('unauthorizedError:', message);
+  return new createHttpError.Unauthorized(message);
 }
 
 // 404
 export function notFoundError(contentId: string) {
-  console.error('notFoundError:', contentId);
-  return new createError.NotFound(`contentId:${contentId} not found`);
+  log.error('notFoundError:', contentId);
+  return new createHttpError.NotFound(`contentId:${contentId} not found`);
 }
 
 // 500
 export function internalServerError(error: unknown) {
-  console.error('internalServerError:', error);
-  return new createError.InternalServerError(String(error));
+  log.error('internalServerError:', error);
+  return new createHttpError.InternalServerError(String(error));
 }
 
-export function logger(message: unknown) {
-  if (process.env.NODE_ENV !== 'test') {
-    console.log(message);
-  }
-}
+export const log = {
+  info: (...messages: unknown[]) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(...messages);
+    }
+  },
+  error: (...messages: unknown[]) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.error(...messages);
+    }
+  },
+};

@@ -15,7 +15,7 @@ import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpErrorHandler from '@middy/http-error-handler';
 import httpEventNormalizer from '@middy/http-event-normalizer';
 import { verifyToken } from './token.js';
-import { logger } from './utils.js';
+import { log } from './utils.js';
 
 export type AuthLambdaEvent = Omit<LambdaEvent, 'body'> & {
   token?: VerifiedToken;
@@ -43,7 +43,7 @@ function logEvents(): MiddlewareObj<LambdaEvent> {
   return {
     before: (request: Request<LambdaEvent>): void => {
       if (process.env.NODE_ENV !== 'test') {
-        logger({
+        log.info({
           logType: 'incoming request',
           ...request.event,
         });
@@ -51,7 +51,7 @@ function logEvents(): MiddlewareObj<LambdaEvent> {
     },
     after: (request: Request<LambdaEvent>): void => {
       if (process.env.NODE_ENV !== 'test') {
-        logger({
+        log.info({
           logType: 'request result',
           ...request.event,
         });
