@@ -1,0 +1,9 @@
+{
+  "include": [ "." ],
+  "extends": "../tsconfig.json", // Extend the base config
+  "compilerOptions": {
+    "noEmit": true, // Prevent emitting JS files for tests
+    "types": ["vitest/globals"]
+  },
+  "exclude": [] // No exclusions needed here as we only include test files
+}

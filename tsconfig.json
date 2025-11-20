@@ -1,5 +1,5 @@
 {
-  "include": [ "." ],
+  "include": [ "./src" ],
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -27,10 +27,10 @@
     "removeComments": false,
     "noEmitOnError": true,
     "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo",
-    "types": ["vitest/globals"]
+    "tsBuildInfoFile": "./dist/.tsbuildinfo"
   },
   "exclude": [
+    "test",
     "node_modules",
     "dist",
     "build",
