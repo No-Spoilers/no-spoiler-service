@@ -1,15 +1,14 @@
-import { mockEvent, mockContext } from './test-helpers.js';
 import { handler } from '../src/handlers/health/getHealth.js';
 
 describe('getHealth', () => {
   it('should return 200', async () => {
-    const result = await handler(mockEvent, mockContext);
+    const result = await handler();
 
     if (typeof result === 'string') {
       throw new Error('Result is a string');
     }
 
-    expect(Object.keys(result)).toEqual(['statusCode', 'body', 'headers']);
+    expect(Object.keys(result)).toEqual(['statusCode', 'body']);
 
     const { statusCode, body } = result;
 
@@ -25,6 +24,6 @@ describe('getHealth', () => {
 
     const parsedBody: unknown = JSON.parse(body);
 
-    expect(Object.keys(parsedBody as object)).toEqual(['packageVersion']);
+    expect(Object.keys(parsedBody as object)).toEqual(['status', 'version']);
   });
 });

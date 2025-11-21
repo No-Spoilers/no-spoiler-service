@@ -1,12 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'path';
-import { commonMiddleware } from '../../lib/commonMiddleware.js';
-
-// Use a more robust path resolution that works both in source and compiled form
-const packageJsonPath = join(process.cwd(), 'package.json');
+import { internalServerError, success } from '../../lib/utils';
 
 async function getHealth() {
   try {
+    const packageJsonPath = join(process.cwd(), 'package.json');
+
     const file = await readFile(packageJsonPath, 'utf8');
     if (typeof file !== 'string') {
       throw new Error('Failed to read package.json');
@@ -14,33 +13,18 @@ async function getHealth() {
 
     const packageJson: unknown = JSON.parse(file);
 
-    if (
-      typeof packageJson !== 'object' ||
-      packageJson === null ||
-      !('version' in packageJson)
-    ) {
-      throw new Error('Failed to parse package.json');
-    }
-
     const responseBody = {
-      packageVersion: packageJson.version,
+      status: 'success',
+      version: (packageJson as { version?: string }).version ?? 'unknown',
     };
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(responseBody),
-    };
+    return success(responseBody);
   } catch (error) {
-    console.error('Health check failed:', error);
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error: 'Health check failed',
-        message: 'Unable to read package information',
-      }),
-    };
+    return internalServerError({
+      status: 'error',
+      reason: `${error as Error}`,
+    });
   }
 }
 
-export const handler = commonMiddleware(getHealth);
+export const handler = getHealth;

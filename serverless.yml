@@ -18,6 +18,11 @@ provider:
       statements:
         - ${file(lambda/iam/NoSpoilersTableIAM.yml):NoSpoilersTableIAM}
 
+build:
+  esbuild:
+    bundle: true
+    sourcemap: true
+
 resources:
   Resources:
     NoSpoilersTable: ${file(lambda/resources/NoSpoilersTable.yml):NoSpoilersTable}

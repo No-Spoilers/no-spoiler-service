@@ -35,7 +35,7 @@ export function extractTextValue(attrValue: AttributeValue | undefined): {
 export function success(body: unknown) {
   return {
     statusCode: 200,
-    body,
+    body: JSON.stringify(body),
   };
 }
 
@@ -58,9 +58,12 @@ export function notFoundError(contentId: string) {
 }
 
 // 500
-export function internalServerError(error: unknown) {
-  log.error('internalServerError:', error);
-  return new createHttpError.InternalServerError(String(error));
+export function internalServerError(body: unknown) {
+  log.error('internalServerError:', body);
+  return {
+    statusCode: 500,
+    body: JSON.stringify(body),
+  };
 }
 
 export const log = {

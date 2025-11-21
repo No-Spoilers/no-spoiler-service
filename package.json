@@ -1,10 +1,9 @@
 {
   "name": "no-spoiler-service",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "serverless api for no-spoilers.net",
   "author": "Geoffrey Emerson <geoffrey.emerson.git@gmail.com>",
   "license": "UNLICENSED",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/No-Spoilers/no-spoiler-service.git"
@@ -16,13 +15,14 @@
     "build": "tsc",
     "build:clean": "rm -rf dist && pnpm run build && sls package",
     "test": "vitest",
-    "dev": "NODE_ENV=development sls offline start",
+    "dev": "NODE_ENV=development sls dev",
     "deploy": "sls deploy",
     "deploy:prod": "sls deploy --stage prod",
     "remove": "sls remove",
     "info": "sls info",
     "logs": "sls logs -f",
-    "sls:deploy": "sls deploy"
+    "sls:deploy": "sls deploy",
+    "sls:help": "sls help"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.893.0",
