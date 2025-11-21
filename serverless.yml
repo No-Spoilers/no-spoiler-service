@@ -6,7 +6,7 @@ licenseKey: ${ssm:/aws/reference/secretsmanager/SERVERLESS_LICENSE_KEY}
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
