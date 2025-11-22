@@ -3,6 +3,7 @@ name: Deploy Lamda to Dev
 on:
   push:
     branches:
+      - main
       - dev
 
 jobs:
