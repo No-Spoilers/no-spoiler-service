@@ -136,20 +136,11 @@ async function dbQuerySeriesById(
   try {
     const reverseLookup = contentId.startsWith('s') ? false : true;
 
-    const params = reverseLookup
-      ? {
-          IndexName: 'ReverseLookup',
-          KeyConditionExpression: '#sk = :sk',
-          ExpressionAttributeNames: { '#sk': 'sort_key' },
-          ExpressionAttributeValues: { ':sk': { S: contentId } },
-        }
-      : {
-          KeyConditionExpression: '#pk = :pk',
-          ExpressionAttributeNames: { '#pk': 'primary_key' },
-          ExpressionAttributeValues: { ':pk': { S: contentId } },
-        };
+    const dbSearch = reverseLookup
+      ? searchBySecondaryKey(contentId)
+      : searchByPrimaryKey(contentId);
 
-    const queryResult = await searchDbItems(params);
+    const queryResult = await dbSearch;
 
     if (queryResult instanceof Error) {
       throw queryResult;
@@ -207,4 +198,21 @@ async function dbQuerySeriesById(
   } catch (error) {
     throw internalServerError(error);
   }
+}
+
+function searchByPrimaryKey(contentId: string) {
+  return searchDbItems({
+    KeyConditionExpression: '#pk = :pk',
+    ExpressionAttributeNames: { '#pk': 'primary_key' },
+    ExpressionAttributeValues: { ':pk': { S: contentId } },
+  });
+}
+
+function searchBySecondaryKey(contentId: string) {
+  return searchDbItems({
+    IndexName: 'ReverseLookup',
+    KeyConditionExpression: '#sk = :sk',
+    ExpressionAttributeNames: { '#sk': 'sort_key' },
+    ExpressionAttributeValues: { ':sk': { S: contentId } },
+  });
 }

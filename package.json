@@ -9,18 +9,15 @@
     "url": "https://github.com/No-Spoilers/no-spoiler-service.git"
   },
   "scripts": {
-    "lint:fix": "eslint . --fix",
     "lint": "eslint .",
-    "type-check": "tsc --noEmit",
+    "lint:fix": "eslint . --fix",
     "build": "tsc",
-    "build:clean": "rm -rf dist && pnpm run build && sls package",
-    "test": "vitest",
-    "dev": "NODE_ENV=development sls dev",
-    "deploy": "sls deploy",
-    "deploy:prod": "sls deploy --stage prod",
-    "remove": "sls remove",
-    "info": "sls info",
-    "logs": "sls logs -f",
+    "test": "vitest --run",
+    "test:coverage": "vitest run --coverage",
+    "sls:dev": "NODE_ENV=development sls dev",
+    "sls:remove": "sls remove",
+    "sls:info": "sls info",
+    "sls:logs": "sls logs -f",
     "sls:deploy": "sls deploy",
     "sls:help": "sls help"
   },
@@ -47,6 +44,7 @@
     "@types/node": "24.5.2",
     "@typescript-eslint/eslint-plugin": "8.44.0",
     "@typescript-eslint/parser": "8.44.0",
+    "@vitest/coverage-v8": "3.2.4",
     "aws-sdk-client-mock": "4.1.0",
     "aws-sdk-mock": "6.2.1",
     "eslint": "9.36.0",
@@ -58,6 +56,7 @@
     "prettier": "3.6.2",
     "serverless": "4.19.1",
     "typescript": "5.9.2",
+    "typescript-eslint": "8.47.0",
     "vitest": "^3.2.4"
   }
 }
