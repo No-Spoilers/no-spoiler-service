@@ -1,12 +1,13 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
 import validator from '@middy/validator';
-import { postEntrySchema } from '../../schemas/postEntrySchema.js';
-import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { transpileSchema } from '@middy/validator/transpile';
+
 import { generateId } from '../../lib/base64id.js';
-import { putDbItem } from '../../lib/dynamodb-client.js';
-import { getDbItem } from '../../lib/dynamodb-client.js';
 import { internalServerError } from '../../lib/utils.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { postEntrySchema } from '../../schemas/postEntrySchema.js';
+import { getDbItem, putDbItem } from '../../lib/dynamodb-client.js';
 
 interface EntryRecord {
   primary_key: string;
@@ -80,7 +81,7 @@ async function postEntry(event: PostEntryEvent) {
 }
 
 export const handler = commonMiddleware(postEntry).use(
-  validator({ eventSchema: postEntrySchema }),
+  validator({ eventSchema: transpileSchema(postEntrySchema) }),
 );
 
 export async function dbCreateEntry(

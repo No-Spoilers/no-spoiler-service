@@ -2,10 +2,12 @@ import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
 import createError from 'http-errors';
 import validator from '@middy/validator';
-import { postSeriesSchema } from '../../schemas/postSeriesSchema.js';
-import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { transpileSchema } from '@middy/validator/transpile';
+
 import { generateId } from '../../lib/base64id.js';
 import { putDbItem } from '../../lib/dynamodb-client.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { postSeriesSchema } from '../../schemas/postSeriesSchema.js';
 
 interface TokenData {
   sub: string;
@@ -67,7 +69,7 @@ async function postSeries(event: PostSeriesEvent) {
 }
 
 export const handler = commonMiddleware(postSeries).use(
-  validator({ eventSchema: postSeriesSchema }),
+  validator({ eventSchema: transpileSchema(postSeriesSchema) }),
 );
 
 export async function dbCreateSeries(

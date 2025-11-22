@@ -1,13 +1,15 @@
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
-import validator from '@middy/validator';
 import createError from 'http-errors';
+import validator from '@middy/validator';
+import { transpileSchema } from '@middy/validator/transpile';
+
 import { generateId } from '../../lib/base64id.js';
 import { putDbItem } from '../../lib/dynamodb-client.js';
+import { searchDbItems } from '../../lib/dynamodb-client.js';
 import { postBookSchema } from '../../schemas/postBookSchema.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
 import { internalServerError, extractStringValue } from '../../lib/utils.js';
-import { searchDbItems } from '../../lib/dynamodb-client.js';
 
 interface TokenData {
   sub: string;
@@ -84,7 +86,7 @@ async function postBook(event: PostBookEvent) {
 }
 
 export const handler = commonMiddleware(postBook).use(
-  validator({ eventSchema: postBookSchema }),
+  validator({ eventSchema: transpileSchema(postBookSchema) }),
 );
 
 export async function dbCreateBook(

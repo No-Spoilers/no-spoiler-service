@@ -2,9 +2,11 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import type { AuthLambdaEvent } from '../../lib/commonMiddleware.js';
 
 import validator from '@middy/validator';
-import { getDbItem, updateDbItem } from '../../lib/dynamodb-client.js';
-import { patchEntrySchema } from '../../schemas/patchEntrySchema.js';
+import { transpileSchema } from '@middy/validator/transpile';
+
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
+import { patchEntrySchema } from '../../schemas/patchEntrySchema.js';
+import { getDbItem, updateDbItem } from '../../lib/dynamodb-client.js';
 import {
   extractStringValue,
   extractTextValue,
@@ -50,7 +52,7 @@ interface PatchEntryEvent extends AuthLambdaEvent {
 }
 
 export const handler = commonMiddleware(patchEntry).use(
-  validator({ eventSchema: patchEntrySchema }),
+  validator({ eventSchema: transpileSchema(patchEntrySchema) }),
 );
 
 async function patchEntry(event: PatchEntryEvent) {

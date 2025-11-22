@@ -7,11 +7,13 @@ import type {
 import bcrypt from 'bcryptjs';
 import createError from 'http-errors';
 import validator from '@middy/validator';
-import { internalServerError, extractStringValue } from '../../lib/utils.js';
+import { transpileSchema } from '@middy/validator/transpile';
+
 import { createNewToken } from '../../lib/token.js';
 import { searchDbItems } from '../../lib/dynamodb-client.js';
 import { commonMiddleware } from '../../lib/commonMiddleware.js';
 import { postLoginSchema } from '../../schemas/postLoginSchema.js';
+import { internalServerError, extractStringValue } from '../../lib/utils.js';
 
 interface UserRecord {
   userId: string;
@@ -47,7 +49,7 @@ interface DbUser {
 }
 
 export const handler = commonMiddleware(postLogin).use(
-  validator({ eventSchema: postLoginSchema }),
+  validator({ eventSchema: transpileSchema(postLoginSchema) }),
 );
 
 async function postLogin(event: LoginEvent) {

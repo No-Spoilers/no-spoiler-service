@@ -4,16 +4,16 @@ import type {
   ComparisonOperator,
 } from '@aws-sdk/client-dynamodb';
 
-import validator from '@middy/validator';
-import { postUserSchema } from '../../schemas/postUserSchema.js';
-
 import bcrypt from 'bcryptjs';
+import validator from '@middy/validator';
 import { transpileSchema } from '@middy/validator/transpile';
-import { commonMiddleware } from '../../lib/commonMiddleware.js';
-import { createNewToken } from '../../lib/token.js';
+
 import { generateId } from '../../lib/base64id.js';
+import { createNewToken } from '../../lib/token.js';
 import { putDbItem } from '../../lib/dynamodb-client.js';
 import { searchDbItems } from '../../lib/dynamodb-client.js';
+import { postUserSchema } from '../../schemas/postUserSchema.js';
+import { commonMiddleware } from '../../lib/commonMiddleware.js';
 import {
   badRequestError,
   internalServerError,
