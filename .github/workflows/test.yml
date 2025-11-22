@@ -8,10 +8,12 @@ jobs:
     name: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: asdf-vm/actions/install@v4
-    - run: pnpm install
-    - name: run test suite
-      run: pnpm test
-      env:
-        TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+      - uses: actions/checkout@v4
+      - uses: asdf-vm/actions/install@v4
+      - run: pnpm install
+      - name: run eslint
+        run: pnpm lint
+      - name: run test suite
+        run: pnpm test
+        env:
+          TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
