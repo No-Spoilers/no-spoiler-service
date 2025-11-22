@@ -1,11 +1,10 @@
-name: Test PRs
+name: Lint and Test Commits
 
 on:
   push:
     branches:
       - main
       - dev
-  pull_request:
 
 jobs:
   test:
