@@ -58,12 +58,9 @@ export function notFoundError(contentId: string) {
 }
 
 // 500
-export function internalServerError(body: unknown) {
-  log.error('internalServerError:', body);
-  return {
-    statusCode: 500,
-    body: JSON.stringify(body),
-  };
+export function internalServerError(error: unknown) {
+  log.error('internalServerError:', error);
+  return new createHttpError.InternalServerError(String(error));
 }
 
 export const log = {

@@ -20,10 +20,7 @@ async function getHealth() {
 
     return success(responseBody);
   } catch (error) {
-    return internalServerError({
-      status: 'error',
-      reason: `${error as Error}`,
-    });
+    throw internalServerError(error);
   }
 }
 
